@@ -2,17 +2,23 @@
 <html>
 <head>
 <title>Sandbox</title>
-
-</head>
-<body>
 <script src="scripts/require.js"></script>
+<script src="scripts/main.js"></script>
+
 <script>
+/*
 requirejs.config({
 baseUrl: "scripts",
 urlArgs: "bust=" +  (new Date()).getTime()
 });
 require(['main'], function () {
 });
+*/
+var lol = new GoBoard("moo", 550, 19);
 </script>
+</head>
+<body>
+	<h1>Awesome</h1>
+<div id="moo"></div>
 </body>
 </html>

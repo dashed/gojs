@@ -10,6 +10,7 @@ requirejs.config({
     "raphael.core": "libs/raphael/raphael.core",
     "raphael.svg": "libs/raphael/raphael.svg",
     "raphael.vml": "libs/raphael/raphael.vml",
+    "raphael.scale": "libs/raphael/raphael.scale",
     "domReady": "helper/domReady",
     "jquery": "http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min",
     "underscore": "libs/underscore-min",
@@ -20,6 +21,9 @@ requirejs.config({
     raphael: {
       exports: "Raphael"
     },
+    'raphael.scale': {
+      exports: "RaphaelScale"
+    },
     jquery: {
       exports: "$"
     },
@@ -29,175 +33,192 @@ requirejs.config({
   }
 });
 
-define(["raphael", "jquery", "underscore", "Chain", "Board", "domReady!"], function(Raphael, $, _, Chain, Board) {
-  var black_stone, board_outline, cell_radius, circle_radius, group, i, line_horiz, line_vert, n, paper, range, raph_x, text_buffer, text_movement, text_size, track_stone, track_stone_pointer, virtual_board, white_stone, x, y;
-  $("#canvas").html("l");
-  range = function(start, end, step) {
-    var typeofEnd, typeofStart;
-    range = [];
-    typeofStart = typeof start;
-    typeofEnd = typeof end;
-    if (step === 0) {
-      throw TypeError("Step cannot be zero.");
-    }
-    if (typeofStart === "undefined" || typeofEnd === "undefined") {
-      throw TypeError("Must pass start and end arguments.");
-    } else {
-      if (typeofStart !== typeofEnd) {
-        throw TypeError("Start and end arguments must be of same type.");
+define(["raphael.scale", "jquery", "underscore", "Chain", "Board", "domReady!"], function(RaphaelScale, $, _, Chain, Board) {
+  var _GoBoard;
+  return _GoBoard = (function() {
+
+    function _GoBoard(container, container_size, board_size) {
+      this.container = container;
+      this.container_size = container_size;
+      this.board_size = board_size;
+      if (typeof this.container !== "string" || typeof this.container_size !== "number") {
+        return;
       }
-    }
-    typeof step === "undefined" && (step = 1);
-    if (end < start) {
-      step = -step;
-    }
-    if (typeofStart === "number") {
-      while ((step > 0 ? end >= start : end <= start)) {
-        range.push(start);
-        start += step;
+      if (typeof this.board_size !== "number" || this.board_size > 19) {
+        this.board_size = 19;
       }
-    } else if (typeofStart === "string") {
-      if (start.length !== 1 || end.length !== 1) {
-        throw TypeError("Only strings with one character are supported.");
-      }
-      start = start.charCodeAt(0);
-      end = end.charCodeAt(0);
-      while ((step > 0 ? end >= start : end <= start)) {
-        range.push(String.fromCharCode(start));
-        start += step;
-      }
-    } else {
-      throw TypeError("Only string and number types are supported");
+      this.canvas = $("#" + this.container.toString());
+      this.draw_board();
     }
-    return range;
-  };
-  cell_radius = 25;
-  n = 19;
-  text_size = 15;
-  text_buffer = text_size + cell_radius / 2 + 10;
-  text_movement = cell_radius / 2 + text_size / 2 + 5;
-  raph_x = cell_radius * (n - 1) + text_buffer * 2;
-  paper = Raphael(25, 25, raph_x, raph_x);
-  circle_radius = 0.50 * cell_radius;
-  y = text_buffer * 1;
-  x = y;
-  board_outline = paper.rect(x, y, cell_radius * (n - 1), cell_radius * (n - 1)).attr("stroke-width", 1);
-  paper.rect(x, y, cell_radius * (n - 1), cell_radius * (n - 1)).attr("stroke-width", 1);
-  _.each(_.range(n), function(letter, index) {
-    letter = String.fromCharCode(65 + index);
-    paper.text(x + cell_radius * index, y + cell_radius * (n - 1) + text_movement, letter).attr("font-size", text_size);
-    return paper.text(x + cell_radius * index, y - text_movement, letter).attr("font-size", text_size);
-  });
-  _.each(_.range(1, n + 1), function(letter, index) {
-    paper.text(x - text_movement, y + cell_radius * (n - 1 - index), letter).attr("font-size", text_size);
-    return paper.text(x + cell_radius * (n - 1) + text_movement, y + cell_radius * (n - 1 - index), letter).attr("font-size", text_size);
-  });
-  i = 0;
-  while (i < n - 2) {
-    line_vert = paper.path("M" + (x + cell_radius * (i + 1)) + "," + (y + cell_radius * (n - 1)) + "V" + y);
-    line_horiz = paper.path("M" + x + "," + (y + cell_radius * (i + 1)) + "H" + (x + cell_radius * (n - 1)));
-    i++;
-  }
-  (function() {
-    var generate_star;
-    generate_star = function(_x, _y) {
-      var handicap;
-      handicap = paper.circle(x + cell_radius * _x, y + cell_radius * _y, 0.15 * circle_radius);
-      return handicap.attr("fill", "#000");
+
+    _GoBoard.prototype.draw_board = function() {
+      var black_stone, board_outline, canvas, canvas_length, cell_radius, circle_radius, group, i, length, line_horiz, line_vert, n, paper, text_buffer, text_movement, text_size, track_stone, track_stone_pointer, virtual_board, white_stone, x, y;
+      canvas = this.canvas;
+      canvas.css('overflow', 'hidden');
+      canvas.css('display', 'block');
+      canvas = this.canvas;
+      n = this.board_size;
+      cell_radius = 25;
+      circle_radius = 0.50 * cell_radius;
+      text_size = 15;
+      text_movement = cell_radius / 2 + text_size / 2 + 5;
+      text_buffer = text_size + cell_radius / 2 + 10;
+      canvas_length = cell_radius * (n - 1) + text_buffer * 2;
+      paper = RaphaelScale(canvas[0], canvas_length, canvas_length);
+      length = this.container_size;
+      paper.changeSize(length, length, true, false);
+      canvas.css('position', 'static');
+      canvas.height(length);
+      canvas.width(length);
+      y = text_buffer * 1;
+      x = y;
+      board_outline = paper.rect(x, y, cell_radius * (n - 1), cell_radius * (n - 1)).attr("stroke-width", 2);
+      paper.rect(x, y, cell_radius * (n - 1), cell_radius * (n - 1)).attr("stroke-width", 1);
+      _.each(_.range(n), function(letter, index) {
+        letter = String.fromCharCode(65 + index);
+        paper.text(x + cell_radius * index, y + cell_radius * (n - 1) + text_movement, letter).attr("font-size", text_size);
+        return paper.text(x + cell_radius * index, y - text_movement, letter).attr("font-size", text_size);
+      });
+      _.each(_.range(1, n + 1), function(letter, index) {
+        paper.text(x - text_movement, y + cell_radius * (n - 1 - index), letter).attr("font-size", text_size);
+        return paper.text(x + cell_radius * (n - 1) + text_movement, y + cell_radius * (n - 1 - index), letter).attr("font-size", text_size);
+      });
+      i = 0;
+      while (i < n - 2) {
+        line_vert = paper.path("M" + (x + cell_radius * (i + 1)) + "," + (y + cell_radius * (n - 1)) + "V" + y);
+        line_horiz = paper.path("M" + x + "," + (y + cell_radius * (i + 1)) + "H" + (x + cell_radius * (n - 1)));
+        i++;
+      }
+      (function() {
+        var generate_star;
+        generate_star = function(_x, _y) {
+          var handicap;
+          handicap = paper.circle(x + cell_radius * _x, y + cell_radius * _y, 0.20 * circle_radius);
+          return handicap.attr("fill", "#000");
+        };
+        if (n === 19) {
+          generate_star(3, 3);
+          generate_star(9, 3);
+          generate_star(15, 3);
+          generate_star(3, 9);
+          generate_star(9, 9);
+          generate_star(15, 9);
+          generate_star(3, 15);
+          generate_star(9, 15);
+          return generate_star(15, 15);
+        } else if (n === 13) {
+          generate_star(3, 3);
+          generate_star(9, 3);
+          generate_star(6, 6);
+          generate_star(3, 9);
+          return generate_star(9, 9);
+        } else if (n === 9) {
+          generate_star(2, 2);
+          generate_star(6, 2);
+          generate_star(4, 4);
+          generate_star(2, 6);
+          return generate_star(6, 6);
+        }
+      })();
+      track_stone_pointer = null;
+      track_stone = function(i, j) {
+        var _x, _y;
+        _x = x + cell_radius * i;
+        _y = y + cell_radius * j;
+        if (track_stone_pointer != null) {
+          track_stone_pointer.remove();
+        }
+        track_stone_pointer = paper.circle(_x, _y, circle_radius / 2);
+        track_stone_pointer.attr("stroke", "red");
+        return track_stone_pointer.attr("stroke-width", "2");
+      };
+      white_stone = function(i, j) {
+        var stone_bg, stone_fg, _x, _y;
+        _x = x + cell_radius * i;
+        _y = y + cell_radius * j;
+        stone_bg = paper.circle(_x, _y, circle_radius);
+        stone_bg.attr("fill", "#fff");
+        stone_bg.attr("stroke-width", "0");
+        stone_fg = paper.circle(_x, _y, circle_radius);
+        stone_fg.attr("fill", "r(0.75,0.75)#fff-#A0A0A0");
+        stone_fg.attr("fill-opacity", 1);
+        stone_fg.attr("stroke-opacity", 0.3);
+        stone_fg.attr("stroke-width", "1.1");
+        return track_stone(i, j);
+      };
+      black_stone = function(i, j) {
+        var stone_bg, stone_fg, _x, _y;
+        _x = x + cell_radius * i;
+        _y = y + cell_radius * j;
+        stone_bg = paper.circle(_x, _y, circle_radius);
+        stone_bg.attr("fill", "#fff");
+        stone_bg.attr("stroke-width", "0");
+        stone_fg = paper.circle(_x, _y, circle_radius);
+        stone_fg.attr("fill-opacity", 0.9);
+        stone_fg.attr("fill", "r(0.75,0.75)#A0A0A0-#000");
+        stone_fg.attr("stroke-opacity", 0.3);
+        stone_fg.attr("stroke-width", "1.2");
+        return track_stone(i, j);
+      };
+      group = paper.set();
+      _.each(_.range(n), function(i, index) {
+        return _.each(_.range(n), function(j, index) {
+          var clicker;
+          clicker = paper.rect(x - cell_radius / 2 + cell_radius * i, y - cell_radius / 2 + cell_radius * j, cell_radius, cell_radius);
+          clicker.attr("fill", "#fff");
+          clicker.attr("stroke-width", "0");
+          clicker.attr("fill-opacity", 0);
+          clicker.data("coord", [i, j]);
+          return group.push(clicker);
+        });
+      });
+      virtual_board = new Board.get(n);
+      group.mouseover(function(e) {
+        var coord;
+        return coord = this.data("coord");
+      }).click(function(e) {
+        var coord, move_results, raph_layer_ids;
+        coord = this.data("coord");
+        move_results = virtual_board.move(coord);
+        switch (move_results.color) {
+          case virtual_board.BLACK:
+            raph_layer_ids = black_stone(move_results.x, move_results.y);
+            break;
+          case virtual_board.WHITE:
+            raph_layer_ids = white_stone(move_results.x, move_results.y);
+            break;
+        }
+        this.toFront();
+      });
+      /*
+            # Fill board with all stones 
+           
+            _.each _.range(0, n, 2), (i, index) ->
+              _.each _.range(0, n, 2), (j, index) ->
+                white_stone i, j
+      
+      
+            _.each _.range(1, n, 2), (i, index) ->
+              _.each _.range(1, n, 2), (j, index) ->
+                white_stone i, j
+      
+      
+            _.each _.range(1, n, 2), (i, index) ->
+              _.each _.range(0, n, 2), (j, index) ->
+                black_stone i, j
+      
+      
+            _.each _.range(0, n, 2), (i, index) ->
+              _.each _.range(1, n, 2), (j, index) ->
+                black_stone i, j
+      */
+
+      paper.safari();
+      paper.renderfix();
+      return _GoBoard;
     };
-    if (n === 19) {
-      generate_star(3, 3);
-      generate_star(9, 3);
-      generate_star(15, 3);
-      generate_star(3, 9);
-      generate_star(9, 9);
-      generate_star(15, 9);
-      generate_star(3, 15);
-      generate_star(9, 15);
-      return generate_star(15, 15);
-    } else if (n === 13) {
-      generate_star(3, 3);
-      generate_star(9, 3);
-      generate_star(6, 6);
-      generate_star(3, 9);
-      return generate_star(9, 9);
-    } else if (n === 9) {
-      generate_star(2, 2);
-      generate_star(6, 2);
-      generate_star(4, 4);
-      generate_star(2, 6);
-      return generate_star(6, 6);
-    }
+
+    return _GoBoard;
+
   })();
-  track_stone_pointer = null;
-  track_stone = function(i, j) {
-    var _x, _y;
-    _x = x + cell_radius * i;
-    _y = y + cell_radius * j;
-    if (track_stone_pointer != null) {
-      track_stone_pointer.remove();
-    }
-    track_stone_pointer = paper.circle(_x, _y, circle_radius / 2);
-    track_stone_pointer.attr("stroke", "red");
-    return track_stone_pointer.attr("stroke-width", "2");
-  };
-  white_stone = function(i, j) {
-    var stone_bg, stone_fg, _x, _y;
-    _x = x + cell_radius * i;
-    _y = y + cell_radius * j;
-    stone_bg = paper.circle(_x, _y, circle_radius);
-    stone_bg.attr("fill", "#fff");
-    stone_bg.attr("stroke-width", "0");
-    stone_fg = paper.circle(_x, _y, circle_radius);
-    stone_fg.attr("fill", "r(0.75,0.75)#fff-#A0A0A0");
-    stone_fg.attr("fill-opacity", 1);
-    stone_fg.attr("stroke-opacity", 0.3);
-    stone_fg.attr("stroke-width", "1.1");
-    return track_stone(i, j);
-  };
-  black_stone = function(i, j) {
-    var stone_bg, stone_fg, _x, _y;
-    _x = x + cell_radius * i;
-    _y = y + cell_radius * j;
-    stone_bg = paper.circle(_x, _y, circle_radius);
-    stone_bg.attr("fill", "#fff");
-    stone_bg.attr("stroke-width", "0");
-    stone_fg = paper.circle(_x, _y, circle_radius);
-    stone_fg.attr("fill-opacity", 0.9);
-    stone_fg.attr("fill", "r(0.75,0.75)#A0A0A0-#000");
-    stone_fg.attr("stroke-width", "1.2");
-    return track_stone(i, j);
-  };
-  group = paper.set();
-  _.each(_.range(n), function(i, index) {
-    return _.each(_.range(n), function(j, index) {
-      var clicker;
-      clicker = paper.rect(x - cell_radius / 2 + cell_radius * i, y - cell_radius / 2 + cell_radius * j, cell_radius, cell_radius);
-      clicker.attr("fill", "#fff");
-      clicker.attr("stroke-width", "0");
-      clicker.attr("fill-opacity", 0);
-      clicker.data("coord", [i, j]);
-      return group.push(clicker);
-    });
-  });
-  virtual_board = new Board.get(n);
-  group.mouseover(function(e) {
-    var coord;
-    return coord = this.data("coord");
-  }).click(function(e) {
-    var coord, move_results, raph_layer_ids;
-    coord = this.data("coord");
-    move_results = virtual_board.move(coord);
-    switch (move_results.color) {
-      case virtual_board.BLACK:
-        raph_layer_ids = black_stone(move_results.x, move_results.y);
-        break;
-      case virtual_board.WHITE:
-        raph_layer_ids = white_stone(move_results.x, move_results.y);
-        break;
-    }
-    this.toFront();
-  });
-  paper.safari();
-  return paper.renderfix();
 });

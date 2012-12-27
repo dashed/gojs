@@ -33,7 +33,7 @@ define(["underscore"], function(_) {
       this.BLACK = 1;
       this.WHITE = 2;
       this.CURRENT_STONE = this.BLACK;
-      if (typeof this.size === "undefined") {
+      if (typeof this.size !== "number") {
         this.size = 0;
       }
       get_this = this;

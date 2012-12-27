@@ -22,7 +22,7 @@ define ["underscore"], (_) ->
       @WHITE = 2
       @CURRENT_STONE = @BLACK
 
-      if typeof @size is "undefined"
+      if typeof @size != "number"
         @size = 0
 
 
