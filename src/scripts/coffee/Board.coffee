@@ -150,6 +150,20 @@ define ["underscore", "jquery", "Chain"], (_, $, Chain) ->
         dead: []
 
 
+      if point_color is @EMPTY
+        if @CURRENT_STONE is @BLACK
+
+          @virtual_board = @set_color(@virtual_board, _coord, @BLACK)
+          move_results.color = @BLACK
+          @CURRENT_STONE = @WHITE
+
+        else
+          @virtual_board = @set_color(@virtual_board, _coord, @WHITE)
+          move_results.color = @WHITE
+          @CURRENT_STONE = @BLACK
+      return move_results
+
+
       if (_x is @KO_POINT[0] && _y is @KO_POINT[1])
         return move_results
 
@@ -170,7 +184,7 @@ define ["underscore", "jquery", "Chain"], (_, $, Chain) ->
 
           # if any neighbor is an ally that isn't in atari
           else if n_color is get_this.CURRENT_STONE
-            if !get_this.get_chain(virtual_board_clone, neighbor).in_atari()
+            if !(get_this.get_chain(virtual_board_clone, neighbor).in_atari())
               suicide = false
 
           # if any neighbor is an enemy and that enemy is in atari
@@ -181,6 +195,8 @@ define ["underscore", "jquery", "Chain"], (_, $, Chain) ->
               
             if(enemy.in_atari())
               suicide = false
+
+              console.log  enemy.get_stones()
 
               # remove the enemy stones from the board
               _.each enemy.get_stones(), (stone) ->

@@ -153,6 +153,18 @@ define(["underscore", "jquery", "Chain"], function(_, $, Chain) {
         y: _y,
         dead: []
       };
+      if (point_color === this.EMPTY) {
+        if (this.CURRENT_STONE === this.BLACK) {
+          this.virtual_board = this.set_color(this.virtual_board, _coord, this.BLACK);
+          move_results.color = this.BLACK;
+          this.CURRENT_STONE = this.WHITE;
+        } else {
+          this.virtual_board = this.set_color(this.virtual_board, _coord, this.WHITE);
+          move_results.color = this.WHITE;
+          this.CURRENT_STONE = this.BLACK;
+        }
+      }
+      return move_results;
       if (_x === this.KO_POINT[0] && _y === this.KO_POINT[1]) {
         return move_results;
       }
@@ -165,13 +177,14 @@ define(["underscore", "jquery", "Chain"], function(_, $, Chain) {
           if (n_color === get_this.EMPTY) {
             return suicide = false;
           } else if (n_color === get_this.CURRENT_STONE) {
-            if (!get_this.get_chain(virtual_board_clone, neighbor).in_atari()) {
+            if (!(get_this.get_chain(virtual_board_clone, neighbor).in_atari())) {
               return suicide = false;
             }
           } else if (n_color === get_this.get_opposite_color(get_this.CURRENT_STONE)) {
             enemy = get_this.get_chain(virtual_board_clone, neighbor);
             if (enemy.in_atari()) {
               suicide = false;
+              console.log(enemy.get_stones());
               return _.each(enemy.get_stones(), function(stone) {
                 get_this.set_color(virtual_board_clone, stone, get_this.EMPTY);
                 capturedStones[stone] = stone;
