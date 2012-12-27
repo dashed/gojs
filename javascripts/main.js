@@ -7918,6 +7918,114 @@ define('raphael',['raphael.core', 'raphael.svg', 'raphael.vml'], function (R) {
 });
 
 
+/*
+ * ScaleRaphael 0.8 by Zevan Rosser 2010 
+ * For use with Raphael library : www.raphaeljs.com
+ * Licensed under the MIT license.
+ *
+ * www.shapevent.com/scaleraphael/
+ */
+
+//(function(){
+//window.ScaleRaphael = function(container, width, height){
+define('raphael.scale',["raphael"], function(Raphael) {
+
+    return function(container, width, height){
+    var wrapper = container;//document.getElementById(container);
+    
+    if (!wrapper.style.position) wrapper.style.position = "relative";
+    wrapper.style.width = width + "px";
+    wrapper.style.height = height + "px";
+    wrapper.style.overflow = "hidden";
+    
+    var nestedWrapper;
+      
+    if (Raphael.type == "VML"){
+      wrapper.innerHTML = "<rvml:group style='position : absolute; width: 1000px; height: 1000px; top: 0px; left: 0px' coordsize='1000,1000' class='rvml' id='vmlgroup'><\/rvml:group>";
+      nestedWrapper = document.getElementById("vmlgroup");
+    }else{
+      wrapper.innerHTML = "<div id='svggroup'><\/div>";
+      nestedWrapper = document.getElementById("svggroup");
+    }
+ 
+    var paper = new Raphael(nestedWrapper, width, height);
+    var vmlDiv;
+    
+    if (Raphael.type == "SVG"){
+      paper.canvas.setAttribute("viewBox", "0 0 "+width+" "+height);
+    }else{
+      vmlDiv = wrapper.getElementsByTagName("div")[0];
+    }
+    
+    paper.changeSize = function(w, h, center, clipping){
+      clipping = !clipping;
+      
+      var ratioW = w / width;
+      var ratioH = h / height;
+      var scale = ratioW < ratioH ? ratioW : ratioH;
+      
+      var newHeight = parseInt(height * scale);
+      var newWidth = parseInt(width * scale);
+      
+      if (Raphael.type == "VML"){
+         // scale the textpaths
+       var txt = document.getElementsByTagName("textpath");
+        for (var i in txt){
+          var curr = txt[i];
+          if (curr.style){
+            if(!curr._fontSize){
+              var mod = curr.style.font.split("px");
+              curr._fontSize = parseInt(mod[0]);
+              curr._font = mod[1];
+            }
+            curr.style.font = curr._fontSize * scale + "px" + curr._font;
+          }
+        }
+        var newSize; 
+        if (newWidth < newHeight){
+         newSize = newWidth * 1000 / width;
+        }else{
+         newSize = newHeight * 1000 / height;
+        }
+        newSize = parseInt(newSize);
+        nestedWrapper.style.width = newSize + "px";
+        nestedWrapper.style.height = newSize + "px";
+        if (clipping){
+          nestedWrapper.style.left = parseInt((w - newWidth) / 2) + "px";
+          nestedWrapper.style.top = parseInt((h - newHeight) / 2) + "px";
+        }
+        vmlDiv.style.overflow = "visible";
+      }
+      
+      if (clipping){
+        newWidth = w;
+        newHeight = h;
+      }
+      
+      wrapper.style.width = newWidth + "px";
+      wrapper.style.height = newHeight + "px";
+      paper.setSize(newWidth, newHeight);
+      
+      if (center){
+        wrapper.style.position = "absolute";
+        wrapper.style.left = parseInt((w - newWidth) / 2) + "px";
+        wrapper.style.top = parseInt((h - newHeight) / 2) + "px";
+      }
+    }
+    
+    paper.scaleAll = function(amount){
+      paper.changeSize(width * amount, height * amount);
+    }
+    
+    paper.changeSize(width, height);
+    
+    paper.w = width;
+    paper.h = height;
+    
+    return paper;
+  }
+//})();
+});
 (function(){var n=this,t=n._,r={},e=Array.prototype,u=Object.prototype,i=Function.prototype,a=e.push,o=e.slice,c=e.concat,l=u.toString,f=u.hasOwnProperty,s=e.forEach,p=e.map,v=e.reduce,h=e.reduceRight,g=e.filter,d=e.every,m=e.some,y=e.indexOf,b=e.lastIndexOf,x=Array.isArray,_=Object.keys,j=i.bind,w=function(n){return n instanceof w?n:this instanceof w?(this._wrapped=n,void 0):new w(n)};"undefined"!=typeof exports?("undefined"!=typeof module&&module.exports&&(exports=module.exports=w),exports._=w):n._=w,w.VERSION="1.4.3";var A=w.each=w.forEach=function(n,t,e){if(null!=n)if(s&&n.forEach===s)n.forEach(t,e);else if(n.length===+n.length){for(var u=0,i=n.length;i>u;u++)if(t.call(e,n[u],u,n)===r)return}else for(var a in n)if(w.has(n,a)&&t.call(e,n[a],a,n)===r)return};w.map=w.collect=function(n,t,r){var e=[];return null==n?e:p&&n.map===p?n.map(t,r):(A(n,function(n,u,i){e[e.length]=t.call(r,n,u,i)}),e)};var O="Reduce of empty array with no initial value";w.reduce=w.foldl=w.inject=function(n,t,r,e){var u=arguments.length>2;if(null==n&&(n=[]),v&&n.reduce===v)return e&&(t=w.bind(t,e)),u?n.reduce(t,r):n.reduce(t);if(A(n,function(n,i,a){u?r=t.call(e,r,n,i,a):(r=n,u=!0)}),!u)throw new TypeError(O);return r},w.reduceRight=w.foldr=function(n,t,r,e){var u=arguments.length>2;if(null==n&&(n=[]),h&&n.reduceRight===h)return e&&(t=w.bind(t,e)),u?n.reduceRight(t,r):n.reduceRight(t);var i=n.length;if(i!==+i){var a=w.keys(n);i=a.length}if(A(n,function(o,c,l){c=a?a[--i]:--i,u?r=t.call(e,r,n[c],c,l):(r=n[c],u=!0)}),!u)throw new TypeError(O);return r},w.find=w.detect=function(n,t,r){var e;return E(n,function(n,u,i){return t.call(r,n,u,i)?(e=n,!0):void 0}),e},w.filter=w.select=function(n,t,r){var e=[];return null==n?e:g&&n.filter===g?n.filter(t,r):(A(n,function(n,u,i){t.call(r,n,u,i)&&(e[e.length]=n)}),e)},w.reject=function(n,t,r){return w.filter(n,function(n,e,u){return!t.call(r,n,e,u)},r)},w.every=w.all=function(n,t,e){t||(t=w.identity);var u=!0;return null==n?u:d&&n.every===d?n.every(t,e):(A(n,function(n,i,a){return(u=u&&t.call(e,n,i,a))?void 0:r}),!!u)};var E=w.some=w.any=function(n,t,e){t||(t=w.identity);var u=!1;return null==n?u:m&&n.some===m?n.some(t,e):(A(n,function(n,i,a){return u||(u=t.call(e,n,i,a))?r:void 0}),!!u)};w.contains=w.include=function(n,t){return null==n?!1:y&&n.indexOf===y?-1!=n.indexOf(t):E(n,function(n){return n===t})},w.invoke=function(n,t){var r=o.call(arguments,2);return w.map(n,function(n){return(w.isFunction(t)?t:n[t]).apply(n,r)})},w.pluck=function(n,t){return w.map(n,function(n){return n[t]})},w.where=function(n,t){return w.isEmpty(t)?[]:w.filter(n,function(n){for(var r in t)if(t[r]!==n[r])return!1;return!0})},w.max=function(n,t,r){if(!t&&w.isArray(n)&&n[0]===+n[0]&&65535>n.length)return Math.max.apply(Math,n);if(!t&&w.isEmpty(n))return-1/0;var e={computed:-1/0,value:-1/0};return A(n,function(n,u,i){var a=t?t.call(r,n,u,i):n;a>=e.computed&&(e={value:n,computed:a})}),e.value},w.min=function(n,t,r){if(!t&&w.isArray(n)&&n[0]===+n[0]&&65535>n.length)return Math.min.apply(Math,n);if(!t&&w.isEmpty(n))return 1/0;var e={computed:1/0,value:1/0};return A(n,function(n,u,i){var a=t?t.call(r,n,u,i):n;e.computed>a&&(e={value:n,computed:a})}),e.value},w.shuffle=function(n){var t,r=0,e=[];return A(n,function(n){t=w.random(r++),e[r-1]=e[t],e[t]=n}),e};var F=function(n){return w.isFunction(n)?n:function(t){return t[n]}};w.sortBy=function(n,t,r){var e=F(t);return w.pluck(w.map(n,function(n,t,u){return{value:n,index:t,criteria:e.call(r,n,t,u)}}).sort(function(n,t){var r=n.criteria,e=t.criteria;if(r!==e){if(r>e||void 0===r)return 1;if(e>r||void 0===e)return-1}return n.index<t.index?-1:1}),"value")};var k=function(n,t,r,e){var u={},i=F(t||w.identity);return A(n,function(t,a){var o=i.call(r,t,a,n);e(u,o,t)}),u};w.groupBy=function(n,t,r){return k(n,t,r,function(n,t,r){(w.has(n,t)?n[t]:n[t]=[]).push(r)})},w.countBy=function(n,t,r){return k(n,t,r,function(n,t){w.has(n,t)||(n[t]=0),n[t]++})},w.sortedIndex=function(n,t,r,e){r=null==r?w.identity:F(r);for(var u=r.call(e,t),i=0,a=n.length;a>i;){var o=i+a>>>1;u>r.call(e,n[o])?i=o+1:a=o}return i},w.toArray=function(n){return n?w.isArray(n)?o.call(n):n.length===+n.length?w.map(n,w.identity):w.values(n):[]},w.size=function(n){return null==n?0:n.length===+n.length?n.length:w.keys(n).length},w.first=w.head=w.take=function(n,t,r){return null==n?void 0:null==t||r?n[0]:o.call(n,0,t)},w.initial=function(n,t,r){return o.call(n,0,n.length-(null==t||r?1:t))},w.last=function(n,t,r){return null==n?void 0:null==t||r?n[n.length-1]:o.call(n,Math.max(n.length-t,0))},w.rest=w.tail=w.drop=function(n,t,r){return o.call(n,null==t||r?1:t)},w.compact=function(n){return w.filter(n,w.identity)};var R=function(n,t,r){return A(n,function(n){w.isArray(n)?t?a.apply(r,n):R(n,t,r):r.push(n)}),r};w.flatten=function(n,t){return R(n,t,[])},w.without=function(n){return w.difference(n,o.call(arguments,1))},w.uniq=w.unique=function(n,t,r,e){w.isFunction(t)&&(e=r,r=t,t=!1);var u=r?w.map(n,r,e):n,i=[],a=[];return A(u,function(r,e){(t?e&&a[a.length-1]===r:w.contains(a,r))||(a.push(r),i.push(n[e]))}),i},w.union=function(){return w.uniq(c.apply(e,arguments))},w.intersection=function(n){var t=o.call(arguments,1);return w.filter(w.uniq(n),function(n){return w.every(t,function(t){return w.indexOf(t,n)>=0})})},w.difference=function(n){var t=c.apply(e,o.call(arguments,1));return w.filter(n,function(n){return!w.contains(t,n)})},w.zip=function(){for(var n=o.call(arguments),t=w.max(w.pluck(n,"length")),r=Array(t),e=0;t>e;e++)r[e]=w.pluck(n,""+e);return r},w.object=function(n,t){if(null==n)return{};for(var r={},e=0,u=n.length;u>e;e++)t?r[n[e]]=t[e]:r[n[e][0]]=n[e][1];return r},w.indexOf=function(n,t,r){if(null==n)return-1;var e=0,u=n.length;if(r){if("number"!=typeof r)return e=w.sortedIndex(n,t),n[e]===t?e:-1;e=0>r?Math.max(0,u+r):r}if(y&&n.indexOf===y)return n.indexOf(t,r);for(;u>e;e++)if(n[e]===t)return e;return-1},w.lastIndexOf=function(n,t,r){if(null==n)return-1;var e=null!=r;if(b&&n.lastIndexOf===b)return e?n.lastIndexOf(t,r):n.lastIndexOf(t);for(var u=e?r:n.length;u--;)if(n[u]===t)return u;return-1},w.range=function(n,t,r){1>=arguments.length&&(t=n||0,n=0),r=arguments[2]||1;for(var e=Math.max(Math.ceil((t-n)/r),0),u=0,i=Array(e);e>u;)i[u++]=n,n+=r;return i};var I=function(){};w.bind=function(n,t){var r,e;if(n.bind===j&&j)return j.apply(n,o.call(arguments,1));if(!w.isFunction(n))throw new TypeError;return r=o.call(arguments,2),e=function(){if(!(this instanceof e))return n.apply(t,r.concat(o.call(arguments)));I.prototype=n.prototype;var u=new I;I.prototype=null;var i=n.apply(u,r.concat(o.call(arguments)));return Object(i)===i?i:u}},w.bindAll=function(n){var t=o.call(arguments,1);return 0==t.length&&(t=w.functions(n)),A(t,function(t){n[t]=w.bind(n[t],n)}),n},w.memoize=function(n,t){var r={};return t||(t=w.identity),function(){var e=t.apply(this,arguments);return w.has(r,e)?r[e]:r[e]=n.apply(this,arguments)}},w.delay=function(n,t){var r=o.call(arguments,2);return setTimeout(function(){return n.apply(null,r)},t)},w.defer=function(n){return w.delay.apply(w,[n,1].concat(o.call(arguments,1)))},w.throttle=function(n,t){var r,e,u,i,a=0,o=function(){a=new Date,u=null,i=n.apply(r,e)};return function(){var c=new Date,l=t-(c-a);return r=this,e=arguments,0>=l?(clearTimeout(u),u=null,a=c,i=n.apply(r,e)):u||(u=setTimeout(o,l)),i}},w.debounce=function(n,t,r){var e,u;return function(){var i=this,a=arguments,o=function(){e=null,r||(u=n.apply(i,a))},c=r&&!e;return clearTimeout(e),e=setTimeout(o,t),c&&(u=n.apply(i,a)),u}},w.once=function(n){var t,r=!1;return function(){return r?t:(r=!0,t=n.apply(this,arguments),n=null,t)}},w.wrap=function(n,t){return function(){var r=[n];return a.apply(r,arguments),t.apply(this,r)}},w.compose=function(){var n=arguments;return function(){for(var t=arguments,r=n.length-1;r>=0;r--)t=[n[r].apply(this,t)];return t[0]}},w.after=function(n,t){return 0>=n?t():function(){return 1>--n?t.apply(this,arguments):void 0}},w.keys=_||function(n){if(n!==Object(n))throw new TypeError("Invalid object");var t=[];for(var r in n)w.has(n,r)&&(t[t.length]=r);return t},w.values=function(n){var t=[];for(var r in n)w.has(n,r)&&t.push(n[r]);return t},w.pairs=function(n){var t=[];for(var r in n)w.has(n,r)&&t.push([r,n[r]]);return t},w.invert=function(n){var t={};for(var r in n)w.has(n,r)&&(t[n[r]]=r);return t},w.functions=w.methods=function(n){var t=[];for(var r in n)w.isFunction(n[r])&&t.push(r);return t.sort()},w.extend=function(n){return A(o.call(arguments,1),function(t){if(t)for(var r in t)n[r]=t[r]}),n},w.pick=function(n){var t={},r=c.apply(e,o.call(arguments,1));return A(r,function(r){r in n&&(t[r]=n[r])}),t},w.omit=function(n){var t={},r=c.apply(e,o.call(arguments,1));for(var u in n)w.contains(r,u)||(t[u]=n[u]);return t},w.defaults=function(n){return A(o.call(arguments,1),function(t){if(t)for(var r in t)null==n[r]&&(n[r]=t[r])}),n},w.clone=function(n){return w.isObject(n)?w.isArray(n)?n.slice():w.extend({},n):n},w.tap=function(n,t){return t(n),n};var S=function(n,t,r,e){if(n===t)return 0!==n||1/n==1/t;if(null==n||null==t)return n===t;n instanceof w&&(n=n._wrapped),t instanceof w&&(t=t._wrapped);var u=l.call(n);if(u!=l.call(t))return!1;switch(u){case"[object String]":return n==t+"";case"[object Number]":return n!=+n?t!=+t:0==n?1/n==1/t:n==+t;case"[object Date]":case"[object Boolean]":return+n==+t;case"[object RegExp]":return n.source==t.source&&n.global==t.global&&n.multiline==t.multiline&&n.ignoreCase==t.ignoreCase}if("object"!=typeof n||"object"!=typeof t)return!1;for(var i=r.length;i--;)if(r[i]==n)return e[i]==t;r.push(n),e.push(t);var a=0,o=!0;if("[object Array]"==u){if(a=n.length,o=a==t.length)for(;a--&&(o=S(n[a],t[a],r,e)););}else{var c=n.constructor,f=t.constructor;if(c!==f&&!(w.isFunction(c)&&c instanceof c&&w.isFunction(f)&&f instanceof f))return!1;for(var s in n)if(w.has(n,s)&&(a++,!(o=w.has(t,s)&&S(n[s],t[s],r,e))))break;if(o){for(s in t)if(w.has(t,s)&&!a--)break;o=!a}}return r.pop(),e.pop(),o};w.isEqual=function(n,t){return S(n,t,[],[])},w.isEmpty=function(n){if(null==n)return!0;if(w.isArray(n)||w.isString(n))return 0===n.length;for(var t in n)if(w.has(n,t))return!1;return!0},w.isElement=function(n){return!(!n||1!==n.nodeType)},w.isArray=x||function(n){return"[object Array]"==l.call(n)},w.isObject=function(n){return n===Object(n)},A(["Arguments","Function","String","Number","Date","RegExp"],function(n){w["is"+n]=function(t){return l.call(t)=="[object "+n+"]"}}),w.isArguments(arguments)||(w.isArguments=function(n){return!(!n||!w.has(n,"callee"))}),w.isFunction=function(n){return"function"==typeof n},w.isFinite=function(n){return isFinite(n)&&!isNaN(parseFloat(n))},w.isNaN=function(n){return w.isNumber(n)&&n!=+n},w.isBoolean=function(n){return n===!0||n===!1||"[object Boolean]"==l.call(n)},w.isNull=function(n){return null===n},w.isUndefined=function(n){return void 0===n},w.has=function(n,t){return f.call(n,t)},w.noConflict=function(){return n._=t,this},w.identity=function(n){return n},w.times=function(n,t,r){for(var e=Array(n),u=0;n>u;u++)e[u]=t.call(r,u);return e},w.random=function(n,t){return null==t&&(t=n,n=0),n+(0|Math.random()*(t-n+1))};var T={escape:{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#x27;","/":"&#x2F;"}};T.unescape=w.invert(T.escape);var M={escape:RegExp("["+w.keys(T.escape).join("")+"]","g"),unescape:RegExp("("+w.keys(T.unescape).join("|")+")","g")};w.each(["escape","unescape"],function(n){w[n]=function(t){return null==t?"":(""+t).replace(M[n],function(t){return T[n][t]})}}),w.result=function(n,t){if(null==n)return null;var r=n[t];return w.isFunction(r)?r.call(n):r},w.mixin=function(n){A(w.functions(n),function(t){var r=w[t]=n[t];w.prototype[t]=function(){var n=[this._wrapped];return a.apply(n,arguments),z.call(this,r.apply(w,n))}})};var N=0;w.uniqueId=function(n){var t=""+ ++N;return n?n+t:t},w.templateSettings={evaluate:/<%([\s\S]+?)%>/g,interpolate:/<%=([\s\S]+?)%>/g,escape:/<%-([\s\S]+?)%>/g};var q=/(.)^/,B={"'":"'","\\":"\\","\r":"r","\n":"n","	":"t","\u2028":"u2028","\u2029":"u2029"},D=/\\|'|\r|\n|\t|\u2028|\u2029/g;w.template=function(n,t,r){r=w.defaults({},r,w.templateSettings);var e=RegExp([(r.escape||q).source,(r.interpolate||q).source,(r.evaluate||q).source].join("|")+"|$","g"),u=0,i="__p+='";n.replace(e,function(t,r,e,a,o){return i+=n.slice(u,o).replace(D,function(n){return"\\"+B[n]}),r&&(i+="'+\n((__t=("+r+"))==null?'':_.escape(__t))+\n'"),e&&(i+="'+\n((__t=("+e+"))==null?'':__t)+\n'"),a&&(i+="';\n"+a+"\n__p+='"),u=o+t.length,t}),i+="';\n",r.variable||(i="with(obj||{}){\n"+i+"}\n"),i="var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};\n"+i+"return __p;\n";try{var a=Function(r.variable||"obj","_",i)}catch(o){throw o.source=i,o}if(t)return a(t,w);var c=function(n){return a.call(this,n,w)};return c.source="function("+(r.variable||"obj")+"){\n"+i+"}",c},w.chain=function(n){return w(n).chain()};var z=function(n){return this._chain?w(n).chain():n};w.mixin(w),A(["pop","push","reverse","shift","sort","splice","unshift"],function(n){var t=e[n];w.prototype[n]=function(){var r=this._wrapped;return t.apply(r,arguments),"shift"!=n&&"splice"!=n||0!==r.length||delete r[0],z.call(this,r)}}),A(["concat","join","slice"],function(n){var t=e[n];w.prototype[n]=function(){return z.call(this,t.apply(this._wrapped,arguments))}}),w.extend(w.prototype,{chain:function(){return this._chain=!0,this},value:function(){return this._wrapped}})}).call(this);
 define("underscore", (function (global) {
     return function () {
@@ -7928,16 +8036,25 @@ define("underscore", (function (global) {
 
 // Generated by CoffeeScript 1.3.3
 
-define("Chain",[], function() {
+define('Chain',["underscore"], function(_) {
   var Chain;
   return Chain = (function() {
 
-    function Chain() {
-      alert("lol");
+    function Chain(stones, liberties) {
+      this.stones = stones;
+      this.liberties = liberties;
     }
 
-    Chain.prototype.move = function() {
-      return alert("rawr");
+    Chain.prototype.get_liberties = function() {
+      return this.liberties;
+    };
+
+    Chain.prototype.in_atari = function() {
+      return _.size(this.liberties) === 1;
+    };
+
+    Chain.prototype.get_stones = function() {
+      return this.stones;
     };
 
     return Chain;
@@ -7947,40 +8064,27 @@ define("Chain",[], function() {
 
 // Generated by CoffeeScript 1.3.3
 
-define('Board',["underscore"], function(_) {
-  var Board, _Board;
+define('Board',["underscore", "jquery", "Chain"], function(_, $, Chain) {
+  var Board;
   Board = (function() {
-    var _instance;
 
-    function Board() {}
+    Board.EMPTY = 0;
 
-    _instance = void 0;
+    Board.BLACK = 1;
 
-    Board.get = function(size) {
-      return _instance != null ? _instance : _instance = new _Board(size);
-    };
+    Board.WHITE = 2;
 
-    return Board;
+    Board.CURRENT_STONE = Board.BLACK;
 
-  })();
-  _Board = (function() {
-
-    _Board.EMPTY = 0;
-
-    _Board.BLACK = 1;
-
-    _Board.WHITE = 2;
-
-    _Board.CURRENT_STONE = _Board.BLACK;
-
-    function _Board(size) {
+    function Board(size) {
       var get_this;
       this.size = size;
       this.EMPTY = 0;
       this.BLACK = 1;
       this.WHITE = 2;
       this.CURRENT_STONE = this.BLACK;
-      if (typeof this.size === "undefined") {
+      this.KO_POINT = [];
+      if (typeof this.size !== "number") {
         this.size = 0;
       }
       get_this = this;
@@ -7994,31 +8098,173 @@ define('Board',["underscore"], function(_) {
       return;
     }
 
-    _Board.prototype.move = function(_coord) {
-      var move_results, point, _x, _y;
+    Board.prototype.get_neighbors = function(_point) {
+      var neighbours, _x, _y;
+      _x = _point[0];
+      _y = _point[1];
+      neighbours = [];
+      if (_x > 0) {
+        neighbours.push([_x - 1, _y]);
+      }
+      if (_x < this.size - 1) {
+        neighbours.push([_x + 1, _y]);
+      }
+      if (_y > 0) {
+        neighbours.push([_x, _y - 1]);
+      }
+      if (_y < this.size - 1) {
+        neighbours.push([_x, _y + 1]);
+      }
+      return neighbours;
+    };
+
+    Board.prototype.get_color = function(_virtual_board, point) {
+      var n_x, n_y;
+      n_x = point[0];
+      n_y = point[1];
+      return _virtual_board[n_x][n_y];
+    };
+
+    Board.prototype.set_color = function(_virtual_board, point, _color) {
+      var n_x, n_y;
+      n_x = point[0];
+      n_y = point[1];
+      _virtual_board[n_x][n_y] = _color;
+      return _virtual_board;
+    };
+
+    Board.prototype.get_opposite_color = function(_color) {
+      var _color_opp;
+      _color_opp = this.EMPTY;
+      switch (_color) {
+        case this.EMPTY:
+          _color_opp = this.EMPTY;
+          break;
+        case this.WHITE:
+          _color_opp = this.BLACK;
+          break;
+        case this.BLACK:
+          _color_opp = this.WHITE;
+          break;
+        default:
+          _color_opp = this.EMPTY;
+      }
+      return _color_opp;
+    };
+
+    Board.prototype.get_chain_points = function(_virtual_board, point) {
+      var flood_fill_color, get_this, my_color, stones;
+      stones = {};
+      stones[point] = point;
+      my_color = this.get_color(_virtual_board, point);
+      flood_fill_color = this.get_opposite_color(my_color);
+      _virtual_board = this.set_color(_virtual_board, point, flood_fill_color);
+      get_this = this;
+      _.each(this.get_neighbors(point), function(neighbor) {
+        var n_color;
+        n_color = get_this.get_color(_virtual_board, point);
+        if (n_color === my_color) {
+          if (!(_.contains(_.keys(stones), neighbor.toString()))) {
+            return _.each(get_this.get_chain_points(_virtual_board, neighbor), function(_neighbor) {
+              return stones[_neighbor] = _neighbor;
+            });
+          }
+        }
+      });
+      return stones;
+    };
+
+    Board.prototype.get_chain = function(_virtual_board, point) {
+      var get_this, liberties, stones, virtual_board_clone;
+      virtual_board_clone = $.extend(true, [], _virtual_board);
+      stones = this.get_chain_points(virtual_board_clone, point);
+      liberties = {};
+      get_this = this;
+      _.each(stones, function(stone) {
+        return _.each(get_this.get_neighbors(stone), function(point) {
+          if (get_this.get_color(_virtual_board, point) === get_this.EMPTY) {
+            return liberties[point] = point;
+          }
+        });
+      });
+      return new Chain(stones, liberties);
+    };
+
+    Board.prototype.move = function(_coord) {
+      var capturedStones, get_this, move_results, point_color, suicide, virtual_board_clone, _x, _y;
+      capturedStones = {};
+      virtual_board_clone = $.extend(true, [], this.virtual_board);
       _x = _coord[0];
       _y = _coord[1];
-      point = this.virtual_board[_x][_y];
+      point_color = this.get_color(virtual_board_clone, _coord);
       move_results = {
         color: this.EMPTY,
         x: _x,
-        y: _y
+        y: _y,
+        dead: []
       };
-      if (point === this.EMPTY) {
+      if (point_color === this.EMPTY) {
         if (this.CURRENT_STONE === this.BLACK) {
-          this.virtual_board[_x][_y] = this.BLACK;
+          this.virtual_board = this.set_color(this.virtual_board, _coord, this.BLACK);
           move_results.color = this.BLACK;
           this.CURRENT_STONE = this.WHITE;
         } else {
-          this.virtual_board[_x][_y] = this.WHITE;
+          this.virtual_board = this.set_color(this.virtual_board, _coord, this.WHITE);
           move_results.color = this.WHITE;
           this.CURRENT_STONE = this.BLACK;
         }
       }
       return move_results;
+      if (_x === this.KO_POINT[0] && _y === this.KO_POINT[1]) {
+        return move_results;
+      }
+      if (point_color === this.EMPTY) {
+        suicide = true;
+        get_this = this;
+        _.each(this.get_neighbors(_coord), function(neighbor) {
+          var enemy, n_color;
+          n_color = get_this.get_color(virtual_board_clone, neighbor);
+          if (n_color === get_this.EMPTY) {
+            return suicide = false;
+          } else if (n_color === get_this.CURRENT_STONE) {
+            if (!(get_this.get_chain(virtual_board_clone, neighbor).in_atari())) {
+              return suicide = false;
+            }
+          } else if (n_color === get_this.get_opposite_color(get_this.CURRENT_STONE)) {
+            enemy = get_this.get_chain(virtual_board_clone, neighbor);
+            if (enemy.in_atari()) {
+              suicide = false;
+              return _.each(enemy.get_stones(), function(stone) {
+                get_this.set_color(virtual_board_clone, stone, get_this.EMPTY);
+                capturedStones[stone] = stone;
+                return move_results.dead.push(stone);
+              });
+            }
+          }
+        });
+        if (suicide) {
+          return move_results;
+        }
+        if (this.CURRENT_STONE === this.BLACK) {
+          virtual_board_clone = this.set_color(virtual_board_clone, _coord, this.BLACK);
+          move_results.color = this.BLACK;
+          this.CURRENT_STONE = this.WHITE;
+        } else {
+          virtual_board_clone = this.set_color(virtual_board_clone, _coord, this.WHITE);
+          move_results.color = this.WHITE;
+          this.CURRENT_STONE = this.BLACK;
+        }
+        if (_.size(capturedStones) === 1) {
+          this.KO_POINT = capturedStones[_.keys(capturedStones)[0]];
+        } else {
+          this.KO_POINT = [];
+        }
+        this.virtual_board = virtual_board_clone;
+      }
+      return move_results;
     };
 
-    return _Board;
+    return Board;
 
   })();
   return Board;
@@ -8166,6 +8412,7 @@ requirejs.config({
     "raphael.core": "libs/raphael/raphael.core",
     "raphael.svg": "libs/raphael/raphael.svg",
     "raphael.vml": "libs/raphael/raphael.vml",
+    "raphael.scale": "libs/raphael/raphael.scale",
     "domReady": "helper/domReady",
     "jquery": "http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min",
     "underscore": "libs/underscore-min",
@@ -8176,6 +8423,9 @@ requirejs.config({
     raphael: {
       exports: "Raphael"
     },
+    'raphael.scale': {
+      exports: "RaphaelScale"
+    },
     jquery: {
       exports: "$"
     },
@@ -8185,184 +8435,262 @@ requirejs.config({
   }
 });
 
-define('app',["raphael", "jquery", "underscore", "Chain", "Board", "domReady!"], function(Raphael, $, _, Chain, Board) {
-  var black_stone, board_outline, cell_radius, circle_radius, group, i, line_horiz, line_vert, n, paper, range, raph_x, text_buffer, text_movement, text_size, track_stone, track_stone_pointer, virtual_board, white_stone, x, y;
-  $("#canvas").html("l");
-  range = function(start, end, step) {
-    var typeofEnd, typeofStart;
-    range = [];
-    typeofStart = typeof start;
-    typeofEnd = typeof end;
-    if (step === 0) {
-      throw TypeError("Step cannot be zero.");
-    }
-    if (typeofStart === "undefined" || typeofEnd === "undefined") {
-      throw TypeError("Must pass start and end arguments.");
-    } else {
-      if (typeofStart !== typeofEnd) {
-        throw TypeError("Start and end arguments must be of same type.");
+define('app',["raphael.scale", "raphael", "jquery", "underscore", "Board", "domReady!"], function(RaphaelScale, Raphael, $, _, Board) {
+  var _GoBoard;
+  return _GoBoard = (function() {
+
+    function _GoBoard(container, container_size, board_size) {
+      this.container = container;
+      this.container_size = container_size;
+      this.board_size = board_size;
+      this.RAPH_BOARD_STATE = {};
+      if (typeof this.container !== "string" || typeof this.container_size !== "number") {
+        return;
       }
-    }
-    typeof step === "undefined" && (step = 1);
-    if (end < start) {
-      step = -step;
-    }
-    if (typeofStart === "number") {
-      while ((step > 0 ? end >= start : end <= start)) {
-        range.push(start);
-        start += step;
+      if (typeof this.board_size !== "number" || this.board_size > 19) {
+        this.board_size = 19;
       }
-    } else if (typeofStart === "string") {
-      if (start.length !== 1 || end.length !== 1) {
-        throw TypeError("Only strings with one character are supported.");
-      }
-      start = start.charCodeAt(0);
-      end = end.charCodeAt(0);
-      while ((step > 0 ? end >= start : end <= start)) {
-        range.push(String.fromCharCode(start));
-        start += step;
-      }
-    } else {
-      throw TypeError("Only string and number types are supported");
+      this.canvas = $("#" + this.container.toString());
+      this.draw_board();
     }
-    return range;
-  };
-  cell_radius = 25;
-  n = 19;
-  text_size = 15;
-  text_buffer = text_size + cell_radius / 2 + 10;
-  text_movement = cell_radius / 2 + text_size / 2 + 5;
-  raph_x = cell_radius * (n - 1) + text_buffer * 2;
-  paper = Raphael(25, 25, raph_x, raph_x);
-  circle_radius = 0.50 * cell_radius;
-  y = text_buffer * 1;
-  x = y;
-  board_outline = paper.rect(x, y, cell_radius * (n - 1), cell_radius * (n - 1)).attr("stroke-width", 1);
-  paper.rect(x, y, cell_radius * (n - 1), cell_radius * (n - 1)).attr("stroke-width", 1);
-  _.each(_.range(n), function(letter, index) {
-    letter = String.fromCharCode(65 + index);
-    paper.text(x + cell_radius * index, y + cell_radius * (n - 1) + text_movement, letter).attr("font-size", text_size);
-    return paper.text(x + cell_radius * index, y - text_movement, letter).attr("font-size", text_size);
-  });
-  _.each(_.range(1, n + 1), function(letter, index) {
-    paper.text(x - text_movement, y + cell_radius * (n - 1 - index), letter).attr("font-size", text_size);
-    return paper.text(x + cell_radius * (n - 1) + text_movement, y + cell_radius * (n - 1 - index), letter).attr("font-size", text_size);
-  });
-  i = 0;
-  while (i < n - 2) {
-    line_vert = paper.path("M" + (x + cell_radius * (i + 1)) + "," + (y + cell_radius * (n - 1)) + "V" + y);
-    line_horiz = paper.path("M" + x + "," + (y + cell_radius * (i + 1)) + "H" + (x + cell_radius * (n - 1)));
-    i++;
-  }
-  (function() {
-    var generate_star;
-    generate_star = function(_x, _y) {
-      var handicap;
-      handicap = paper.circle(x + cell_radius * _x, y + cell_radius * _y, 0.15 * circle_radius);
-      return handicap.attr("fill", "#000");
+
+    _GoBoard.prototype.draw_board = function() {
+      var black_stone, board_outline, canvas, canvas_length, cell_radius, circle_radius, get_this, group, i, length, line_horiz, line_vert, n, paper, remove_stone, text_buffer, text_movement, text_size, track_stone, track_stone_pointer, viewbox_length, virtual_board, white_stone, x, y;
+      canvas = this.canvas;
+      canvas.css('overflow', 'hidden');
+      canvas.css('display', 'block');
+      canvas.height(this);
+      canvas = this.canvas;
+      n = this.board_size;
+      cell_radius = 25;
+      circle_radius = 0.50 * cell_radius;
+      text_size = 15;
+      text_movement = cell_radius / 2 + text_size / 2 + 5;
+      text_buffer = text_size + cell_radius / 2 + 10;
+      canvas_length = cell_radius * (n - 1) + text_buffer * 2;
+      paper = Raphael(canvas[0], canvas_length, canvas_length);
+      /*length = @container_size
+      paper.changeSize(length,length, true, false)
+      canvas.css('position', 'static')
+      canvas.css('border', '1px solid black')
+      canvas.height(length)
+      canvas.width(length)
+      */
+
+      y = text_buffer * 1;
+      x = y;
+      board_outline = paper.rect(x, y, cell_radius * (n - 1), cell_radius * (n - 1)).attr("stroke-width", 2);
+      paper.rect(x, y, cell_radius * (n - 1), cell_radius * (n - 1)).attr("stroke-width", 1);
+      _.each(_.range(n), function(letter, index) {
+        letter = String.fromCharCode(65 + index);
+        paper.text(x + cell_radius * index, y + cell_radius * (n - 1) + text_movement, letter).attr("font-size", text_size);
+        return paper.text(x + cell_radius * index, y - text_movement, letter).attr("font-size", text_size);
+      });
+      _.each(_.range(1, n + 1), function(letter, index) {
+        paper.text(x - text_movement, y + cell_radius * (n - 1 - index), letter).attr("font-size", text_size);
+        return paper.text(x + cell_radius * (n - 1) + text_movement, y + cell_radius * (n - 1 - index), letter).attr("font-size", text_size);
+      });
+      i = 0;
+      while (i < n - 2) {
+        line_vert = paper.path("M" + (x + cell_radius * (i + 1)) + "," + (y + cell_radius * (n - 1)) + "V" + y);
+        line_horiz = paper.path("M" + x + "," + (y + cell_radius * (i + 1)) + "H" + (x + cell_radius * (n - 1)));
+        i++;
+      }
+      (function() {
+        var generate_star;
+        generate_star = function(_x, _y) {
+          var handicap;
+          handicap = paper.circle(x + cell_radius * _x, y + cell_radius * _y, 0.20 * circle_radius);
+          return handicap.attr("fill", "#000");
+        };
+        if (n === 19) {
+          generate_star(3, 3);
+          generate_star(9, 3);
+          generate_star(15, 3);
+          generate_star(3, 9);
+          generate_star(9, 9);
+          generate_star(15, 9);
+          generate_star(3, 15);
+          generate_star(9, 15);
+          return generate_star(15, 15);
+        } else if (n === 13) {
+          generate_star(3, 3);
+          generate_star(9, 3);
+          generate_star(6, 6);
+          generate_star(3, 9);
+          return generate_star(9, 9);
+        } else if (n === 9) {
+          generate_star(2, 2);
+          generate_star(6, 2);
+          generate_star(4, 4);
+          generate_star(2, 6);
+          return generate_star(6, 6);
+        }
+      })();
+      track_stone_pointer = null;
+      track_stone = function(i, j) {
+        var _x, _y;
+        _x = x + cell_radius * i;
+        _y = y + cell_radius * j;
+        if (track_stone_pointer != null) {
+          track_stone_pointer.remove();
+        }
+        track_stone_pointer = paper.circle(_x, _y, circle_radius / 2);
+        track_stone_pointer.attr("stroke", "red");
+        return track_stone_pointer.attr("stroke-width", "2");
+      };
+      white_stone = function(i, j) {
+        var group, stone_bg, stone_fg, _x, _y;
+        _x = x + cell_radius * i;
+        _y = y + cell_radius * j;
+        stone_bg = paper.circle(_x, _y, circle_radius);
+        stone_bg.attr("fill", "#fff");
+        stone_bg.attr("stroke-width", "0");
+        stone_fg = paper.circle(_x, _y, circle_radius);
+        stone_fg.attr("fill", "r(0.75,0.75)#fff-#A0A0A0");
+        stone_fg.attr("fill-opacity", 1);
+        stone_fg.attr("stroke-opacity", 0.3);
+        stone_fg.attr("stroke-width", "1.1");
+        track_stone(i, j);
+        group = [];
+        group.push(stone_bg.id);
+        group.push(stone_fg.id);
+        return group;
+      };
+      black_stone = function(i, j) {
+        var group, stone_bg, stone_fg, _x, _y;
+        _x = x + cell_radius * i;
+        _y = y + cell_radius * j;
+        stone_bg = paper.circle(_x, _y, circle_radius);
+        stone_bg.attr("fill", "#fff");
+        stone_bg.attr("stroke-width", "0");
+        stone_fg = paper.circle(_x, _y, circle_radius);
+        stone_fg.attr("fill-opacity", 0.9);
+        stone_fg.attr("fill", "r(0.75,0.75)#A0A0A0-#000");
+        stone_fg.attr("stroke-opacity", 0.3);
+        stone_fg.attr("stroke-width", "1.2");
+        track_stone(i, j);
+        group = [];
+        group.push(stone_bg.id);
+        group.push(stone_fg.id);
+        return group;
+      };
+      group = paper.set();
+      _.each(_.range(n), function(i, index) {
+        return _.each(_.range(n), function(j, index) {
+          var clicker;
+          clicker = paper.rect(x - cell_radius / 2 + cell_radius * i, y - cell_radius / 2 + cell_radius * j, cell_radius, cell_radius);
+          clicker.attr("fill", "#fff");
+          clicker.attr("stroke-width", "0");
+          clicker.attr("fill-opacity", 0);
+          clicker.data("coord", [i, j]);
+          return group.push(clicker);
+        });
+      });
+      get_this = this;
+      remove_stone = function(coord) {
+        console.log(coord);
+        return _.each(get_this.RAPH_BOARD_STATE[coord], function(id) {
+          return paper.getById(id).remove();
+        });
+      };
+      virtual_board = new Board(n);
+      get_this = this;
+      group.mouseover(function(e) {
+        var coord;
+        return coord = this.data("coord");
+      }).click(function(e) {
+        var coord, move_results, raph_layer_ids;
+        coord = this.data("coord");
+        move_results = virtual_board.move(coord);
+        _.each(move_results.dead, function(dead_stone) {
+          return remove_stone(dead_stone);
+        });
+        switch (move_results.color) {
+          case virtual_board.BLACK:
+            raph_layer_ids = black_stone(move_results.x, move_results.y);
+            get_this.RAPH_BOARD_STATE[coord] = raph_layer_ids;
+            break;
+          case virtual_board.WHITE:
+            raph_layer_ids = white_stone(move_results.x, move_results.y);
+            get_this.RAPH_BOARD_STATE[coord] = raph_layer_ids;
+            break;
+        }
+        this.toFront();
+      });
+      /*
+            # Fill board with all stones 
+           
+            _.each _.range(0, n, 2), (i, index) ->
+              _.each _.range(0, n, 2), (j, index) ->
+                white_stone i, j
+      
+      
+            _.each _.range(1, n, 2), (i, index) ->
+              _.each _.range(1, n, 2), (j, index) ->
+                white_stone i, j
+      
+      
+            _.each _.range(1, n, 2), (i, index) ->
+              _.each _.range(0, n, 2), (j, index) ->
+                black_stone i, j
+      
+      
+            _.each _.range(0, n, 2), (i, index) ->
+              _.each _.range(1, n, 2), (j, index) ->
+                black_stone i, j
+      */
+
+      paper.safari();
+      paper.renderfix();
+      length = this.container_size;
+      canvas.height(length);
+      canvas.width(length);
+      viewbox_length = canvas_length * canvas_length / canvas.width();
+      paper.setViewBox(0, 0, viewbox_length * 2, viewbox_length * 2, true);
+      paper.setSize(canvas_length * 2, canvas_length * 2);
+      return _GoBoard;
     };
-    if (n === 19) {
-      generate_star(3, 3);
-      generate_star(9, 3);
-      generate_star(15, 3);
-      generate_star(3, 9);
-      generate_star(9, 9);
-      generate_star(15, 9);
-      generate_star(3, 15);
-      generate_star(9, 15);
-      return generate_star(15, 15);
-    } else if (n === 13) {
-      generate_star(3, 3);
-      generate_star(9, 3);
-      generate_star(6, 6);
-      generate_star(3, 9);
-      return generate_star(9, 9);
-    } else if (n === 9) {
-      generate_star(2, 2);
-      generate_star(6, 2);
-      generate_star(4, 4);
-      generate_star(2, 6);
-      return generate_star(6, 6);
-    }
+
+    return _GoBoard;
+
   })();
-  track_stone_pointer = null;
-  track_stone = function(i, j) {
-    var _x, _y;
-    _x = x + cell_radius * i;
-    _y = y + cell_radius * j;
-    if (track_stone_pointer != null) {
-      track_stone_pointer.remove();
-    }
-    track_stone_pointer = paper.circle(_x, _y, circle_radius / 2);
-    track_stone_pointer.attr("stroke", "red");
-    return track_stone_pointer.attr("stroke-width", "2");
-  };
-  white_stone = function(i, j) {
-    var stone_bg, stone_fg, _x, _y;
-    _x = x + cell_radius * i;
-    _y = y + cell_radius * j;
-    stone_bg = paper.circle(_x, _y, circle_radius);
-    stone_bg.attr("fill", "#fff");
-    stone_bg.attr("stroke-width", "0");
-    stone_fg = paper.circle(_x, _y, circle_radius);
-    stone_fg.attr("fill", "r(0.75,0.75)#fff-#A0A0A0");
-    stone_fg.attr("fill-opacity", 1);
-    stone_fg.attr("stroke-opacity", 0.3);
-    stone_fg.attr("stroke-width", "1.1");
-    return track_stone(i, j);
-  };
-  black_stone = function(i, j) {
-    var stone_bg, stone_fg, _x, _y;
-    _x = x + cell_radius * i;
-    _y = y + cell_radius * j;
-    stone_bg = paper.circle(_x, _y, circle_radius);
-    stone_bg.attr("fill", "#fff");
-    stone_bg.attr("stroke-width", "0");
-    stone_fg = paper.circle(_x, _y, circle_radius);
-    stone_fg.attr("fill-opacity", 0.9);
-    stone_fg.attr("fill", "r(0.75,0.75)#A0A0A0-#000");
-    stone_fg.attr("stroke-width", "1.2");
-    return track_stone(i, j);
-  };
-  group = paper.set();
-  _.each(_.range(n), function(i, index) {
-    return _.each(_.range(n), function(j, index) {
-      var clicker;
-      clicker = paper.rect(x - cell_radius / 2 + cell_radius * i, y - cell_radius / 2 + cell_radius * j, cell_radius, cell_radius);
-      clicker.attr("fill", "#fff");
-      clicker.attr("stroke-width", "0");
-      clicker.attr("fill-opacity", 0);
-      clicker.data("coord", [i, j]);
-      return group.push(clicker);
-    });
-  });
-  virtual_board = new Board.get(n);
-  group.mouseover(function(e) {
-    var coord;
-    return coord = this.data("coord");
-  }).click(function(e) {
-    var coord, move_results, raph_layer_ids;
-    coord = this.data("coord");
-    move_results = virtual_board.move(coord);
-    switch (move_results.color) {
-      case virtual_board.BLACK:
-        raph_layer_ids = black_stone(move_results.x, move_results.y);
-        break;
-      case virtual_board.WHITE:
-        raph_layer_ids = white_stone(move_results.x, move_results.y);
-        break;
-    }
-    this.toFront();
-  });
-  paper.safari();
-  return paper.renderfix();
 });
 
-requirejs.config({
-baseUrl: "scripts",
-urlArgs: "bust=" +  (new Date()).getTime()
-});
-require(['app'], function () {
-});
+// Generated by CoffeeScript 1.3.3
+
+(function() {
+  var _GoBoard;
+  requirejs.config({
+    baseUrl: "scripts",
+    urlArgs: "bust=" + (new Date()).getTime(),
+    shim: {
+      "app": {
+        exports: "_GoBoard"
+      }
+    }
+  });
+  _GoBoard = (function() {
+
+    function _GoBoard(container, container_size, board_size) {
+      var size;
+      this.container = container;
+      this.container_size = container_size;
+      this.board_size = board_size;
+      size = this.size;
+      container = this.container;
+      board_size = this.board_size;
+      require(["app"], function(_GoBoard) {
+        var lol;
+        lol = new _GoBoard(container, container_size, board_size);
+      });
+      return;
+    }
+
+    return _GoBoard;
+
+  })();
+  return window.GoBoard = _GoBoard;
+})();
 
 define("main", function(){});
