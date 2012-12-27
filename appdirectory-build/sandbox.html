@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+<head>
+<title>Sandbox</title>
+
+</head>
+<body>
+<script src="scripts/require.js"></script>
+<script>
+requirejs.config({
+baseUrl: "scripts",
+urlArgs: "bust=" +  (new Date()).getTime()
+});
+require(['main'], function () {
+});
+</script>
+</body>
+</html>
