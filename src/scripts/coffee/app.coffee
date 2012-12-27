@@ -74,7 +74,7 @@ define ["raphael.scale","raphael", "jquery", "underscore", "Board", "domReady!" 
 
       text_size = 15 #pixels
       text_movement = cell_radius / 2 + text_size / 2 + 5
-      text_buffer = text_size + cell_radius / 2 + 10
+      text_buffer = text_size + cell_radius / 2 + 15
 
       canvas_length = cell_radius * (n - 1) + text_buffer * 2
 
@@ -300,6 +300,7 @@ define ["raphael.scale","raphael", "jquery", "underscore", "Board", "domReady!" 
 
 
       # Replaced by http://www.shapevent.com/scaleraphael/
+      ###
       length = @container_size
       canvas.height(length)
       canvas.width(length)
@@ -307,6 +308,14 @@ define ["raphael.scale","raphael", "jquery", "underscore", "Board", "domReady!" 
       viewbox_length = canvas_length*canvas_length/canvas.width()
       paper.setViewBox(0, 0, viewbox_length*2, viewbox_length*2, true)
       paper.setSize(canvas_length*2,canvas_length*2)
+      ###
+      
+      length = this.container_size;
+      canvas.height(length);
+      canvas.width(length);
+      viewbox_length = canvas_length * canvas_length / canvas.width();
+      paper.setViewBox(0, 0, canvas_length, canvas_length, false);
+      paper.setSize(length, length);
 
       return _GoBoard
 
