@@ -3,7 +3,7 @@
     optimize: "none",
     appDir: "../",
     baseUrl: "scripts",
-    dir: "../../appdirectory-build",
+    dir: "../../build",
     paths: {
         jquery: "empty:"
     },
