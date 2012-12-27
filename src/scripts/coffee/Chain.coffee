@@ -1,9 +1,15 @@
-define "Chain", () ->
+define ["underscore"], (_) ->
 
   class Chain
-    constructor: () ->
-      alert "lol"
+    constructor: (@stones, @liberties) ->
+      # rawr
 
-    move: () ->
-      alert "rawr"
+    get_liberties: ()->
+      return @liberties
+
+    in_atari: ()->
+      return _.size(@liberties) is 1
+
+    get_stones: ()->
+      return @stones
 

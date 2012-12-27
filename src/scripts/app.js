@@ -33,7 +33,7 @@ requirejs.config({
   }
 });
 
-define(["raphael.scale", "jquery", "underscore", "Chain", "Board", "domReady!"], function(RaphaelScale, $, _, Chain, Board) {
+define(["raphael.scale", "jquery", "underscore", "Board", "domReady!"], function(RaphaelScale, $, _, Board) {
   var _GoBoard;
   return _GoBoard = (function() {
 
@@ -41,6 +41,7 @@ define(["raphael.scale", "jquery", "underscore", "Chain", "Board", "domReady!"],
       this.container = container;
       this.container_size = container_size;
       this.board_size = board_size;
+      this.RAPH_BOARD_STATE = {};
       if (typeof this.container !== "string" || typeof this.container_size !== "number") {
         return;
       }
@@ -52,7 +53,7 @@ define(["raphael.scale", "jquery", "underscore", "Chain", "Board", "domReady!"],
     }
 
     _GoBoard.prototype.draw_board = function() {
-      var black_stone, board_outline, canvas, canvas_length, cell_radius, circle_radius, group, i, length, line_horiz, line_vert, n, paper, text_buffer, text_movement, text_size, track_stone, track_stone_pointer, virtual_board, white_stone, x, y;
+      var black_stone, board_outline, canvas, canvas_length, cell_radius, circle_radius, get_this, group, i, length, line_horiz, line_vert, n, paper, remove_stone, text_buffer, text_movement, text_size, track_stone, track_stone_pointer, virtual_board, white_stone, x, y;
       canvas = this.canvas;
       canvas.css('overflow', 'hidden');
       canvas.css('display', 'block');
@@ -133,7 +134,7 @@ define(["raphael.scale", "jquery", "underscore", "Chain", "Board", "domReady!"],
         return track_stone_pointer.attr("stroke-width", "2");
       };
       white_stone = function(i, j) {
-        var stone_bg, stone_fg, _x, _y;
+        var group, stone_bg, stone_fg, _x, _y;
         _x = x + cell_radius * i;
         _y = y + cell_radius * j;
         stone_bg = paper.circle(_x, _y, circle_radius);
@@ -144,10 +145,14 @@ define(["raphael.scale", "jquery", "underscore", "Chain", "Board", "domReady!"],
         stone_fg.attr("fill-opacity", 1);
         stone_fg.attr("stroke-opacity", 0.3);
         stone_fg.attr("stroke-width", "1.1");
-        return track_stone(i, j);
+        track_stone(i, j);
+        group = [];
+        group.push(stone_bg.id);
+        group.push(stone_fg.id);
+        return group;
       };
       black_stone = function(i, j) {
-        var stone_bg, stone_fg, _x, _y;
+        var group, stone_bg, stone_fg, _x, _y;
         _x = x + cell_radius * i;
         _y = y + cell_radius * j;
         stone_bg = paper.circle(_x, _y, circle_radius);
@@ -158,7 +163,11 @@ define(["raphael.scale", "jquery", "underscore", "Chain", "Board", "domReady!"],
         stone_fg.attr("fill", "r(0.75,0.75)#A0A0A0-#000");
         stone_fg.attr("stroke-opacity", 0.3);
         stone_fg.attr("stroke-width", "1.2");
-        return track_stone(i, j);
+        track_stone(i, j);
+        group = [];
+        group.push(stone_bg.id);
+        group.push(stone_fg.id);
+        return group;
       };
       group = paper.set();
       _.each(_.range(n), function(i, index) {
@@ -172,7 +181,15 @@ define(["raphael.scale", "jquery", "underscore", "Chain", "Board", "domReady!"],
           return group.push(clicker);
         });
       });
+      get_this = this;
+      remove_stone = function(coord) {
+        console.log(coord);
+        return _.each(get_this.RAPH_BOARD_STATE[coord], function(id) {
+          return paper.getById(id).remove();
+        });
+      };
       virtual_board = new Board.get(n);
+      get_this = this;
       group.mouseover(function(e) {
         var coord;
         return coord = this.data("coord");
@@ -180,12 +197,17 @@ define(["raphael.scale", "jquery", "underscore", "Chain", "Board", "domReady!"],
         var coord, move_results, raph_layer_ids;
         coord = this.data("coord");
         move_results = virtual_board.move(coord);
+        _.each(move_results.dead, function(dead_stone) {
+          return remove_stone(dead_stone);
+        });
         switch (move_results.color) {
           case virtual_board.BLACK:
             raph_layer_ids = black_stone(move_results.x, move_results.y);
+            get_this.RAPH_BOARD_STATE[coord] = raph_layer_ids;
             break;
           case virtual_board.WHITE:
             raph_layer_ids = white_stone(move_results.x, move_results.y);
+            get_this.RAPH_BOARD_STATE[coord] = raph_layer_ids;
             break;
         }
         this.toFront();

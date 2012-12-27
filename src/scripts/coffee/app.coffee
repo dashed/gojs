@@ -34,7 +34,7 @@ requirejs.config
 
 
 
-define ["raphael.scale", "jquery", "underscore", "Chain", "Board", "domReady!" ], (RaphaelScale, $, _, Chain, Board) ->
+define ["raphael.scale", "jquery", "underscore", "Board", "domReady!" ], (RaphaelScale, $, _, Board) ->
   
   #This function is called once the DOM is ready.
   #It will be safe to query the DOM and manipulate
@@ -43,6 +43,9 @@ define ["raphael.scale", "jquery", "underscore", "Chain", "Board", "domReady!" ]
   class _GoBoard
 
     constructor: (@container, @container_size, @board_size) ->
+
+      @RAPH_BOARD_STATE = {} # track raphael ids
+
 
       if typeof @container != "string" or typeof(@container_size) != "number"
         return
@@ -177,9 +180,17 @@ define ["raphael.scale", "jquery", "underscore", "Chain", "Board", "domReady!" ]
 
         track_stone(i,j)
 
+        group = []
+        group.push stone_bg.id
+        group.push stone_fg.id
+        return group
+
+        
+
       black_stone = (i, j) ->
         _x = x + cell_radius * i
         _y = y + cell_radius * j
+
         stone_bg = paper.circle(_x, _y, circle_radius)
         stone_bg.attr "fill", "#fff"
         stone_bg.attr "stroke-width", "0"
@@ -192,9 +203,10 @@ define ["raphael.scale", "jquery", "underscore", "Chain", "Board", "domReady!" ]
 
         track_stone(i,j)
 
-      
-
-
+        group = []
+        group.push stone_bg.id
+        group.push stone_fg.id
+        return group
       
       # Put stones on board if user has clicked
       group = paper.set()
@@ -207,6 +219,11 @@ define ["raphael.scale", "jquery", "underscore", "Chain", "Board", "domReady!" ]
           clicker.data "coord", [i, j]
           group.push clicker
 
+      get_this = this
+      remove_stone = (coord) ->
+        console.log coord
+        _.each get_this.RAPH_BOARD_STATE[coord], (id) ->
+          paper.getById(id).remove()
 
       
       # Replicate board in memory
@@ -214,22 +231,33 @@ define ["raphael.scale", "jquery", "underscore", "Chain", "Board", "domReady!" ]
       virtual_board = new Board.get(n)
 
       
+      get_this = this
       group.mouseover((e) ->
         coord = @data("coord")
 
       ).click (e) ->
+
         coord = @data("coord")
 
         move_results = virtual_board.move(coord)
+
+        # remove_stones
+        _.each move_results.dead, (dead_stone) ->
+          remove_stone(dead_stone) 
+         
 
         #console.log move_results.color
 
         switch move_results.color
           when virtual_board.BLACK
             raph_layer_ids = black_stone(move_results.x, move_results.y)
+
+            get_this.RAPH_BOARD_STATE[coord] = raph_layer_ids
             
           when virtual_board.WHITE
             raph_layer_ids = white_stone(move_results.x, move_results.y)
+
+            get_this.RAPH_BOARD_STATE[coord] = raph_layer_ids
             
           else
             # do nothing
