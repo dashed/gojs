@@ -8447,38 +8447,36 @@ define('app',["raphael.scale", "raphael", "jquery", "underscore", "Board", "domR
       if (typeof this.container !== "string" || typeof this.container_size !== "number") {
         return;
       }
+      if (this.container_size < 0) {
+        return;
+      }
       if (typeof this.board_size !== "number" || this.board_size > 19) {
         this.board_size = 19;
+      }
+      if (this.board_size < 0) {
+        this.board_size = 0;
       }
       this.canvas = $("#" + this.container.toString());
       this.draw_board();
     }
 
     _GoBoard.prototype.draw_board = function() {
-      var black_stone, board_outline, canvas, canvas_length, cell_radius, circle_radius, get_this, group, i, length, line_horiz, line_vert, n, paper, remove_stone, text_buffer, text_movement, text_size, track_stone, track_stone_pointer, viewbox_length, virtual_board, white_stone, x, y;
+      var black_stone, board_outline, canvas, canvas_length, cell_radius, circle_radius, get_this, group, i, length, line_horiz, line_vert, n, paper, remove_stone, text_buffer, text_movement, text_size, track_stone, track_stone_pointer, virtual_board, white_stone, x, y;
       canvas = this.canvas;
       canvas.css('overflow', 'hidden');
       canvas.css('display', 'block');
-      canvas.height(this);
+      canvas.css('border', '1px solid black');
       canvas = this.canvas;
       n = this.board_size;
       cell_radius = 25;
       circle_radius = 0.50 * cell_radius;
       text_size = 15;
-      text_movement = cell_radius / 2 + text_size / 2 + 5;
-      text_buffer = text_size + cell_radius / 2 + 10;
+      text_buffer = text_size + cell_radius / 2 + 20;
+      text_movement = text_buffer / 2;
       canvas_length = cell_radius * (n - 1) + text_buffer * 2;
       paper = Raphael(canvas[0], canvas_length, canvas_length);
-      /*length = @container_size
-      paper.changeSize(length,length, true, false)
-      canvas.css('position', 'static')
-      canvas.css('border', '1px solid black')
-      canvas.height(length)
-      canvas.width(length)
-      */
-
       y = text_buffer * 1;
-      x = y;
+      x = text_buffer;
       board_outline = paper.rect(x, y, cell_radius * (n - 1), cell_radius * (n - 1)).attr("stroke-width", 2);
       paper.rect(x, y, cell_radius * (n - 1), cell_radius * (n - 1)).attr("stroke-width", 1);
       _.each(_.range(n), function(letter, index) {
@@ -8643,12 +8641,21 @@ define('app',["raphael.scale", "raphael", "jquery", "underscore", "Board", "domR
 
       paper.safari();
       paper.renderfix();
+      /*
+            length = @container_size
+            canvas.height(length)
+            canvas.width(length)
+      
+            viewbox_length = canvas_length*canvas_length/canvas.width()
+            paper.setViewBox(0, 0, viewbox_length*2, viewbox_length*2, true)
+            paper.setSize(canvas_length*2,canvas_length*2)
+      */
+
       length = this.container_size;
       canvas.height(length);
       canvas.width(length);
-      viewbox_length = canvas_length * canvas_length / canvas.width();
-      paper.setViewBox(0, 0, viewbox_length * 2, viewbox_length * 2, true);
-      paper.setSize(canvas_length * 2, canvas_length * 2);
+      paper.setViewBox(0, 0, canvas_length, canvas_length, false);
+      paper.setSize(length, length);
       return _GoBoard;
     };
 
