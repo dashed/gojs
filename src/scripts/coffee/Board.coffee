@@ -1,13 +1,10 @@
 define ["underscore", "jquery", "Chain"], (_, $, Chain) ->
 
-  # The publicly accessible Singleton fetcher
-  class Board
-    _instance = undefined # Must be declared here to force the closure on the class
-    @get: (size) -> # Must be a static method
-      _instance ?= new _Board size
+
+
 
   # The actual Singleton class
-  class _Board
+  class Board
 
     # class variables
     @EMPTY: 0
@@ -196,7 +193,6 @@ define ["underscore", "jquery", "Chain"], (_, $, Chain) ->
             if(enemy.in_atari())
               suicide = false
 
-              console.log  enemy.get_stones()
 
               # remove the enemy stones from the board
               _.each enemy.get_stones(), (stone) ->

@@ -34,7 +34,7 @@ requirejs.config
 
 
 
-define ["raphael.scale", "jquery", "underscore", "Board", "domReady!" ], (RaphaelScale, $, _, Board) ->
+define ["raphael.scale","raphael", "jquery", "underscore", "Board", "domReady!" ], (RaphaelScale,Raphael, $, _, Board) ->
   
   #This function is called once the DOM is ready.
   #It will be safe to query the DOM and manipulate
@@ -63,6 +63,7 @@ define ["raphael.scale", "jquery", "underscore", "Board", "domReady!" ], (Raphae
       canvas = @canvas
       canvas.css('overflow', 'hidden')
       canvas.css('display', 'block')
+      canvas.height(@)
 
       canvas = @canvas
 
@@ -78,14 +79,14 @@ define ["raphael.scale", "jquery", "underscore", "Board", "domReady!" ], (Raphae
       canvas_length = cell_radius * (n - 1) + text_buffer * 2
 
       # Create canvas
-      paper = RaphaelScale(canvas[0], canvas_length, canvas_length)
+      paper = Raphael(canvas[0], canvas_length, canvas_length)
 
-      length = @container_size
+      ###length = @container_size
       paper.changeSize(length,length, true, false)
       canvas.css('position', 'static')
-      #canvas.css('border', '1px solid black')
+      canvas.css('border', '1px solid black')
       canvas.height(length)
-      canvas.width(length)
+      canvas.width(length)###
 
       #paper.setViewBox(0,0,canvas_length,canvas_length)
       #paper.setSize($("#canvas").width(),$("#canvas").width())
@@ -228,7 +229,7 @@ define ["raphael.scale", "jquery", "underscore", "Board", "domReady!" ], (Raphae
       
       # Replicate board in memory
       # this is a singleton instance
-      virtual_board = new Board.get(n)
+      virtual_board = new Board(n)
 
       
       get_this = this
@@ -299,9 +300,13 @@ define ["raphael.scale", "jquery", "underscore", "Board", "domReady!" ], (Raphae
 
 
       # Replaced by http://www.shapevent.com/scaleraphael/
-      #viewbox_length = canvas_length*canvas_length/canvas.width()
-      #paper.setViewBox(0, 0, viewbox_length*2, viewbox_length*2, true)
-      #paper.setSize(canvas_length*2,canvas_length*2)
+      length = @container_size
+      canvas.height(length)
+      canvas.width(length)
+
+      viewbox_length = canvas_length*canvas_length/canvas.width()
+      paper.setViewBox(0, 0, viewbox_length*2, viewbox_length*2, true)
+      paper.setSize(canvas_length*2,canvas_length*2)
 
       return _GoBoard
 
