@@ -177,8 +177,11 @@ define(["raphael.scale", "raphael", "jquery", "underscore", "Board", "domReady!"
           var clicker;
           clicker = paper.rect(x - cell_radius / 2 + cell_radius * i, y - cell_radius / 2 + cell_radius * j, cell_radius, cell_radius);
           clicker.attr("fill", "#fff");
-          clicker.attr("stroke-width", "0");
           clicker.attr("fill-opacity", 0);
+          clicker.attr("opacity", 0);
+          clicker.attr("stroke-width", 0);
+          clicker.attr("stroke", "#fff");
+          clicker.attr("stroke-opacity", 0);
           clicker.data("coord", [i, j]);
           return group.push(clicker);
         });

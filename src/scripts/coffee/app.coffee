@@ -216,8 +216,11 @@ define ["raphael.scale","raphael", "jquery", "underscore", "Board", "domReady!" 
         _.each _.range(n), (j, index) ->
           clicker = paper.rect(x - cell_radius / 2 + cell_radius * i, y - cell_radius / 2 + cell_radius * j, cell_radius, cell_radius)
           clicker.attr "fill", "#fff"
-          clicker.attr "stroke-width", "0"
           clicker.attr "fill-opacity", 0
+          clicker.attr "opacity", 0
+          clicker.attr "stroke-width", 0
+          clicker.attr "stroke", "#fff"
+          clicker.attr "stroke-opacity", 0
           clicker.data "coord", [i, j]
           group.push clicker
 
@@ -247,8 +250,6 @@ define ["raphael.scale","raphael", "jquery", "underscore", "Board", "domReady!" 
         _.each move_results.dead, (dead_stone) ->
           remove_stone(dead_stone) 
          
-
-        #console.log move_results.color
 
         switch move_results.color
           when virtual_board.BLACK

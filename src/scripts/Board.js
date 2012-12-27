@@ -34,7 +34,7 @@ define(["underscore", "jquery", "Chain"], function(_, $, Chain) {
       return;
     }
 
-    Board.prototype.get_neighbors = function(_point) {
+    Board.prototype.get_adjacent_points = function(_point) {
       var neighbours, _x, _y;
       _x = _point[0];
       _y = _point[1];
@@ -88,57 +88,49 @@ define(["underscore", "jquery", "Chain"], function(_, $, Chain) {
       return _color_opp;
     };
 
-    Board.prototype.get_chain_points = function(_virtual_board, point) {
-      var flood_fill_color, get_this, my_color, stones;
-      stones = {};
-      stones[point] = point;
-      my_color = this.get_color(_virtual_board, point);
-      flood_fill_color = this.get_opposite_color(my_color);
-      _virtual_board = this.set_color(_virtual_board, point, flood_fill_color);
-      get_this = this;
-      _.each(this.get_neighbors(point), function(neighbor) {
-        var n_color;
-        n_color = get_this.get_color(_virtual_board, point);
-        if (n_color === my_color) {
-          if (!(_.contains(_.keys(stones), neighbor.toString()))) {
-            return _.each(get_this.get_chain_points(_virtual_board, neighbor), function(_neighbor) {
-              return stones[_neighbor] = _neighbor;
-            });
-          }
-        }
-      });
-      return stones;
+    Board.prototype.get_chain = function(_coord) {
+      var chain_info, current_color, fill_color, virtual_board_clone;
+      chain_info = {
+        liberties: {},
+        chain_members: {}
+      };
+      current_color = this.get_color(this.virtual_board, _coord);
+      if (current_color === this.EMPTY) {
+        return chain_info;
+      }
+      fill_color = this.get_opposite_color(_coord);
+      virtual_board_clone = $.extend(true, [], this.virtual_board);
     };
 
-    Board.prototype.get_chain = function(_virtual_board, point) {
-      var get_this, liberties, stones, virtual_board_clone;
-      virtual_board_clone = $.extend(true, [], _virtual_board);
-      stones = this.get_chain_points(virtual_board_clone, point);
-      liberties = {};
+    Board.prototype.is_move_legal = function(_coord) {
+      var adjacent_points, get_this, legal_results;
+      adjacent_points = this.get_adjacent_points(_coord);
       get_this = this;
-      _.each(stones, function(stone) {
-        return _.each(get_this.get_neighbors(stone), function(point) {
-          if (get_this.get_color(_virtual_board, point) === get_this.EMPTY) {
-            return liberties[point] = point;
-          }
-        });
+      _.each(adjacent_points, function(adjacent_point) {
+        return get_this.get_chain(adjacent_point);
       });
-      return new Chain(stones, liberties);
+      legal_results = {
+        legal: true,
+        dead: []
+      };
+      return legal_results;
     };
 
     Board.prototype.move = function(_coord) {
-      var capturedStones, get_this, move_results, point_color, suicide, virtual_board_clone, _x, _y;
-      capturedStones = {};
-      virtual_board_clone = $.extend(true, [], this.virtual_board);
-      _x = _coord[0];
-      _y = _coord[1];
-      point_color = this.get_color(virtual_board_clone, _coord);
+      var legal_results, move_results, point_color;
       move_results = {
         color: this.EMPTY,
-        x: _x,
-        y: _y,
+        x: _coord[0],
+        y: _coord[1],
         dead: []
       };
+      legal_results = this.is_move_legal(_coord);
+      if (legal_results.legal === true) {
+        move_results.dead = $.extend(true, [], legal_results.dead);
+      } else {
+        return move_results;
+      }
+      point_color = this.get_color(this.virtual_board, _coord);
       if (point_color === this.EMPTY) {
         if (this.CURRENT_STONE === this.BLACK) {
           this.virtual_board = this.set_color(this.virtual_board, _coord, this.BLACK);
@@ -149,53 +141,6 @@ define(["underscore", "jquery", "Chain"], function(_, $, Chain) {
           move_results.color = this.WHITE;
           this.CURRENT_STONE = this.BLACK;
         }
-      }
-      return move_results;
-      if (_x === this.KO_POINT[0] && _y === this.KO_POINT[1]) {
-        return move_results;
-      }
-      if (point_color === this.EMPTY) {
-        suicide = true;
-        get_this = this;
-        _.each(this.get_neighbors(_coord), function(neighbor) {
-          var enemy, n_color;
-          n_color = get_this.get_color(virtual_board_clone, neighbor);
-          if (n_color === get_this.EMPTY) {
-            return suicide = false;
-          } else if (n_color === get_this.CURRENT_STONE) {
-            if (!(get_this.get_chain(virtual_board_clone, neighbor).in_atari())) {
-              return suicide = false;
-            }
-          } else if (n_color === get_this.get_opposite_color(get_this.CURRENT_STONE)) {
-            enemy = get_this.get_chain(virtual_board_clone, neighbor);
-            if (enemy.in_atari()) {
-              suicide = false;
-              return _.each(enemy.get_stones(), function(stone) {
-                get_this.set_color(virtual_board_clone, stone, get_this.EMPTY);
-                capturedStones[stone] = stone;
-                return move_results.dead.push(stone);
-              });
-            }
-          }
-        });
-        if (suicide) {
-          return move_results;
-        }
-        if (this.CURRENT_STONE === this.BLACK) {
-          virtual_board_clone = this.set_color(virtual_board_clone, _coord, this.BLACK);
-          move_results.color = this.BLACK;
-          this.CURRENT_STONE = this.WHITE;
-        } else {
-          virtual_board_clone = this.set_color(virtual_board_clone, _coord, this.WHITE);
-          move_results.color = this.WHITE;
-          this.CURRENT_STONE = this.BLACK;
-        }
-        if (_.size(capturedStones) === 1) {
-          this.KO_POINT = capturedStones[_.keys(capturedStones)[0]];
-        } else {
-          this.KO_POINT = [];
-        }
-        this.virtual_board = virtual_board_clone;
       }
       return move_results;
     };
