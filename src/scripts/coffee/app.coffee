@@ -50,8 +50,14 @@ define ["raphael.scale","raphael", "jquery", "underscore", "Board", "domReady!" 
       if typeof @container != "string" or typeof(@container_size) != "number"
         return
 
+      if @container_size < 0
+        return
+
       if typeof @board_size != "number" or @board_size > 19
         @board_size = 19
+
+      if @board_size < 0
+        @board_size = 0
 
 
       @canvas = $("#"+ @container.toString())
@@ -63,7 +69,7 @@ define ["raphael.scale","raphael", "jquery", "underscore", "Board", "domReady!" 
       canvas = @canvas
       canvas.css('overflow', 'hidden')
       canvas.css('display', 'block')
-      canvas.height(@)
+      canvas.css('border', '1px solid black')
 
       canvas = @canvas
 
@@ -73,43 +79,38 @@ define ["raphael.scale","raphael", "jquery", "underscore", "Board", "domReady!" 
       circle_radius = 0.50 * cell_radius
 
       text_size = 15 #pixels
-      text_movement = cell_radius / 2 + text_size / 2 + 5
-      text_buffer = text_size + cell_radius / 2 + 15
+      text_buffer = text_size + cell_radius / 2 + 20
+      text_movement = text_buffer/2 
+      # cell_radius / 2 + text_size / 2 + 5
+      
 
       canvas_length = cell_radius * (n - 1) + text_buffer * 2
 
       # Create canvas
       paper = Raphael(canvas[0], canvas_length, canvas_length)
 
-      ###length = @container_size
-      paper.changeSize(length,length, true, false)
-      canvas.css('position', 'static')
-      canvas.css('border', '1px solid black')
-      canvas.height(length)
-      canvas.width(length)###
-
-      #paper.setViewBox(0,0,canvas_length,canvas_length)
-      #paper.setSize($("#canvas").width(),$("#canvas").width())
-
-      # measurement
-      #paper.rect(0,0, canvas_length,canvas_length);
-
       
       # coord of top left of canvas
       y = text_buffer * 1 # top-left x
-      x = y # top-left y
+      x = text_buffer # top-left y
       
       # construct the board
       board_outline = paper.rect(x, y, cell_radius * (n - 1), cell_radius * (n - 1)).attr("stroke-width", 2)
       paper.rect(x, y, cell_radius * (n - 1), cell_radius * (n - 1)).attr "stroke-width", 1
+
+      #paper.rect(x- text_movement, y-text_movement*1, cell_radius * (n)+text_movement, cell_radius * (n)+text_movement*2).attr "stroke-width", 3
       
       # text labels
       _.each _.range(n), (letter, index) ->
+
+        # Alphabet
         letter = String.fromCharCode(65 + index)
         paper.text(x + cell_radius * (index), y + cell_radius * (n - 1) + text_movement, letter).attr "font-size", text_size
         paper.text(x + cell_radius * (index), y - text_movement, letter).attr "font-size", text_size
 
       _.each _.range(1, n + 1), (letter, index) ->
+
+        # Numbers
         paper.text(x - text_movement, y + cell_radius * (n - 1 - index), letter).attr "font-size", text_size
         paper.text(x + cell_radius * (n - 1) + text_movement, y + cell_radius * (n - 1 - index), letter).attr "font-size", text_size
 
@@ -313,7 +314,7 @@ define ["raphael.scale","raphael", "jquery", "underscore", "Board", "domReady!" 
       length = this.container_size;
       canvas.height(length);
       canvas.width(length);
-      viewbox_length = canvas_length * canvas_length / canvas.width();
+      #viewbox_length = canvas_length * canvas_length / canvas.width();
       paper.setViewBox(0, 0, canvas_length, canvas_length, false);
       paper.setSize(length, length);
 
