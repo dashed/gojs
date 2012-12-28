@@ -68,7 +68,7 @@ define ["raphael", "jquery", "underscore", "murmurhash3","Board", "domReady!" ],
 
       canvas = @canvas
       canvas.css('overflow', 'hidden')
-      canvas.css('display', 'block')
+      canvas.css('display', 'inline-block')
       canvas.css('border', '1px solid black')
 
       canvas = @canvas
