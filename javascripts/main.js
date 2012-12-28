@@ -7918,114 +7918,6 @@ define('raphael',['raphael.core', 'raphael.svg', 'raphael.vml'], function (R) {
 });
 
 
-/*
- * ScaleRaphael 0.8 by Zevan Rosser 2010 
- * For use with Raphael library : www.raphaeljs.com
- * Licensed under the MIT license.
- *
- * www.shapevent.com/scaleraphael/
- */
-
-//(function(){
-//window.ScaleRaphael = function(container, width, height){
-define('raphael.scale',["raphael"], function(Raphael) {
-
-    return function(container, width, height){
-    var wrapper = container;//document.getElementById(container);
-    
-    if (!wrapper.style.position) wrapper.style.position = "relative";
-    wrapper.style.width = width + "px";
-    wrapper.style.height = height + "px";
-    wrapper.style.overflow = "hidden";
-    
-    var nestedWrapper;
-      
-    if (Raphael.type == "VML"){
-      wrapper.innerHTML = "<rvml:group style='position : absolute; width: 1000px; height: 1000px; top: 0px; left: 0px' coordsize='1000,1000' class='rvml' id='vmlgroup'><\/rvml:group>";
-      nestedWrapper = document.getElementById("vmlgroup");
-    }else{
-      wrapper.innerHTML = "<div id='svggroup'><\/div>";
-      nestedWrapper = document.getElementById("svggroup");
-    }
- 
-    var paper = new Raphael(nestedWrapper, width, height);
-    var vmlDiv;
-    
-    if (Raphael.type == "SVG"){
-      paper.canvas.setAttribute("viewBox", "0 0 "+width+" "+height);
-    }else{
-      vmlDiv = wrapper.getElementsByTagName("div")[0];
-    }
-    
-    paper.changeSize = function(w, h, center, clipping){
-      clipping = !clipping;
-      
-      var ratioW = w / width;
-      var ratioH = h / height;
-      var scale = ratioW < ratioH ? ratioW : ratioH;
-      
-      var newHeight = parseInt(height * scale);
-      var newWidth = parseInt(width * scale);
-      
-      if (Raphael.type == "VML"){
-         // scale the textpaths
-       var txt = document.getElementsByTagName("textpath");
-        for (var i in txt){
-          var curr = txt[i];
-          if (curr.style){
-            if(!curr._fontSize){
-              var mod = curr.style.font.split("px");
-              curr._fontSize = parseInt(mod[0]);
-              curr._font = mod[1];
-            }
-            curr.style.font = curr._fontSize * scale + "px" + curr._font;
-          }
-        }
-        var newSize; 
-        if (newWidth < newHeight){
-         newSize = newWidth * 1000 / width;
-        }else{
-         newSize = newHeight * 1000 / height;
-        }
-        newSize = parseInt(newSize);
-        nestedWrapper.style.width = newSize + "px";
-        nestedWrapper.style.height = newSize + "px";
-        if (clipping){
-          nestedWrapper.style.left = parseInt((w - newWidth) / 2) + "px";
-          nestedWrapper.style.top = parseInt((h - newHeight) / 2) + "px";
-        }
-        vmlDiv.style.overflow = "visible";
-      }
-      
-      if (clipping){
-        newWidth = w;
-        newHeight = h;
-      }
-      
-      wrapper.style.width = newWidth + "px";
-      wrapper.style.height = newHeight + "px";
-      paper.setSize(newWidth, newHeight);
-      
-      if (center){
-        wrapper.style.position = "absolute";
-        wrapper.style.left = parseInt((w - newWidth) / 2) + "px";
-        wrapper.style.top = parseInt((h - newHeight) / 2) + "px";
-      }
-    }
-    
-    paper.scaleAll = function(amount){
-      paper.changeSize(width * amount, height * amount);
-    }
-    
-    paper.changeSize(width, height);
-    
-    paper.w = width;
-    paper.h = height;
-    
-    return paper;
-  }
-//})();
-});
 (function(){var n=this,t=n._,r={},e=Array.prototype,u=Object.prototype,i=Function.prototype,a=e.push,o=e.slice,c=e.concat,l=u.toString,f=u.hasOwnProperty,s=e.forEach,p=e.map,v=e.reduce,h=e.reduceRight,g=e.filter,d=e.every,m=e.some,y=e.indexOf,b=e.lastIndexOf,x=Array.isArray,_=Object.keys,j=i.bind,w=function(n){return n instanceof w?n:this instanceof w?(this._wrapped=n,void 0):new w(n)};"undefined"!=typeof exports?("undefined"!=typeof module&&module.exports&&(exports=module.exports=w),exports._=w):n._=w,w.VERSION="1.4.3";var A=w.each=w.forEach=function(n,t,e){if(null!=n)if(s&&n.forEach===s)n.forEach(t,e);else if(n.length===+n.length){for(var u=0,i=n.length;i>u;u++)if(t.call(e,n[u],u,n)===r)return}else for(var a in n)if(w.has(n,a)&&t.call(e,n[a],a,n)===r)return};w.map=w.collect=function(n,t,r){var e=[];return null==n?e:p&&n.map===p?n.map(t,r):(A(n,function(n,u,i){e[e.length]=t.call(r,n,u,i)}),e)};var O="Reduce of empty array with no initial value";w.reduce=w.foldl=w.inject=function(n,t,r,e){var u=arguments.length>2;if(null==n&&(n=[]),v&&n.reduce===v)return e&&(t=w.bind(t,e)),u?n.reduce(t,r):n.reduce(t);if(A(n,function(n,i,a){u?r=t.call(e,r,n,i,a):(r=n,u=!0)}),!u)throw new TypeError(O);return r},w.reduceRight=w.foldr=function(n,t,r,e){var u=arguments.length>2;if(null==n&&(n=[]),h&&n.reduceRight===h)return e&&(t=w.bind(t,e)),u?n.reduceRight(t,r):n.reduceRight(t);var i=n.length;if(i!==+i){var a=w.keys(n);i=a.length}if(A(n,function(o,c,l){c=a?a[--i]:--i,u?r=t.call(e,r,n[c],c,l):(r=n[c],u=!0)}),!u)throw new TypeError(O);return r},w.find=w.detect=function(n,t,r){var e;return E(n,function(n,u,i){return t.call(r,n,u,i)?(e=n,!0):void 0}),e},w.filter=w.select=function(n,t,r){var e=[];return null==n?e:g&&n.filter===g?n.filter(t,r):(A(n,function(n,u,i){t.call(r,n,u,i)&&(e[e.length]=n)}),e)},w.reject=function(n,t,r){return w.filter(n,function(n,e,u){return!t.call(r,n,e,u)},r)},w.every=w.all=function(n,t,e){t||(t=w.identity);var u=!0;return null==n?u:d&&n.every===d?n.every(t,e):(A(n,function(n,i,a){return(u=u&&t.call(e,n,i,a))?void 0:r}),!!u)};var E=w.some=w.any=function(n,t,e){t||(t=w.identity);var u=!1;return null==n?u:m&&n.some===m?n.some(t,e):(A(n,function(n,i,a){return u||(u=t.call(e,n,i,a))?r:void 0}),!!u)};w.contains=w.include=function(n,t){return null==n?!1:y&&n.indexOf===y?-1!=n.indexOf(t):E(n,function(n){return n===t})},w.invoke=function(n,t){var r=o.call(arguments,2);return w.map(n,function(n){return(w.isFunction(t)?t:n[t]).apply(n,r)})},w.pluck=function(n,t){return w.map(n,function(n){return n[t]})},w.where=function(n,t){return w.isEmpty(t)?[]:w.filter(n,function(n){for(var r in t)if(t[r]!==n[r])return!1;return!0})},w.max=function(n,t,r){if(!t&&w.isArray(n)&&n[0]===+n[0]&&65535>n.length)return Math.max.apply(Math,n);if(!t&&w.isEmpty(n))return-1/0;var e={computed:-1/0,value:-1/0};return A(n,function(n,u,i){var a=t?t.call(r,n,u,i):n;a>=e.computed&&(e={value:n,computed:a})}),e.value},w.min=function(n,t,r){if(!t&&w.isArray(n)&&n[0]===+n[0]&&65535>n.length)return Math.min.apply(Math,n);if(!t&&w.isEmpty(n))return 1/0;var e={computed:1/0,value:1/0};return A(n,function(n,u,i){var a=t?t.call(r,n,u,i):n;e.computed>a&&(e={value:n,computed:a})}),e.value},w.shuffle=function(n){var t,r=0,e=[];return A(n,function(n){t=w.random(r++),e[r-1]=e[t],e[t]=n}),e};var F=function(n){return w.isFunction(n)?n:function(t){return t[n]}};w.sortBy=function(n,t,r){var e=F(t);return w.pluck(w.map(n,function(n,t,u){return{value:n,index:t,criteria:e.call(r,n,t,u)}}).sort(function(n,t){var r=n.criteria,e=t.criteria;if(r!==e){if(r>e||void 0===r)return 1;if(e>r||void 0===e)return-1}return n.index<t.index?-1:1}),"value")};var k=function(n,t,r,e){var u={},i=F(t||w.identity);return A(n,function(t,a){var o=i.call(r,t,a,n);e(u,o,t)}),u};w.groupBy=function(n,t,r){return k(n,t,r,function(n,t,r){(w.has(n,t)?n[t]:n[t]=[]).push(r)})},w.countBy=function(n,t,r){return k(n,t,r,function(n,t){w.has(n,t)||(n[t]=0),n[t]++})},w.sortedIndex=function(n,t,r,e){r=null==r?w.identity:F(r);for(var u=r.call(e,t),i=0,a=n.length;a>i;){var o=i+a>>>1;u>r.call(e,n[o])?i=o+1:a=o}return i},w.toArray=function(n){return n?w.isArray(n)?o.call(n):n.length===+n.length?w.map(n,w.identity):w.values(n):[]},w.size=function(n){return null==n?0:n.length===+n.length?n.length:w.keys(n).length},w.first=w.head=w.take=function(n,t,r){return null==n?void 0:null==t||r?n[0]:o.call(n,0,t)},w.initial=function(n,t,r){return o.call(n,0,n.length-(null==t||r?1:t))},w.last=function(n,t,r){return null==n?void 0:null==t||r?n[n.length-1]:o.call(n,Math.max(n.length-t,0))},w.rest=w.tail=w.drop=function(n,t,r){return o.call(n,null==t||r?1:t)},w.compact=function(n){return w.filter(n,w.identity)};var R=function(n,t,r){return A(n,function(n){w.isArray(n)?t?a.apply(r,n):R(n,t,r):r.push(n)}),r};w.flatten=function(n,t){return R(n,t,[])},w.without=function(n){return w.difference(n,o.call(arguments,1))},w.uniq=w.unique=function(n,t,r,e){w.isFunction(t)&&(e=r,r=t,t=!1);var u=r?w.map(n,r,e):n,i=[],a=[];return A(u,function(r,e){(t?e&&a[a.length-1]===r:w.contains(a,r))||(a.push(r),i.push(n[e]))}),i},w.union=function(){return w.uniq(c.apply(e,arguments))},w.intersection=function(n){var t=o.call(arguments,1);return w.filter(w.uniq(n),function(n){return w.every(t,function(t){return w.indexOf(t,n)>=0})})},w.difference=function(n){var t=c.apply(e,o.call(arguments,1));return w.filter(n,function(n){return!w.contains(t,n)})},w.zip=function(){for(var n=o.call(arguments),t=w.max(w.pluck(n,"length")),r=Array(t),e=0;t>e;e++)r[e]=w.pluck(n,""+e);return r},w.object=function(n,t){if(null==n)return{};for(var r={},e=0,u=n.length;u>e;e++)t?r[n[e]]=t[e]:r[n[e][0]]=n[e][1];return r},w.indexOf=function(n,t,r){if(null==n)return-1;var e=0,u=n.length;if(r){if("number"!=typeof r)return e=w.sortedIndex(n,t),n[e]===t?e:-1;e=0>r?Math.max(0,u+r):r}if(y&&n.indexOf===y)return n.indexOf(t,r);for(;u>e;e++)if(n[e]===t)return e;return-1},w.lastIndexOf=function(n,t,r){if(null==n)return-1;var e=null!=r;if(b&&n.lastIndexOf===b)return e?n.lastIndexOf(t,r):n.lastIndexOf(t);for(var u=e?r:n.length;u--;)if(n[u]===t)return u;return-1},w.range=function(n,t,r){1>=arguments.length&&(t=n||0,n=0),r=arguments[2]||1;for(var e=Math.max(Math.ceil((t-n)/r),0),u=0,i=Array(e);e>u;)i[u++]=n,n+=r;return i};var I=function(){};w.bind=function(n,t){var r,e;if(n.bind===j&&j)return j.apply(n,o.call(arguments,1));if(!w.isFunction(n))throw new TypeError;return r=o.call(arguments,2),e=function(){if(!(this instanceof e))return n.apply(t,r.concat(o.call(arguments)));I.prototype=n.prototype;var u=new I;I.prototype=null;var i=n.apply(u,r.concat(o.call(arguments)));return Object(i)===i?i:u}},w.bindAll=function(n){var t=o.call(arguments,1);return 0==t.length&&(t=w.functions(n)),A(t,function(t){n[t]=w.bind(n[t],n)}),n},w.memoize=function(n,t){var r={};return t||(t=w.identity),function(){var e=t.apply(this,arguments);return w.has(r,e)?r[e]:r[e]=n.apply(this,arguments)}},w.delay=function(n,t){var r=o.call(arguments,2);return setTimeout(function(){return n.apply(null,r)},t)},w.defer=function(n){return w.delay.apply(w,[n,1].concat(o.call(arguments,1)))},w.throttle=function(n,t){var r,e,u,i,a=0,o=function(){a=new Date,u=null,i=n.apply(r,e)};return function(){var c=new Date,l=t-(c-a);return r=this,e=arguments,0>=l?(clearTimeout(u),u=null,a=c,i=n.apply(r,e)):u||(u=setTimeout(o,l)),i}},w.debounce=function(n,t,r){var e,u;return function(){var i=this,a=arguments,o=function(){e=null,r||(u=n.apply(i,a))},c=r&&!e;return clearTimeout(e),e=setTimeout(o,t),c&&(u=n.apply(i,a)),u}},w.once=function(n){var t,r=!1;return function(){return r?t:(r=!0,t=n.apply(this,arguments),n=null,t)}},w.wrap=function(n,t){return function(){var r=[n];return a.apply(r,arguments),t.apply(this,r)}},w.compose=function(){var n=arguments;return function(){for(var t=arguments,r=n.length-1;r>=0;r--)t=[n[r].apply(this,t)];return t[0]}},w.after=function(n,t){return 0>=n?t():function(){return 1>--n?t.apply(this,arguments):void 0}},w.keys=_||function(n){if(n!==Object(n))throw new TypeError("Invalid object");var t=[];for(var r in n)w.has(n,r)&&(t[t.length]=r);return t},w.values=function(n){var t=[];for(var r in n)w.has(n,r)&&t.push(n[r]);return t},w.pairs=function(n){var t=[];for(var r in n)w.has(n,r)&&t.push([r,n[r]]);return t},w.invert=function(n){var t={};for(var r in n)w.has(n,r)&&(t[n[r]]=r);return t},w.functions=w.methods=function(n){var t=[];for(var r in n)w.isFunction(n[r])&&t.push(r);return t.sort()},w.extend=function(n){return A(o.call(arguments,1),function(t){if(t)for(var r in t)n[r]=t[r]}),n},w.pick=function(n){var t={},r=c.apply(e,o.call(arguments,1));return A(r,function(r){r in n&&(t[r]=n[r])}),t},w.omit=function(n){var t={},r=c.apply(e,o.call(arguments,1));for(var u in n)w.contains(r,u)||(t[u]=n[u]);return t},w.defaults=function(n){return A(o.call(arguments,1),function(t){if(t)for(var r in t)null==n[r]&&(n[r]=t[r])}),n},w.clone=function(n){return w.isObject(n)?w.isArray(n)?n.slice():w.extend({},n):n},w.tap=function(n,t){return t(n),n};var S=function(n,t,r,e){if(n===t)return 0!==n||1/n==1/t;if(null==n||null==t)return n===t;n instanceof w&&(n=n._wrapped),t instanceof w&&(t=t._wrapped);var u=l.call(n);if(u!=l.call(t))return!1;switch(u){case"[object String]":return n==t+"";case"[object Number]":return n!=+n?t!=+t:0==n?1/n==1/t:n==+t;case"[object Date]":case"[object Boolean]":return+n==+t;case"[object RegExp]":return n.source==t.source&&n.global==t.global&&n.multiline==t.multiline&&n.ignoreCase==t.ignoreCase}if("object"!=typeof n||"object"!=typeof t)return!1;for(var i=r.length;i--;)if(r[i]==n)return e[i]==t;r.push(n),e.push(t);var a=0,o=!0;if("[object Array]"==u){if(a=n.length,o=a==t.length)for(;a--&&(o=S(n[a],t[a],r,e)););}else{var c=n.constructor,f=t.constructor;if(c!==f&&!(w.isFunction(c)&&c instanceof c&&w.isFunction(f)&&f instanceof f))return!1;for(var s in n)if(w.has(n,s)&&(a++,!(o=w.has(t,s)&&S(n[s],t[s],r,e))))break;if(o){for(s in t)if(w.has(t,s)&&!a--)break;o=!a}}return r.pop(),e.pop(),o};w.isEqual=function(n,t){return S(n,t,[],[])},w.isEmpty=function(n){if(null==n)return!0;if(w.isArray(n)||w.isString(n))return 0===n.length;for(var t in n)if(w.has(n,t))return!1;return!0},w.isElement=function(n){return!(!n||1!==n.nodeType)},w.isArray=x||function(n){return"[object Array]"==l.call(n)},w.isObject=function(n){return n===Object(n)},A(["Arguments","Function","String","Number","Date","RegExp"],function(n){w["is"+n]=function(t){return l.call(t)=="[object "+n+"]"}}),w.isArguments(arguments)||(w.isArguments=function(n){return!(!n||!w.has(n,"callee"))}),w.isFunction=function(n){return"function"==typeof n},w.isFinite=function(n){return isFinite(n)&&!isNaN(parseFloat(n))},w.isNaN=function(n){return w.isNumber(n)&&n!=+n},w.isBoolean=function(n){return n===!0||n===!1||"[object Boolean]"==l.call(n)},w.isNull=function(n){return null===n},w.isUndefined=function(n){return void 0===n},w.has=function(n,t){return f.call(n,t)},w.noConflict=function(){return n._=t,this},w.identity=function(n){return n},w.times=function(n,t,r){for(var e=Array(n),u=0;n>u;u++)e[u]=t.call(r,u);return e},w.random=function(n,t){return null==t&&(t=n,n=0),n+(0|Math.random()*(t-n+1))};var T={escape:{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#x27;","/":"&#x2F;"}};T.unescape=w.invert(T.escape);var M={escape:RegExp("["+w.keys(T.escape).join("")+"]","g"),unescape:RegExp("("+w.keys(T.unescape).join("|")+")","g")};w.each(["escape","unescape"],function(n){w[n]=function(t){return null==t?"":(""+t).replace(M[n],function(t){return T[n][t]})}}),w.result=function(n,t){if(null==n)return null;var r=n[t];return w.isFunction(r)?r.call(n):r},w.mixin=function(n){A(w.functions(n),function(t){var r=w[t]=n[t];w.prototype[t]=function(){var n=[this._wrapped];return a.apply(n,arguments),z.call(this,r.apply(w,n))}})};var N=0;w.uniqueId=function(n){var t=""+ ++N;return n?n+t:t},w.templateSettings={evaluate:/<%([\s\S]+?)%>/g,interpolate:/<%=([\s\S]+?)%>/g,escape:/<%-([\s\S]+?)%>/g};var q=/(.)^/,B={"'":"'","\\":"\\","\r":"r","\n":"n","	":"t","\u2028":"u2028","\u2029":"u2029"},D=/\\|'|\r|\n|\t|\u2028|\u2029/g;w.template=function(n,t,r){r=w.defaults({},r,w.templateSettings);var e=RegExp([(r.escape||q).source,(r.interpolate||q).source,(r.evaluate||q).source].join("|")+"|$","g"),u=0,i="__p+='";n.replace(e,function(t,r,e,a,o){return i+=n.slice(u,o).replace(D,function(n){return"\\"+B[n]}),r&&(i+="'+\n((__t=("+r+"))==null?'':_.escape(__t))+\n'"),e&&(i+="'+\n((__t=("+e+"))==null?'':__t)+\n'"),a&&(i+="';\n"+a+"\n__p+='"),u=o+t.length,t}),i+="';\n",r.variable||(i="with(obj||{}){\n"+i+"}\n"),i="var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments,'');};\n"+i+"return __p;\n";try{var a=Function(r.variable||"obj","_",i)}catch(o){throw o.source=i,o}if(t)return a(t,w);var c=function(n){return a.call(this,n,w)};return c.source="function("+(r.variable||"obj")+"){\n"+i+"}",c},w.chain=function(n){return w(n).chain()};var z=function(n){return this._chain?w(n).chain():n};w.mixin(w),A(["pop","push","reverse","shift","sort","splice","unshift"],function(n){var t=e[n];w.prototype[n]=function(){var r=this._wrapped;return t.apply(r,arguments),"shift"!=n&&"splice"!=n||0!==r.length||delete r[0],z.call(this,r)}}),A(["concat","join","slice"],function(n){var t=e[n];w.prototype[n]=function(){return z.call(this,t.apply(this._wrapped,arguments))}}),w.extend(w.prototype,{chain:function(){return this._chain=!0,this},value:function(){return this._wrapped}})}).call(this);
 define("underscore", (function (global) {
     return function () {
@@ -8034,37 +7926,125 @@ define("underscore", (function (global) {
     };
 }(this)));
 
-// Generated by CoffeeScript 1.3.3
+/*
+ *  The MurmurHash3 algorithm was created by Austin Appleby.  This JavaScript port was authored
+ *  by Peter Zotov (based on Java port by Yonik Seeley) and is placed into the public domain.
+ *  The author hereby disclaims copyright to this source code.
+ *
+ *  This produces exactly the same hash values as the final C++
+ *  version of MurmurHash3 and is thus suitable for producing the same hash values across
+ *  platforms.
+ *
+ *  There are two versions of this hash implementation. First interprets the string as a
+ *  sequence of bytes, thereby ignoring most significant byte of each codepoint. The
+ *  second is
+ *
+ *  See http://github.com/whitequark/murmurhash3-js for future updates to this file.
+ */
+define('murmurhash3',[], function () { 
+var MurmurHash3 = {
+    mul32: function(m, n) {
+        var nlo = n & 0xffff;
+        var nhi = n - nlo;
+        return ((nhi * m | 0) + (nlo * m | 0)) | 0;
+    },
 
-define('Chain',["underscore"], function(_) {
-  var Chain;
-  return Chain = (function() {
+    hashBytes: function(data, len, seed) {
+        var c1 = 0xcc9e2d51, c2 = 0x1b873593;
 
-    function Chain(stones, liberties) {
-      this.stones = stones;
-      this.liberties = liberties;
+        var h1 = seed;
+        var roundedEnd = len & ~0x3;
+
+        for (var i = 0; i < roundedEnd; i += 4) {
+            var k1 = (data.charCodeAt(i)     & 0xff)        |
+                ((data.charCodeAt(i + 1) & 0xff) << 8)  |
+                ((data.charCodeAt(i + 2) & 0xff) << 16) |
+                ((data.charCodeAt(i + 3) & 0xff) << 24);
+
+            k1 = this.mul32(k1, c1);
+            k1 = ((k1 & 0x1ffff) << 15) | (k1 >>> 17);  // ROTL32(k1,15);
+            k1 = this.mul32(k1, c2);
+
+            h1 ^= k1;
+            h1 = ((h1 & 0x7ffff) << 13) | (h1 >>> 19);  // ROTL32(h1,13);
+            h1 = (h1 * 5 + 0xe6546b64) | 0;
+        }
+
+        k1 = 0;
+
+        switch(len % 4) {
+            case 3:
+                k1 = (data.charCodeAt(roundedEnd + 2) & 0xff) << 16;
+                // fallthrough
+            case 2:
+                k1 |= (data.charCodeAt(roundedEnd + 1) & 0xff) << 8;
+                // fallthrough
+            case 1:
+                k1 |= (data.charCodeAt(roundedEnd) & 0xff);
+                k1 = this.mul32(k1, c1);
+                k1 = ((k1 & 0x1ffff) << 15) | (k1 >>> 17);  // ROTL32(k1,15);
+                k1 = this.mul32(k1, c2);
+                h1 ^= k1;
+        }
+
+        // finalization
+        h1 ^= len;
+
+        // fmix(h1);
+        h1 ^= h1 >>> 16;
+        h1  = this.mul32(h1, 0x85ebca6b);
+        h1 ^= h1 >>> 13;
+        h1  = this.mul32(h1, 0xc2b2ae35);
+        h1 ^= h1 >>> 16;
+
+        return h1;
+    },
+
+    hashString: function(data, len, seed) {
+        var c1 = 0xcc9e2d51, c2 = 0x1b873593;
+
+        var h1 = seed;
+        var roundedEnd = len & ~0x1;
+
+        for (var i = 0; i < roundedEnd; i += 2) {
+            var k1 = data.charCodeAt(i) | (data.charCodeAt(i + 1) << 16);
+
+            k1 = this.mul32(k1, c1);
+            k1 = ((k1 & 0x1ffff) << 15) | (k1 >>> 17);  // ROTL32(k1,15);
+            k1 = this.mul32(k1, c2);
+
+            h1 ^= k1;
+            h1 = ((h1 & 0x7ffff) << 13) | (h1 >>> 19);  // ROTL32(h1,13);
+            h1 = (h1 * 5 + 0xe6546b64) | 0;
+        }
+
+        if((len % 2) == 1) {
+            k1 = data.charCodeAt(roundedEnd);
+            k1 = this.mul32(k1, c1);
+            k1 = ((k1 & 0x1ffff) << 15) | (k1 >>> 17);  // ROTL32(k1,15);
+            k1 = this.mul32(k1, c2);
+            h1 ^= k1;
+        }
+
+        // finalization
+        h1 ^= (len << 1);
+
+        // fmix(h1);
+        h1 ^= h1 >>> 16;
+        h1  = this.mul32(h1, 0x85ebca6b);
+        h1 ^= h1 >>> 13;
+        h1  = this.mul32(h1, 0xc2b2ae35);
+        h1 ^= h1 >>> 16;
+
+        return h1;
     }
+};
 
-    Chain.prototype.get_liberties = function() {
-      return this.liberties;
-    };
-
-    Chain.prototype.in_atari = function() {
-      return _.size(this.liberties) === 1;
-    };
-
-    Chain.prototype.get_stones = function() {
-      return this.stones;
-    };
-
-    return Chain;
-
-  })();
+return MurmurHash3;
 });
-
 // Generated by CoffeeScript 1.3.3
 
-define('Board',["underscore", "jquery", "Chain"], function(_, $, Chain) {
+define('Board',["underscore", "jquery"], function(_, $) {
   var Board;
   Board = (function() {
 
@@ -8098,7 +8078,7 @@ define('Board',["underscore", "jquery", "Chain"], function(_, $, Chain) {
       return;
     }
 
-    Board.prototype.get_neighbors = function(_point) {
+    Board.prototype.get_adjacent_points = function(_point) {
       var neighbours, _x, _y;
       _x = _point[0];
       _y = _point[1];
@@ -8152,114 +8132,99 @@ define('Board',["underscore", "jquery", "Chain"], function(_, $, Chain) {
       return _color_opp;
     };
 
-    Board.prototype.get_chain_points = function(_virtual_board, point) {
-      var flood_fill_color, get_this, my_color, stones;
-      stones = {};
-      stones[point] = point;
-      my_color = this.get_color(_virtual_board, point);
-      flood_fill_color = this.get_opposite_color(my_color);
-      _virtual_board = this.set_color(_virtual_board, point, flood_fill_color);
+    Board.prototype.get_chain = function(board_state, _coord) {
+      var adjacent_points, chain_info, current_color, fill_color, get_this, popped_coord, stack, virtual_board_clone, virtual_board_size, x, y;
+      chain_info = {
+        liberties: {},
+        chain_members: {}
+      };
+      current_color = this.get_color(board_state, _coord);
+      if (current_color === this.EMPTY) {
+        return chain_info;
+      }
+      virtual_board_clone = $.extend(true, [], board_state);
+      fill_color = this.get_opposite_color(current_color);
+      stack = [];
+      stack.push(_coord);
+      chain_info.chain_members[_coord] = _coord;
+      virtual_board_size = this.size - 1;
+      while (_.size(stack) > 0) {
+        popped_coord = stack.pop();
+        x = popped_coord[0];
+        y = popped_coord[1];
+        this.set_color(virtual_board_clone, popped_coord, fill_color);
+        adjacent_points = this.get_adjacent_points(popped_coord);
+        get_this = this;
+        _.each(adjacent_points, function(adjacent_point) {
+          if (get_this.get_color(virtual_board_clone, adjacent_point) === current_color) {
+            stack.push(adjacent_point);
+            chain_info.chain_members[adjacent_point] = adjacent_point;
+          }
+          if (get_this.get_color(virtual_board_clone, adjacent_point) === get_this.EMPTY) {
+            return chain_info.liberties[adjacent_point] = adjacent_point;
+          }
+        });
+      }
+      return chain_info;
+    };
+
+    Board.prototype.process_move = function(_coord) {
+      var adjacent_points, chain_meta, dead_stones, enemy_color, get_this, process_results, virtual_board_clone, virtual_board_hypothetical;
+      process_results = {
+        legal: true,
+        dead: [],
+        board_state: this.virtual_board
+      };
+      if (this.get_color(this.virtual_board, _coord) !== this.EMPTY) {
+        process_results.legal = false;
+        return process_results;
+      }
+      virtual_board_clone = $.extend(true, [], this.virtual_board);
+      virtual_board_hypothetical = this.set_color(virtual_board_clone, _coord, this.CURRENT_STONE);
+      dead_stones = {};
+      adjacent_points = this.get_adjacent_points(_coord);
+      enemy_color = this.get_opposite_color(this.CURRENT_STONE);
       get_this = this;
-      _.each(this.get_neighbors(point), function(neighbor) {
-        var n_color;
-        n_color = get_this.get_color(_virtual_board, point);
-        if (n_color === my_color) {
-          if (!(_.contains(_.keys(stones), neighbor.toString()))) {
-            return _.each(get_this.get_chain_points(_virtual_board, neighbor), function(_neighbor) {
-              return stones[_neighbor] = _neighbor;
+      _.each(adjacent_points, function(adjacent_point) {
+        var chain_meta;
+        if (get_this.get_color(get_this.virtual_board, adjacent_point) === enemy_color) {
+          chain_meta = get_this.get_chain(virtual_board_hypothetical, adjacent_point);
+          if (_.size(chain_meta.liberties) === 0) {
+            _.each(chain_meta.chain_members, function(member) {
+              return dead_stones[member] = member;
+            });
+            return _.each(dead_stones, function(dead_stone) {
+              return virtual_board_hypothetical = get_this.set_color(virtual_board_hypothetical, dead_stone, get_this.EMPTY);
             });
           }
         }
       });
-      return stones;
-    };
-
-    Board.prototype.get_chain = function(_virtual_board, point) {
-      var get_this, liberties, stones, virtual_board_clone;
-      virtual_board_clone = $.extend(true, [], _virtual_board);
-      stones = this.get_chain_points(virtual_board_clone, point);
-      liberties = {};
-      get_this = this;
-      _.each(stones, function(stone) {
-        return _.each(get_this.get_neighbors(stone), function(point) {
-          if (get_this.get_color(_virtual_board, point) === get_this.EMPTY) {
-            return liberties[point] = point;
-          }
-        });
+      chain_meta = this.get_chain(virtual_board_hypothetical, _coord);
+      if (_.size(chain_meta.liberties) === 0) {
+        virtual_board_hypothetical = this.set_color(virtual_board_clone, _coord, this.EMPTY);
+        process_results.legal = false;
+      }
+      _.each(dead_stones, function(dead_stone) {
+        return process_results.dead.push(dead_stone);
       });
-      return new Chain(stones, liberties);
+      process_results.board_state = virtual_board_hypothetical;
+      return process_results;
     };
 
     Board.prototype.move = function(_coord) {
-      var capturedStones, get_this, move_results, point_color, suicide, virtual_board_clone, _x, _y;
-      capturedStones = {};
-      virtual_board_clone = $.extend(true, [], this.virtual_board);
-      _x = _coord[0];
-      _y = _coord[1];
-      point_color = this.get_color(virtual_board_clone, _coord);
+      var move_results, process_results;
       move_results = {
         color: this.EMPTY,
-        x: _x,
-        y: _y,
+        x: _coord[0],
+        y: _coord[1],
         dead: []
       };
-      if (point_color === this.EMPTY) {
-        if (this.CURRENT_STONE === this.BLACK) {
-          this.virtual_board = this.set_color(this.virtual_board, _coord, this.BLACK);
-          move_results.color = this.BLACK;
-          this.CURRENT_STONE = this.WHITE;
-        } else {
-          this.virtual_board = this.set_color(this.virtual_board, _coord, this.WHITE);
-          move_results.color = this.WHITE;
-          this.CURRENT_STONE = this.BLACK;
-        }
-      }
-      return move_results;
-      if (_x === this.KO_POINT[0] && _y === this.KO_POINT[1]) {
-        return move_results;
-      }
-      if (point_color === this.EMPTY) {
-        suicide = true;
-        get_this = this;
-        _.each(this.get_neighbors(_coord), function(neighbor) {
-          var enemy, n_color;
-          n_color = get_this.get_color(virtual_board_clone, neighbor);
-          if (n_color === get_this.EMPTY) {
-            return suicide = false;
-          } else if (n_color === get_this.CURRENT_STONE) {
-            if (!(get_this.get_chain(virtual_board_clone, neighbor).in_atari())) {
-              return suicide = false;
-            }
-          } else if (n_color === get_this.get_opposite_color(get_this.CURRENT_STONE)) {
-            enemy = get_this.get_chain(virtual_board_clone, neighbor);
-            if (enemy.in_atari()) {
-              suicide = false;
-              return _.each(enemy.get_stones(), function(stone) {
-                get_this.set_color(virtual_board_clone, stone, get_this.EMPTY);
-                capturedStones[stone] = stone;
-                return move_results.dead.push(stone);
-              });
-            }
-          }
-        });
-        if (suicide) {
-          return move_results;
-        }
-        if (this.CURRENT_STONE === this.BLACK) {
-          virtual_board_clone = this.set_color(virtual_board_clone, _coord, this.BLACK);
-          move_results.color = this.BLACK;
-          this.CURRENT_STONE = this.WHITE;
-        } else {
-          virtual_board_clone = this.set_color(virtual_board_clone, _coord, this.WHITE);
-          move_results.color = this.WHITE;
-          this.CURRENT_STONE = this.BLACK;
-        }
-        if (_.size(capturedStones) === 1) {
-          this.KO_POINT = capturedStones[_.keys(capturedStones)[0]];
-        } else {
-          this.KO_POINT = [];
-        }
-        this.virtual_board = virtual_board_clone;
+      process_results = this.process_move(_coord);
+      move_results.dead = $.extend(true, [], process_results.dead);
+      this.virtual_board = process_results.board_state;
+      if (process_results.legal === true) {
+        move_results.color = this.CURRENT_STONE;
+        this.CURRENT_STONE = this.get_opposite_color(this.CURRENT_STONE);
       }
       return move_results;
     };
@@ -8412,11 +8377,10 @@ requirejs.config({
     "raphael.core": "libs/raphael/raphael.core",
     "raphael.svg": "libs/raphael/raphael.svg",
     "raphael.vml": "libs/raphael/raphael.vml",
-    "raphael.scale": "libs/raphael/raphael.scale",
     "domReady": "helper/domReady",
     "jquery": "http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min",
     "underscore": "libs/underscore-min",
-    "Chain": "Chain",
+    "murmurhash3": "libs/murmurhash3",
     "Board": "Board"
   },
   shim: {
@@ -8431,11 +8395,14 @@ requirejs.config({
     },
     underscore: {
       exports: "_"
+    },
+    murmurhash3: {
+      exports: "murmurhash3"
     }
   }
 });
 
-define('app',["raphael.scale", "raphael", "jquery", "underscore", "Board", "domReady!"], function(RaphaelScale, Raphael, $, _, Board) {
+define('app',["raphael", "jquery", "underscore", "murmurhash3", "Board", "domReady!"], function(Raphael, $, _, murmurhash3, Board) {
   var _GoBoard;
   return _GoBoard = (function() {
 
@@ -8579,15 +8546,17 @@ define('app',["raphael.scale", "raphael", "jquery", "underscore", "Board", "domR
           var clicker;
           clicker = paper.rect(x - cell_radius / 2 + cell_radius * i, y - cell_radius / 2 + cell_radius * j, cell_radius, cell_radius);
           clicker.attr("fill", "#fff");
-          clicker.attr("stroke-width", "0");
           clicker.attr("fill-opacity", 0);
+          clicker.attr("opacity", 0);
+          clicker.attr("stroke-width", 0);
+          clicker.attr("stroke", "#fff");
+          clicker.attr("stroke-opacity", 0);
           clicker.data("coord", [i, j]);
           return group.push(clicker);
         });
       });
       get_this = this;
       remove_stone = function(coord) {
-        console.log(coord);
         return _.each(get_this.RAPH_BOARD_STATE[coord], function(id) {
           return paper.getById(id).remove();
         });
