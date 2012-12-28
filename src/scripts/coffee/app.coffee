@@ -10,7 +10,7 @@ requirejs.config
     "raphael.vml": "libs/raphael/raphael.vml"
     #"raphael.scale": "libs/raphael/raphael.scale" -- not to be used anymore
     "domReady": "helper/domReady"
-    "jquery": "http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min"
+    "jquery": "libs/jquery-1.8.3.min"
     "underscore": "libs/underscore-min"
     #"Chain": "Chain" -- deprecated
     "murmurhash3": "libs/murmurhash3"

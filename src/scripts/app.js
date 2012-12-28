@@ -11,7 +11,7 @@ requirejs.config({
     "raphael.svg": "libs/raphael/raphael.svg",
     "raphael.vml": "libs/raphael/raphael.vml",
     "domReady": "helper/domReady",
-    "jquery": "http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min",
+    "jquery": "libs/jquery-1.8.3.min",
     "underscore": "libs/underscore-min",
     "murmurhash3": "libs/murmurhash3",
     "Board": "Board"

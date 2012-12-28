@@ -5,7 +5,7 @@
     baseUrl: "scripts",
     dir: "../../build",
     paths: {
-        jquery: "empty:"
+        //jquery: "empty:"
     },
     modules: [
         {
