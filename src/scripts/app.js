@@ -36,9 +36,7 @@ requirejs.config({
 });
 
 define(["raphael", "jquery", "underscore", "murmurhash3", "Board", "domReady!"], function(Raphael, $, _, murmurhash3, Board) {
-  var lol, _GoBoard;
-  lol = 'hello';
-  console.log(murmurhash3.hashString(lol, lol.length, +new Date()));
+  var _GoBoard;
   return _GoBoard = (function() {
 
     function _GoBoard(container, container_size, board_size) {

@@ -39,9 +39,6 @@ define ["raphael", "jquery", "underscore", "murmurhash3","Board", "domReady!" ],
   #This function is called once the DOM is ready.
   #It will be safe to query the DOM and manipulate
   #DOM nodes in this function.
-  
-  lol = 'hello'
-  console.log  murmurhash3.hashString(lol, lol.length, +new Date())
 
   class _GoBoard
 
