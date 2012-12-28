@@ -150,6 +150,13 @@ define ["underscore", "jquery"], (_, $) ->
         process_results.legal = false
         return process_results
 
+      # check if move is legal under ko rule
+      # see: http://en.wikipedia.org/wiki/Rules_of_Go#Ko_and_Superko
+      if _coord[0] is @KO_POINT[0] and _coord[1] is @KO_POINT[1]
+        process_results.legal = false
+        return process_results        
+
+
       # hypothetical board state
       # place the stone and see what happens
       virtual_board_clone = $.extend(true, [], @virtual_board)
@@ -201,6 +208,7 @@ define ["underscore", "jquery"], (_, $) ->
       # add dead stones to process_results
       _.each dead_stones, (dead_stone) ->
         process_results.dead.push(dead_stone)
+
 
       process_results.board_state = virtual_board_hypothetical
 

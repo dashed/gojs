@@ -1,6 +1,6 @@
 ({
     mainConfigFile: "app.js",
-    optimize: "none",
+    //optimize: "none",
     appDir: "../",
     baseUrl: "scripts",
     dir: "../../build",

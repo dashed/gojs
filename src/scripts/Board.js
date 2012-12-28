@@ -135,6 +135,10 @@ define(["underscore", "jquery"], function(_, $) {
         process_results.legal = false;
         return process_results;
       }
+      if (_coord[0] === this.KO_POINT[0] && _coord[1] === this.KO_POINT[1]) {
+        process_results.legal = false;
+        return process_results;
+      }
       virtual_board_clone = $.extend(true, [], this.virtual_board);
       virtual_board_hypothetical = this.set_color(virtual_board_clone, _coord, this.CURRENT_STONE);
       dead_stones = {};

@@ -150,6 +150,29 @@ define(["raphael", "jquery", "underscore", "murmurhash3", "Board", "domReady!"],
         stone_fg.attr("stroke-opacity", 0.3);
         stone_fg.attr("stroke-width", "1.1");
         track_stone(i, j);
+        /*
+                # triangle
+                circle_radius_t = circle_radius*0.85
+                a = (circle_radius_t*3)/Math.sqrt(3)
+                height = Math.sqrt(3)*a/2
+                #C = _x, circle_radius
+                #B = _x + a/2, _y - (height - circle_radius)
+                #A = _x - a/2, _y - (height - circle_radius)
+                A = [_x - a/2, _y+(height - circle_radius_t)]
+                B = [_x + a/2, _y+(height - circle_radius_t)]
+                C = [_x, _y-circle_radius_t]
+                
+                # AC
+                lol = paper.path("M"+A[0]+" "+A[1]+"L"+C[0]+" "+C[1]).toFront()
+                
+                # CB
+        
+                paper.path("M"+C[0]+" "+C[1]+"L"+B[0]+" "+B[1]).toFront()
+        
+                # BA
+                paper.path("M"+B[0]+" "+B[1]+"L"+A[0]+" "+A[1]).toFront()
+        */
+
         group = [];
         group.push(stone_bg.id);
         group.push(stone_fg.id);
@@ -219,8 +242,6 @@ define(["raphael", "jquery", "underscore", "murmurhash3", "Board", "domReady!"],
         this.toFront();
       });
       /*
-            # Fill board with all stones 
-           
             _.each _.range(0, n, 2), (i, index) ->
               _.each _.range(0, n, 2), (j, index) ->
                 white_stone i, j
