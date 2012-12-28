@@ -8,11 +8,12 @@ requirejs.config
     "raphael.core": "libs/raphael/raphael.core"
     "raphael.svg": "libs/raphael/raphael.svg"
     "raphael.vml": "libs/raphael/raphael.vml"
-    "raphael.scale": "libs/raphael/raphael.scale"
+    #"raphael.scale": "libs/raphael/raphael.scale" -- not to be used anymore
     "domReady": "helper/domReady"
     "jquery": "http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min"
     "underscore": "libs/underscore-min"
-    "Chain": "Chain"
+    #"Chain": "Chain" -- deprecated
+    "murmurhash3": "libs/murmurhash3"
     "Board": "Board"
 
   shim:
@@ -28,18 +29,20 @@ requirejs.config
     underscore:
       exports: "_"
 
+    murmurhash3:
+      exports: "murmurhash3"
 
 
 
-
-
-
-define ["raphael.scale","raphael", "jquery", "underscore", "Board", "domReady!" ], (RaphaelScale,Raphael, $, _, Board) ->
+define ["raphael", "jquery", "underscore", "murmurhash3","Board", "domReady!" ], (Raphael, $, _, murmurhash3, Board) ->
   
   #This function is called once the DOM is ready.
   #It will be safe to query the DOM and manipulate
   #DOM nodes in this function.
   
+  lol = 'hello'
+  console.log  murmurhash3.hashString(lol, lol.length, +new Date())
+
   class _GoBoard
 
     constructor: (@container, @container_size, @board_size) ->
@@ -226,7 +229,6 @@ define ["raphael.scale","raphael", "jquery", "underscore", "Board", "domReady!" 
 
       get_this = this
       remove_stone = (coord) ->
-        console.log coord
         _.each get_this.RAPH_BOARD_STATE[coord], (id) ->
           paper.getById(id).remove()
 

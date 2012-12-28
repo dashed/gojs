@@ -1,4 +1,4 @@
-define ["underscore", "jquery", "Chain"], (_, $, Chain) ->
+define ["underscore", "jquery"], (_, $) ->
 
   # The actual Singleton class
   class Board
@@ -71,47 +71,140 @@ define ["underscore", "jquery", "Chain"], (_, $, Chain) ->
           _color_opp = @EMPTY
       return _color_opp
 
-    get_chain: (_coord) ->
+    get_chain: (board_state, _coord) ->
 
+      # get chain in a specific board_state
+
+      # http://en.wikipedia.org/wiki/Rules_of_Go#Connected_stones_and_points
+      # A chain is a set of one or more stones (necessarily of the same color) that are 
+      # all connected to each other and that are not connected to any other stones. 
+
+      # chain metadata (default on an empty coord)
       chain_info =
         liberties: {}
         chain_members: {}
 
       # current_color
-      current_color = @get_color(@virtual_board, _coord)
+      current_color = @get_color(board_state, _coord)
 
-      # this coord isn't part of a chain
+      # this coord doesn't fit criteria of a chain (which must be at least one stone)
       if current_color is @EMPTY
         return chain_info
 
+      # use flood fill algorithm to find chain members and liberties
+      # from http://lodev.org/cgtutor/floodfill.html#4-Way_Method_With_Stack
+
+      # Deepcopy current board to flood fill
+      virtual_board_clone = $.extend(true, [], board_state)
+
       # fill_color
-      fill_color = @get_opposite_color(_coord)
+      fill_color = @get_opposite_color(current_color)
 
-      # Deepcopy current board
-      virtual_board_clone = $.extend(true, [], @virtual_board)
+      stack = []
 
-      # continue from http://lodev.org/cgtutor/floodfill.html#4-Way_Method_With_Stack
+      stack.push(_coord)
 
-      return
+      # _coord itself is a chain
+      chain_info.chain_members[_coord] = _coord
 
-    is_move_legal: (_coord) ->
+      # max 0-based index size
+      virtual_board_size = @size - 1
+
+      while _.size(stack) > 0
+        popped_coord = stack.pop()
+        x = popped_coord[0]
+        y = popped_coord[1]
+
+        @set_color(virtual_board_clone, popped_coord, fill_color)
+
+        # get adjacent points
+        adjacent_points = @get_adjacent_points(popped_coord)
+
+        get_this = this
+        _.each adjacent_points, (adjacent_point) ->
+
+          # check if adjacent_point is part of the chain
+          if get_this.get_color(virtual_board_clone, adjacent_point) is current_color
+            stack.push(adjacent_point)
+            chain_info.chain_members[adjacent_point] = adjacent_point
+
+          # check if adjacent_point is empty
+          if get_this.get_color(virtual_board_clone, adjacent_point) is get_this.EMPTY
+            chain_info.liberties[adjacent_point] = adjacent_point
+
+
+      return chain_info
+
+    process_move: (_coord) ->
 
       # check if the move is legal
+
+      # legal move metadata
+      process_results = 
+        legal: true
+        dead: []
+        board_state: @virtual_board
+
+      # check if _coord is occupied
+      if @get_color(@virtual_board, _coord) != @EMPTY
+        process_results.legal = false
+        return process_results
+
+      # hypothetical board state
+      # place the stone and see what happens
+      virtual_board_clone = $.extend(true, [], @virtual_board)
+      virtual_board_hypothetical= @set_color(virtual_board_clone, _coord, @CURRENT_STONE)
+
+      # capture rule
+      dead_stones = {}
 
       # get adjacent points
       adjacent_points = @get_adjacent_points(_coord)
 
       # check if adjacent points are occupied by enemy
       # if it is, check its chain and liberty count
+
+      enemy_color = @get_opposite_color(@CURRENT_STONE)
+
       get_this = this
       _.each adjacent_points, (adjacent_point) ->
-        get_this.get_chain(adjacent_point)
 
-      legal_results = 
-        legal: true
-        dead: []
+        # capture rule
+        # Removing from the board any stones of the opponent's color that have no liberties.
+        # see: http://en.wikipedia.org/wiki/Rules_of_Go#Capture
+        if get_this.get_color(get_this.virtual_board, adjacent_point) is enemy_color
+          chain_meta = get_this.get_chain(virtual_board_hypothetical, adjacent_point)
+          
+          # remove any dead enemy chains
+          if _.size(chain_meta.liberties) is 0
 
-      return legal_results
+            _.each chain_meta.chain_members, (member) ->
+              # chain is dead
+              dead_stones[member] = member
+
+            # update
+            # hypothetical board state
+            # remove dead stones
+            _.each dead_stones, (dead_stone) ->
+              virtual_board_hypothetical = get_this.set_color(virtual_board_hypothetical, dead_stone, get_this.EMPTY)
+
+
+      # self-capture rule
+      # see: http://en.wikipedia.org/wiki/Rules_of_Go#Self-capture
+      # (After playing his stone and capturing any opposing stones) a player removes from the board any stones of his own color that have no liberties.
+      # disallow suicide
+      chain_meta = @get_chain(virtual_board_hypothetical, _coord)
+      if _.size(chain_meta.liberties) is 0
+        virtual_board_hypothetical = @set_color(virtual_board_clone, _coord, @EMPTY)
+        process_results.legal = false
+
+      # add dead stones to process_results
+      _.each dead_stones, (dead_stone) ->
+        process_results.dead.push(dead_stone)
+
+      process_results.board_state = virtual_board_hypothetical
+
+      return process_results
 
     move: (_coord) ->
 
@@ -122,30 +215,23 @@ define ["underscore", "jquery", "Chain"], (_, $, Chain) ->
         dead: []
 
       # check if move is legal
-      legal_results = @is_move_legal(_coord)
+      process_results = @process_move(_coord)
+      move_results.dead = $.extend(true, [], process_results.dead)
+      @virtual_board = process_results.board_state
 
-      if legal_results.legal is true
-        move_results.dead = $.extend(true, [], legal_results.dead)
-      else
-        return move_results
+      # put stone on board
+      if process_results.legal is true
 
-      point_color = @get_color(@virtual_board, _coord)
+        # put stone on board
+        move_results.color = @CURRENT_STONE
+        @CURRENT_STONE = @get_opposite_color(@CURRENT_STONE)
+
+
 
       # update board state
       # TODO: track placement and removal of stones
       # TODO: dedicated history class?
 
-      if point_color is @EMPTY
-        if @CURRENT_STONE is @BLACK
-
-          @virtual_board = @set_color(@virtual_board, _coord, @BLACK)
-          move_results.color = @BLACK
-          @CURRENT_STONE = @WHITE
-
-        else
-          @virtual_board = @set_color(@virtual_board, _coord, @WHITE)
-          move_results.color = @WHITE
-          @CURRENT_STONE = @BLACK
 
 
       return move_results

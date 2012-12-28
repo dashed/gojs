@@ -10,11 +10,10 @@ requirejs.config({
     "raphael.core": "libs/raphael/raphael.core",
     "raphael.svg": "libs/raphael/raphael.svg",
     "raphael.vml": "libs/raphael/raphael.vml",
-    "raphael.scale": "libs/raphael/raphael.scale",
     "domReady": "helper/domReady",
     "jquery": "http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min",
     "underscore": "libs/underscore-min",
-    "Chain": "Chain",
+    "murmurhash3": "libs/murmurhash3",
     "Board": "Board"
   },
   shim: {
@@ -29,12 +28,17 @@ requirejs.config({
     },
     underscore: {
       exports: "_"
+    },
+    murmurhash3: {
+      exports: "murmurhash3"
     }
   }
 });
 
-define(["raphael.scale", "raphael", "jquery", "underscore", "Board", "domReady!"], function(RaphaelScale, Raphael, $, _, Board) {
-  var _GoBoard;
+define(["raphael", "jquery", "underscore", "murmurhash3", "Board", "domReady!"], function(Raphael, $, _, murmurhash3, Board) {
+  var lol, _GoBoard;
+  lol = 'hello';
+  console.log(murmurhash3.hashString(lol, lol.length, +new Date()));
   return _GoBoard = (function() {
 
     function _GoBoard(container, container_size, board_size) {
@@ -188,7 +192,6 @@ define(["raphael.scale", "raphael", "jquery", "underscore", "Board", "domReady!"
       });
       get_this = this;
       remove_stone = function(coord) {
-        console.log(coord);
         return _.each(get_this.RAPH_BOARD_STATE[coord], function(id) {
           return paper.getById(id).remove();
         });

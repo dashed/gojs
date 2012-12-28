@@ -22,3 +22,21 @@ see: http://en.wikipedia.org/wiki/Rules_of_Go#Board
 if any of adjacent points is an enemy, perform flood fill algorithm (see: http://en.wikipedia.org/wiki/Flood_fill) to get stones that make a chain and the liberty count.
 
 If liberty count is 0, remove the enemy chains.
+
+
+
+valid_play = false;
+while(!not_valid ){
+ //Get Click
+ board temp_board = current_board;
+ //Get x and y on the board
+ temp_board[x][y] = color;
+ if ( hash(temp_board) in hash_set ){
+   //Reject move and ask for prompt
+   //Mark the tiled clicked on as invalid
+ }
+ else{
+   hash_set.add(hash(temp_board));
+   valid_play = true;
+ }
+} 
