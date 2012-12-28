@@ -69,14 +69,14 @@ define ["raphael", "jquery", "underscore", "murmurhash3","Board", "domReady!" ],
       canvas = @canvas
       canvas.css('overflow', 'hidden')
 
-      if !$.support.inlineBlockNeedsLayout)
+      if !$.support.inlineBlockNeedsLayout
         canvas.css("display", "inline-block")
 
       # IE6/7
       # see: http://stackoverflow.com/questions/6478876/how-do-you-mix-jquery-and-ie-css-hacks
       else
-        canvas.css("display", "inline");
-        canvas.css("zoom", "1");
+        canvas.css("display", "inline")
+        canvas.css("zoom", "1")
       #canvas.css('display', 'block')
       canvas.css('border', '1px solid black')
 

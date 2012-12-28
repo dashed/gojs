@@ -64,7 +64,12 @@ define(["raphael", "jquery", "underscore", "murmurhash3", "Board", "domReady!"],
       var black_stone, board_outline, canvas, canvas_length, cell_radius, circle_radius, get_this, group, i, length, line_horiz, line_vert, n, paper, remove_stone, text_buffer, text_movement, text_size, track_stone, track_stone_pointer, virtual_board, white_stone, x, y;
       canvas = this.canvas;
       canvas.css('overflow', 'hidden');
-      canvas.css('display', 'block');
+      if (!$.support.inlineBlockNeedsLayout) {
+        canvas.css("display", "inline-block");
+      } else {
+        canvas.css("display", "inline");
+        canvas.css("zoom", "1");
+      }
       canvas.css('border', '1px solid black');
       canvas = this.canvas;
       n = this.board_size;
