@@ -17,9 +17,13 @@
       container = @container
       board_size = @board_size
 
-      require ["app", "domReady!"], (_GoBoard)->
-        lol = new _GoBoard(container, container_size, board_size)
-        return
+      setTimeout (->
+        require ["app", "domReady!"], (_GoBoard)->
+          lol = new _GoBoard(container, container_size, board_size)
+          return
+      ), 0
+
+
       return
   if global.GoBoard
     throw new Error("GoBoard has already been defined")

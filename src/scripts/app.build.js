@@ -1,6 +1,6 @@
 ({
     mainConfigFile: "app.js",
-    //optimize: "none",
+    optimize: "uglify2",
     appDir: "../",
     baseUrl: "scripts",
     dir: "../../build",

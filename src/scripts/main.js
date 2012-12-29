@@ -24,10 +24,12 @@
       size = this.size;
       container = this.container;
       board_size = this.board_size;
-      require(["app", "domReady!"], function(_GoBoard) {
-        var lol;
-        lol = new _GoBoard(container, container_size, board_size);
-      });
+      setTimeout((function() {
+        return require(["app", "domReady!"], function(_GoBoard) {
+          var lol;
+          lol = new _GoBoard(container, container_size, board_size);
+        });
+      }), 0);
       return;
     }
 
