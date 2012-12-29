@@ -1,4 +1,9 @@
-define ["underscore", "jquery"], (_, $) ->
+#define ["underscore", "jquery"], (_, $) ->
+define (require) ->
+
+  $ = require('jquery')
+  _ = require('underscore')
+
 
   # The actual Singleton class
   class Board
