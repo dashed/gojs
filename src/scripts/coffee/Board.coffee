@@ -209,6 +209,9 @@ define ["underscore", "jquery"], (_, $) ->
       _.each dead_stones, (dead_stone) ->
         process_results.dead.push(dead_stone)
 
+      # ko rule (positional superko)
+      # 
+
 
       process_results.board_state = virtual_board_hypothetical
 
