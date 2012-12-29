@@ -18,7 +18,7 @@
       board_size = @board_size
 
       setTimeout (->
-        require ["app", "domReady!"], (_GoBoard)->
+        require ["app"], (_GoBoard)->
           lol = new _GoBoard(container, container_size, board_size)
           return
       ), 0
