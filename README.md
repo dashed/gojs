@@ -3,6 +3,36 @@ gojs
 
 Go board game in Javascript.
 
+syntax
+======
+
+`var some_var = GoBoard(container_id, length, board_size);`
+
+* `container_id`: a element container with with a unique `id` attribute
+
+* `length`: render the element container into a square of length `length`
+
+* `board_size`: render the go board of grid `board_size` x `board_size`. Must be an integer between `2` and `19`.
+
+usage
+=====
+
+1. Place `<script src="path/to/gojs.js"></script>` in the `head` element, or right before the `body` tag.
+
+2.	Place an empty `div` container with a unique `id` attribute. A `div` element is preferred, but other elements such as `p` may be used.
+
+	Example:
+	`<div id="go_board"></div>` 
+
+	**Note:** If the container is not empty, gojs will empty it!
+
+3. 	Render the go board via
+
+	`var go_board = GoBoard("go_board", 500, 19)`
+
+
+
+
 colophon
 ========
 

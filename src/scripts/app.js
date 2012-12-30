@@ -52,14 +52,22 @@ define(function(require) {
     _GoBoard.prototype.VERSION = '0.1';
 
     function _GoBoard(container, container_size, board_size) {
-      var $, Board, Raphael, black_stone, board_outline, canvas, canvas_length, cell_radius, circle_radius, get_this, length, n, paper, remove_stone, stone_click_detect, text_buffer, text_movement, text_size, track_stone, track_stone_pointer, virtual_board, white_stone, x, y, _;
+      var $, Board, Raphael, black_stone, board_outline, canvas, canvas_length, cell_radius, circle_radius, get_this, isNumber, length, n, paper, remove_stone, stone_click_detect, text_buffer, text_movement, text_size, track_stone, track_stone_pointer, virtual_board, white_stone, x, y, _;
       this.container = container;
       this.container_size = container_size;
       this.board_size = board_size;
-      if (typeof this.container !== 'string' || typeof this.container_size !== 'number' || typeof this.board_size !== 'number') {
+      isNumber = function(n) {
+        return !isNaN(parseFloat(n)) && isFinite(n);
+      };
+      if (typeof this.container !== 'string' || !isNumber(this.container_size) || !isNumber(this.board_size)) {
         return;
       }
-      if (this.container_size < 0) {
+      $ = require('jquery');
+      this.canvas = $('#' + this.container.toString()).html('');
+      if (this.canvas.length === 0) {
+        return;
+      }
+      if (this.container_size <= 0) {
         return;
       }
       if (this.board_size > 19) {
@@ -69,11 +77,6 @@ define(function(require) {
         return;
       }
       this.RAPH_BOARD_STATE = {};
-      $ = require('jquery');
-      this.canvas = $('#' + this.container.toString()).html('');
-      if (this.canvas.length === 0) {
-        return;
-      }
       Raphael = require('raphael');
       _ = require('underscore');
       Board = require('Board');

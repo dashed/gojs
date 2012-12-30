@@ -53,19 +53,13 @@ define (require) ->
 
     constructor: (@container, @container_size, @board_size) ->
 
-      if typeof @container != 'string' or typeof(@container_size) != 'number' or typeof @board_size != 'number'
+      # validate params
+
+      isNumber = (n) ->
+        return !isNaN(parseFloat(n)) && isFinite(n)
+
+      if typeof @container != 'string' or !isNumber(@container_size) or !isNumber(@board_size)
         return
-
-      if @container_size < 0
-        return
-
-      if @board_size > 19
-        @board_size = 19
-
-      if @board_size <= 1
-        return
-
-      @RAPH_BOARD_STATE = {} # track raphael ids
 
       $ = require('jquery')
       @canvas = $('#'+ @container.toString()).html('')
@@ -74,6 +68,18 @@ define (require) ->
       if @canvas.length is 0
         return
 
+      if @container_size <= 0
+        return
+
+      if @board_size > 19
+        @board_size = 19
+
+      if @board_size <= 1
+        return
+
+      # Render go board
+
+      @RAPH_BOARD_STATE = {} # track raphael ids
 
       Raphael = require('raphael')
       _ = require('underscore')
