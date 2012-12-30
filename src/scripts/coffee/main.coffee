@@ -2,8 +2,6 @@
 
   class _GoBoard
 
-    
-
     constructor: (@container, @container_size, @board_size) ->
 
       requirejs.config
@@ -26,8 +24,6 @@
       get_this = this
       require ["app"], (_GoBoard)->
         get_this.go_board = new _GoBoard(container, container_size, board_size)
-      return @go_board
-      
 
   if global.GoBoard
     throw new Error("GoBoard has already been defined")

@@ -30,6 +30,12 @@ define(function(require) {
       return this.history[hash];
     };
 
+    History.prototype.getBoardStateFromIndex = function(n) {
+      var hash;
+      hash = this.getHashIndex(n);
+      return this.history[hash];
+    };
+
     History.prototype.add = function(raw_board_state, move_color) {
       var board_state, hash;
       board_state = new BoardState(raw_board_state, move_color);

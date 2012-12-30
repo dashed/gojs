@@ -12,27 +12,24 @@ define (require) ->
     @EMPTY: 0
     @BLACK: 1
     @WHITE: 2
-    @CURRENT_STONE: @BLACK
 
     isNumber: (n) ->
       return !isNaN(parseFloat(n)) && isFinite(n)
 
-    constructor: (@size) ->
+    constructor: (@size, @CURRENT_STONE) ->
 
       @EMPTY = 0
       @BLACK = 1
       @WHITE = 2
-      @CURRENT_STONE = @BLACK
+      #@CURRENT_STONE = @BLACK
 
       # repetition rule constants
       @KR = 0 # one stone ko rule (non-superko)
       @PSK = 1 # positional superko
       @SSK = 2 # situational superko
-      @NSSK = 3 # natural superko
+      #@NSSK = 3 # natural superko
 
-      @REPETITION_RULE = @PSK
-
-
+      @REPETITION_RULE = @SSK
 
       if !@isNumber(@size)
         @size = 0
@@ -47,10 +44,20 @@ define (require) ->
         _.each _.range(get_this.size), (j) ->
           get_this.virtual_board[i][j] = get_this.EMPTY
 
+
       # initialize History
       @history = new History(@virtual_board)
 
       return
+
+    set_starting_board_state: (@CURRENT_STONE) ->
+      # use current board_state as move 0
+      # this is used after placement of stones
+      if moo? is true and (@CURRENT_STONE is @BLACK or @CURRENT_STONE is @WHITE)
+        @history = new History(@virtual_board)
+        return true
+      return false
+
 
     get_adjacent_points: (_point) ->
 
@@ -65,7 +72,6 @@ define (require) ->
       return neighbours
 
     get_color: (_virtual_board, point) ->
-
       n_x = point[0]
       n_y = point[1]
       return _virtual_board[n_x][n_y]
@@ -136,7 +142,7 @@ define (require) ->
         x = popped_coord[0]
         y = popped_coord[1]
 
-        @set_color(virtual_board_clone, popped_coord, fill_color)
+        virtual_board_clone = @set_color(virtual_board_clone, popped_coord, fill_color)
 
         # get adjacent points
         adjacent_points = @get_adjacent_points(popped_coord)
@@ -172,11 +178,11 @@ define (require) ->
         return process_results
 
 
-
       # hypothetical board state
       # place the stone and see what happens
       virtual_board_clone = $.extend(true, [], @virtual_board)
       virtual_board_hypothetical= @set_color(virtual_board_clone, _coord, @CURRENT_STONE)
+
 
       # capture rule
       dead_stones = {}
@@ -254,6 +260,7 @@ define (require) ->
           if truth_test
             if (_.size(board_state_difference.stones_removed.BLACK) + _.size(board_state_difference.stones_removed.WHITE)) is 1
               # ko rule violated
+              console.log "ko rule violated"
               process_results.legal = false
 
 
@@ -266,20 +273,31 @@ define (require) ->
         
         if @isNumber(@history.getBoardState(hypothetical_board_state_hash)?.getHash())
           # PSK rule violated
+          console.log "PSK violated at " + _coord
           process_results.legal = false
 
 
-      # situational superko: The hypothetical board position of the attempted move shouldn't be the 
-      # same as any of the previous board states, and the board state was on the player's turn (the player moving next)
+      # situational superko: A player may not play a stone so as to create a board position which existed previously in the game, 
+      # and in which it was the opponent's turn to move next.
       if @REPETITION_RULE is @SSK
         
         # get hash of hypothetical board state
         hypothetical_board_state = new BoardState(virtual_board_hypothetical, @CURRENT_STONE)
         hypothetical_board_state_hash = hypothetical_board_state.getHash()
         
-        if @isNumber(@history.getBoardState(hypothetical_board_state_hash)?.getHash()) and hypothetical_board_state.getWhoMoved() is @CURRENT_STONE
-          # SSK rule violated
-          process_results.legal = false
+        # see if hypothetical board state already exists
+        board_state_test = @history.getBoardState(hypothetical_board_state_hash)
+        board_state_test_hash = board_state_test?.getHash()
+
+        if @isNumber(board_state_test_hash) 
+
+          # check if it was the opponent's turn to move next
+          board_state_test_hash_index = _.lastIndexOf(@history.history_hash_order, board_state_test_hash)
+          board_state_test_next = @history.getBoardStateFromIndex(board_state_test_hash_index+1)
+          if board_state_test_next?.getWhoMoved() is @get_opposite_color(@CURRENT_STONE)
+            # SSK rule violated
+            console.log "SSK violated at " + _coord
+            process_results.legal = false
 
 
       if @REPETITION_RULE is @NSSK
@@ -297,6 +315,29 @@ define (require) ->
       process_results.board_state = virtual_board_hypothetical
 
       return process_results
+
+    pass: () ->
+
+      #todo: implement
+
+      return
+
+    place: (_coord, _color) ->
+
+      place_results = 
+        color: @EMPTY
+        x: _coord[0]
+        y: _coord[1]
+
+
+
+      if @get_color(@virtual_board, _coord) != @EMPTY
+        return place_results
+      else if _color is @BLACK or _color is @WHITE
+        @virtual_board = @set_color(@virtual_board, _coord, _color)
+        place_results.color = _color
+
+      return place_results
 
     move: (_coord) ->
 

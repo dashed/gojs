@@ -30,6 +30,10 @@ define (require) ->
     getBoardState: (hash) ->
       return @history[hash]
 
+    getBoardStateFromIndex: (n) ->
+      hash = @getHashIndex(n)
+      return @history[hash]
+
     add: (raw_board_state, move_color) ->
 
       board_state = new BoardState(raw_board_state, move_color)

@@ -14,24 +14,21 @@ define(function(require) {
 
     Board.WHITE = 2;
 
-    Board.CURRENT_STONE = Board.BLACK;
-
     Board.prototype.isNumber = function(n) {
       return !isNaN(parseFloat(n)) && isFinite(n);
     };
 
-    function Board(size) {
+    function Board(size, CURRENT_STONE) {
       var get_this;
       this.size = size;
+      this.CURRENT_STONE = CURRENT_STONE;
       this.EMPTY = 0;
       this.BLACK = 1;
       this.WHITE = 2;
-      this.CURRENT_STONE = this.BLACK;
       this.KR = 0;
       this.PSK = 1;
       this.SSK = 2;
-      this.NSSK = 3;
-      this.REPETITION_RULE = this.PSK;
+      this.REPETITION_RULE = this.SSK;
       if (!this.isNumber(this.size)) {
         this.size = 0;
       }
@@ -46,6 +43,15 @@ define(function(require) {
       this.history = new History(this.virtual_board);
       return;
     }
+
+    Board.prototype.set_starting_board_state = function(CURRENT_STONE) {
+      this.CURRENT_STONE = CURRENT_STONE;
+      if ((typeof moo !== "undefined" && moo !== null) === true && (this.CURRENT_STONE === this.BLACK || this.CURRENT_STONE === this.WHITE)) {
+        this.history = new History(this.virtual_board);
+        return true;
+      }
+      return false;
+    };
 
     Board.prototype.get_adjacent_points = function(_point) {
       var neighbours, _x, _y;
@@ -121,7 +127,7 @@ define(function(require) {
         popped_coord = stack.pop();
         x = popped_coord[0];
         y = popped_coord[1];
-        this.set_color(virtual_board_clone, popped_coord, fill_color);
+        virtual_board_clone = this.set_color(virtual_board_clone, popped_coord, fill_color);
         adjacent_points = this.get_adjacent_points(popped_coord);
         get_this = this;
         _.each(adjacent_points, function(adjacent_point) {
@@ -138,7 +144,7 @@ define(function(require) {
     };
 
     Board.prototype.process_move = function(_coord) {
-      var adjacent_points, board_state_difference, chain_meta, current_board_state, dead_stones, enemy_color, get_this, hypothetical_board_state, hypothetical_board_state_hash, key, num_board_states, previous_board_state, process_results, stone_being_captured, stone_being_captured_color, stones_added, truth_test, virtual_board_clone, virtual_board_hypothetical, _ref, _ref1;
+      var adjacent_points, board_state_difference, board_state_test, board_state_test_hash, board_state_test_hash_index, board_state_test_next, chain_meta, current_board_state, dead_stones, enemy_color, get_this, hypothetical_board_state, hypothetical_board_state_hash, key, num_board_states, previous_board_state, process_results, stone_being_captured, stone_being_captured_color, stones_added, truth_test, virtual_board_clone, virtual_board_hypothetical, _ref;
       process_results = {
         legal: true,
         dead: [],
@@ -193,6 +199,7 @@ define(function(require) {
           });
           if (truth_test) {
             if ((_.size(board_state_difference.stones_removed.BLACK) + _.size(board_state_difference.stones_removed.WHITE)) === 1) {
+              console.log("ko rule violated");
               process_results.legal = false;
             }
           }
@@ -202,14 +209,22 @@ define(function(require) {
         hypothetical_board_state = new BoardState(virtual_board_hypothetical, this.CURRENT_STONE);
         hypothetical_board_state_hash = hypothetical_board_state.getHash();
         if (this.isNumber((_ref = this.history.getBoardState(hypothetical_board_state_hash)) != null ? _ref.getHash() : void 0)) {
+          console.log("PSK violated at " + _coord);
           process_results.legal = false;
         }
       }
       if (this.REPETITION_RULE === this.SSK) {
         hypothetical_board_state = new BoardState(virtual_board_hypothetical, this.CURRENT_STONE);
         hypothetical_board_state_hash = hypothetical_board_state.getHash();
-        if (this.isNumber((_ref1 = this.history.getBoardState(hypothetical_board_state_hash)) != null ? _ref1.getHash() : void 0) && hypothetical_board_state.getWhoMoved() === this.CURRENT_STONE) {
-          process_results.legal = false;
+        board_state_test = this.history.getBoardState(hypothetical_board_state_hash);
+        board_state_test_hash = board_state_test != null ? board_state_test.getHash() : void 0;
+        if (this.isNumber(board_state_test_hash)) {
+          board_state_test_hash_index = _.lastIndexOf(this.history.history_hash_order, board_state_test_hash);
+          board_state_test_next = this.history.getBoardStateFromIndex(board_state_test_hash_index + 1);
+          if ((board_state_test_next != null ? board_state_test_next.getWhoMoved() : void 0) === this.get_opposite_color(this.CURRENT_STONE)) {
+            console.log("SSK violated at " + _coord);
+            process_results.legal = false;
+          }
         }
       }
       if (this.REPETITION_RULE === this.NSSK) {
@@ -222,6 +237,24 @@ define(function(require) {
       }
       process_results.board_state = virtual_board_hypothetical;
       return process_results;
+    };
+
+    Board.prototype.pass = function() {};
+
+    Board.prototype.place = function(_coord, _color) {
+      var place_results;
+      place_results = {
+        color: this.EMPTY,
+        x: _coord[0],
+        y: _coord[1]
+      };
+      if (this.get_color(this.virtual_board, _coord) !== this.EMPTY) {
+        return place_results;
+      } else if (_color === this.BLACK || _color === this.WHITE) {
+        this.virtual_board = this.set_color(this.virtual_board, _coord, _color);
+        place_results.color = _color;
+      }
+      return place_results;
     };
 
     Board.prototype.move = function(_coord) {

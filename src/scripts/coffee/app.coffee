@@ -92,7 +92,6 @@ define (require) ->
       @RAPH_BOARD_STATE = {} # track raphael ids
 
       Raphael = require('raphael')
-      Board = require('Board')
 
       canvas = @canvas.html('')
 
@@ -214,7 +213,9 @@ define (require) ->
         j = 0
         while j < n
           clicker = paper.rect(x - cell_radius / 2 + cell_radius * i, y - cell_radius / 2 + cell_radius * j, cell_radius, cell_radius)
-          clicker.attr('fill', '#fff').attr('fill-opacity', 0).attr('opacity', 0).attr('stroke-width', 0).attr('stroke', '#fff').attr('stroke-opacity', 0).data('coord', [i, j])
+          clicker.attr('fill', '#fff').attr('fill-opacity', 0).attr('opacity', 0).attr('stroke-width', 0).attr('stroke', '#fff').attr('stroke-opacity', 0)
+          
+          clicker.data('coord', [i, (@board_size-1)-j])
           stone_click_detect.push clicker
           j++
 
@@ -240,18 +241,22 @@ define (require) ->
       # Populate with stones
 
       # tracks move made
+      get_this = this
       track_stone_pointer = null
       track_stone = (i, j) ->
         _x = x + cell_radius * i
-        _y = y + cell_radius * j
+        #_y = y + cell_radius * j
+        _y = y + cell_radius * ((get_this.board_size-1)-j)
         track_stone_pointer.remove()  if track_stone_pointer?
         track_stone_pointer = paper.circle(_x, _y, circle_radius / 2)
         track_stone_pointer.attr 'stroke', 'red'
         track_stone_pointer.attr 'stroke-width', '2'
 
+      get_this = this
       white_stone = (i, j) ->
         _x = x + cell_radius * i
-        _y = y + cell_radius * j
+        # _y = y + cell_radius * j
+        _y = y + cell_radius * ((get_this.board_size-1)-j)
         
         stone_bg = paper.circle(_x, _y, circle_radius)
         stone_bg.attr 'fill', '#fff'
@@ -294,10 +299,13 @@ define (require) ->
         return group
 
         
-
+      get_this = this
       black_stone = (i, j) ->
         _x = x + cell_radius * i
-        _y = y + cell_radius * j
+        #_y = y + cell_radius * j
+        _y = y + cell_radius * ((get_this.board_size-1)-j)
+
+
 
         stone_bg = paper.circle(_x, _y, circle_radius)
         stone_bg.attr 'fill', '#fff'
@@ -324,17 +332,9 @@ define (require) ->
           paper.getById(id).remove()
         return
 
-      
-      # Replicate board in memory
-      # this is a singleton instance
-      virtual_board = new Board(n)
 
-      # Click event
-      get_this = this
-      stone_click_detect.click (e) ->
-
-        coord = @data('coord')
-
+      # make a move (record in history)
+      move = (coord) ->
         move_results = virtual_board.move(coord)
 
         # remove_stones
@@ -353,15 +353,119 @@ define (require) ->
             
           else
             # do nothing
+        return
 
+  
+
+      # place stone (for board setup)
+      place = (coord, color) ->
+
+        # see if we can place the colored stone        
+
+        place_results = virtual_board.place(coord, color)
+
+        switch place_results.color
+          when virtual_board.BLACK
+
+            get_this.RAPH_BOARD_STATE[coord] = black_stone(place_results.x, place_results.y)
+            
+          when virtual_board.WHITE
+
+            get_this.RAPH_BOARD_STATE[coord] = white_stone(place_results.x, place_results.y)
+            
+          else
+            # do nothing
+        return
+
+      
+
+      # Replicate board in memory
+      Board = require('Board')
+      virtual_board = new Board(@board_size, Board.BLACK)
+      @virtual_board = virtual_board
+
+      # Click event
+      get_this = this
+      stone_click_detect.click (e) ->
+
+        move(@data('coord'))
         # move detect element to front to be clicked again
         this.toFront()
         return
 
-  
-      
+      get_this = this
+      eternal_life_test = ->
+
+        b = Board.BLACK
+        w = Board.WHITE
+
+        lol = []
+        lol.push([0,w,w,b,0,0,0,0])
+        lol.push([b,b,w,b,0,0,0,0])
+        lol.push([0,b,w,b,0,0,0,0])
+        lol.push([w,b,w,b,0,0,0,0])
+        lol.push([0,w,w,b,0,0,0,0])
+        lol.push([b,w,b,0,0,0,0,0])
+        lol.push([w,b,0,b,0,0,0,0])
+        lol.push([0,b,0,0,0,0,0,0])
+        lol.reverse()
+        
+
+        if get_this.board_size is lol.length
+          size = get_this.board_size
+          _.each _.range(size), (j) ->
+            _.each _.range(size), (i) ->
+              
+              coord = [i,j]
+              place(coord, lol[j][i])
+
+          virtual_board.set_starting_board_state(Board.WHITE)
+        
+          move([0,5])
+          move([0,3])
+          move([0,4])
+          move([0,2])
 
 
+      tripleko_test = ->
+        # tripleko (SSK test)
+        # http://gif-explode.com/?explode=http://www.britgo.org/files/gifs/tripleko.gif
+        b = virtual_board.BLACK
+        w = virtual_board.WHITE
+
+        
+        lol = []
+        lol.push([0,0,0,0,0,0,0,0])
+        lol.push([b,b,b,b,b,b,b,0])
+        lol.push([w,w,w,w,w,w,b,0])
+        lol.push([0,w,b,w,b,w,b,0])
+        lol.push([w,b,0,b,0,b,w,0])
+        lol.push([b,b,b,b,b,b,w,0])
+        lol.push([w,w,w,w,w,w,w,0])
+        lol.push([0,0,0,0,0,0,0,0])
+        lol.reverse()
+        
+        if get_this.board_size is lol.length
+          size = get_this.board_size
+          _.each _.range(size), (j) ->
+            _.each _.range(size), (i) ->
+              
+              coord = [i,j]
+              place(coord, lol[j][i])
+        
+          virtual_board.set_starting_board_state(Board.WHITE)
+
+          move([2,3])
+          move([0,4])
+          move([4,3])
+          move([2,4])
+          move([0,3])
+          move([4,4])
+          move([2,3])
+        # end triple ko test
+
+      #eternal_life_test()
+      tripleko_test()
       
 
       paper.safari()
@@ -409,7 +513,7 @@ define (require) ->
           black_stone i, j
       ###
 
-      return @
+      
 
   return _GoBoard
 

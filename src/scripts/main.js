@@ -32,7 +32,6 @@
       require(["app"], function(_GoBoard) {
         return get_this.go_board = new _GoBoard(container, container_size, board_size);
       });
-      return this.go_board;
     }
 
     return _GoBoard;

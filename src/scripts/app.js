@@ -59,7 +59,7 @@ define(function(require) {
     _GoBoard.prototype.VERSION = '0.1';
 
     function _GoBoard(container, container_size, board_size) {
-      var $, Board, Raphael, black_stone, board_outline, canvas, canvas_length, cell_radius, circle_radius, clicker, get_this, i, index, isNumber, j, length, letter, line_horiz, line_vert, n, paper, remove_stone, spanner, stone_click_detect, text_buffer, text_movement, text_size, track_stone, track_stone_pointer, virtual_board, white_stone, x, y, _;
+      var $, Board, Raphael, black_stone, board_outline, canvas, canvas_length, cell_radius, circle_radius, clicker, eternal_life_test, get_this, i, index, isNumber, j, length, letter, line_horiz, line_vert, move, n, paper, place, remove_stone, spanner, stone_click_detect, text_buffer, text_movement, text_size, track_stone, track_stone_pointer, tripleko_test, virtual_board, white_stone, x, y, _;
       this.container = container;
       this.container_size = container_size;
       this.board_size = board_size;
@@ -86,7 +86,6 @@ define(function(require) {
       }
       this.RAPH_BOARD_STATE = {};
       Raphael = require('raphael');
-      Board = require('Board');
       canvas = this.canvas.html('');
       spanner = $('<span style="display: block; text-align: center;">').appendTo(canvas);
       $('<button value="|<">|<</button>').click(function(e) {
@@ -166,7 +165,8 @@ define(function(require) {
         j = 0;
         while (j < n) {
           clicker = paper.rect(x - cell_radius / 2 + cell_radius * i, y - cell_radius / 2 + cell_radius * j, cell_radius, cell_radius);
-          clicker.attr('fill', '#fff').attr('fill-opacity', 0).attr('opacity', 0).attr('stroke-width', 0).attr('stroke', '#fff').attr('stroke-opacity', 0).data('coord', [i, j]);
+          clicker.attr('fill', '#fff').attr('fill-opacity', 0).attr('opacity', 0).attr('stroke-width', 0).attr('stroke', '#fff').attr('stroke-opacity', 0);
+          clicker.data('coord', [i, (this.board_size - 1) - j]);
           stone_click_detect.push(clicker);
           j++;
         }
@@ -186,11 +186,12 @@ define(function(require) {
                 stone_click_detect.push clicker
       */
 
+      get_this = this;
       track_stone_pointer = null;
       track_stone = function(i, j) {
         var _x, _y;
         _x = x + cell_radius * i;
-        _y = y + cell_radius * j;
+        _y = y + cell_radius * ((get_this.board_size - 1) - j);
         if (track_stone_pointer != null) {
           track_stone_pointer.remove();
         }
@@ -198,10 +199,11 @@ define(function(require) {
         track_stone_pointer.attr('stroke', 'red');
         return track_stone_pointer.attr('stroke-width', '2');
       };
+      get_this = this;
       white_stone = function(i, j) {
         var group, stone_bg, stone_fg, _x, _y;
         _x = x + cell_radius * i;
-        _y = y + cell_radius * j;
+        _y = y + cell_radius * ((get_this.board_size - 1) - j);
         stone_bg = paper.circle(_x, _y, circle_radius);
         stone_bg.attr('fill', '#fff');
         stone_bg.attr('stroke-width', '0');
@@ -239,10 +241,11 @@ define(function(require) {
         group.push(stone_fg.id);
         return group;
       };
+      get_this = this;
       black_stone = function(i, j) {
         var group, stone_bg, stone_fg, _x, _y;
         _x = x + cell_radius * i;
-        _y = y + cell_radius * j;
+        _y = y + cell_radius * ((get_this.board_size - 1) - j);
         stone_bg = paper.circle(_x, _y, circle_radius);
         stone_bg.attr('fill', '#fff');
         stone_bg.attr('stroke-width', '0');
@@ -263,11 +266,8 @@ define(function(require) {
           return paper.getById(id).remove();
         });
       };
-      virtual_board = new Board(n);
-      get_this = this;
-      stone_click_detect.click(function(e) {
-        var coord, move_results;
-        coord = this.data('coord');
+      move = function(coord) {
+        var move_results;
         move_results = virtual_board.move(coord);
         _.each(move_results.dead, function(dead_stone) {
           return remove_stone(dead_stone);
@@ -280,8 +280,92 @@ define(function(require) {
             get_this.RAPH_BOARD_STATE[coord] = white_stone(move_results.x, move_results.y);
             break;
         }
+      };
+      place = function(coord, color) {
+        var place_results;
+        place_results = virtual_board.place(coord, color);
+        switch (place_results.color) {
+          case virtual_board.BLACK:
+            get_this.RAPH_BOARD_STATE[coord] = black_stone(place_results.x, place_results.y);
+            break;
+          case virtual_board.WHITE:
+            get_this.RAPH_BOARD_STATE[coord] = white_stone(place_results.x, place_results.y);
+            break;
+        }
+      };
+      Board = require('Board');
+      virtual_board = new Board(this.board_size, Board.BLACK);
+      this.virtual_board = virtual_board;
+      get_this = this;
+      stone_click_detect.click(function(e) {
+        move(this.data('coord'));
         this.toFront();
       });
+      get_this = this;
+      eternal_life_test = function() {
+        var b, lol, size, w;
+        b = Board.BLACK;
+        w = Board.WHITE;
+        lol = [];
+        lol.push([0, w, w, b, 0, 0, 0, 0]);
+        lol.push([b, b, w, b, 0, 0, 0, 0]);
+        lol.push([0, b, w, b, 0, 0, 0, 0]);
+        lol.push([w, b, w, b, 0, 0, 0, 0]);
+        lol.push([0, w, w, b, 0, 0, 0, 0]);
+        lol.push([b, w, b, 0, 0, 0, 0, 0]);
+        lol.push([w, b, 0, b, 0, 0, 0, 0]);
+        lol.push([0, b, 0, 0, 0, 0, 0, 0]);
+        lol.reverse();
+        if (get_this.board_size === lol.length) {
+          size = get_this.board_size;
+          _.each(_.range(size), function(j) {
+            return _.each(_.range(size), function(i) {
+              var coord;
+              coord = [i, j];
+              return place(coord, lol[j][i]);
+            });
+          });
+          virtual_board.set_starting_board_state(Board.WHITE);
+          move([0, 5]);
+          move([0, 3]);
+          move([0, 4]);
+          return move([0, 2]);
+        }
+      };
+      tripleko_test = function() {
+        var b, lol, size, w;
+        b = virtual_board.BLACK;
+        w = virtual_board.WHITE;
+        lol = [];
+        lol.push([0, 0, 0, 0, 0, 0, 0, 0]);
+        lol.push([b, b, b, b, b, b, b, 0]);
+        lol.push([w, w, w, w, w, w, b, 0]);
+        lol.push([0, w, b, w, b, w, b, 0]);
+        lol.push([w, b, 0, b, 0, b, w, 0]);
+        lol.push([b, b, b, b, b, b, w, 0]);
+        lol.push([w, w, w, w, w, w, w, 0]);
+        lol.push([0, 0, 0, 0, 0, 0, 0, 0]);
+        lol.reverse();
+        if (get_this.board_size === lol.length) {
+          size = get_this.board_size;
+          _.each(_.range(size), function(j) {
+            return _.each(_.range(size), function(i) {
+              var coord;
+              coord = [i, j];
+              return place(coord, lol[j][i]);
+            });
+          });
+          virtual_board.set_starting_board_state(Board.WHITE);
+          move([2, 3]);
+          move([0, 4]);
+          move([4, 3]);
+          move([2, 4]);
+          move([0, 3]);
+          move([4, 4]);
+          return move([2, 3]);
+        }
+      };
+      tripleko_test();
       paper.safari();
       paper.renderfix();
       /*
@@ -319,7 +403,6 @@ define(function(require) {
                 black_stone i, j
       */
 
-      return this;
     }
 
     return _GoBoard;
