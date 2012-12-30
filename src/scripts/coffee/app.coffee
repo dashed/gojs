@@ -100,8 +100,8 @@ define (require) ->
       circle_radius = 0.50 * cell_radius
 
       text_size = 15 #pixels
-      text_buffer = text_size + cell_radius / 2 + 20
-      text_movement = text_buffer/2 
+      text_buffer = text_size + cell_radius / 2 + 15
+      text_movement = text_buffer/2 +5
       # cell_radius / 2 + text_size / 2 + 5
       
 
@@ -308,27 +308,7 @@ define (require) ->
 
   
       
-      # Fill board with all stones 
-      ###
-      _.each _.range(0, n, 2), (i, index) ->
-        _.each _.range(0, n, 2), (j, index) ->
-          white_stone i, j
 
-
-      _.each _.range(1, n, 2), (i, index) ->
-        _.each _.range(1, n, 2), (j, index) ->
-          white_stone i, j
-
-
-      _.each _.range(1, n, 2), (i, index) ->
-        _.each _.range(0, n, 2), (j, index) ->
-          black_stone i, j
-
-
-      _.each _.range(0, n, 2), (i, index) ->
-        _.each _.range(1, n, 2), (j, index) ->
-          black_stone i, j
-      ###
 
       
 
@@ -354,6 +334,28 @@ define (require) ->
       #viewbox_length = canvas_length * canvas_length / canvas.width();
       paper.setViewBox(0, 0, canvas_length, canvas_length, false);
       paper.setSize(length, length);
+
+      # Fill board with all stones 
+      ###
+      _.each _.range(0, n, 2), (i, index) ->
+        _.each _.range(0, n, 2), (j, index) ->
+          white_stone i, j
+
+
+      _.each _.range(1, n, 2), (i, index) ->
+        _.each _.range(1, n, 2), (j, index) ->
+          white_stone i, j
+
+
+      _.each _.range(1, n, 2), (i, index) ->
+        _.each _.range(0, n, 2), (j, index) ->
+          black_stone i, j
+
+
+      _.each _.range(0, n, 2), (i, index) ->
+        _.each _.range(1, n, 2), (j, index) ->
+          black_stone i, j
+      ###
 
       return _GoBoard
 

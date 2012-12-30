@@ -2,6 +2,8 @@
 
   class _GoBoard
 
+    @VERSION: '0.1'
+
     constructor: (@container, @container_size, @board_size) ->
 
       requirejs.config
@@ -13,9 +15,7 @@
           "app":
             exports: "_GoBoard"
 
-      size = @size 
-      container = @container
-      board_size = @board_size
+
 
       setTimeout (->
         require ["app"], (_GoBoard)->
@@ -30,4 +30,8 @@
   else
     global.GoBoard = _GoBoard
   return
-)(if typeof window is "undefined" then this else window)
+  # see: https://github.com/shichuan/javascript-patterns/blob/master/general-patterns/access-to-global-object.html
+  #)(if typeof window is "undefined" then this else window)
+)(this or (1
+eval_
+)("this"))

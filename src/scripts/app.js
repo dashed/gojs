@@ -91,8 +91,8 @@ define(function(require) {
       cell_radius = 25;
       circle_radius = 0.50 * cell_radius;
       text_size = 15;
-      text_buffer = text_size + cell_radius / 2 + 20;
-      text_movement = text_buffer / 2;
+      text_buffer = text_size + cell_radius / 2 + 15;
+      text_movement = text_buffer / 2 + 5;
       canvas_length = cell_radius * (n - 1) + text_buffer * 2;
       paper = Raphael(canvas[0], canvas_length, canvas_length);
       y = text_buffer * 1;
@@ -254,27 +254,6 @@ define(function(require) {
         }
         this.toFront();
       });
-      /*
-            _.each _.range(0, n, 2), (i, index) ->
-              _.each _.range(0, n, 2), (j, index) ->
-                white_stone i, j
-      
-      
-            _.each _.range(1, n, 2), (i, index) ->
-              _.each _.range(1, n, 2), (j, index) ->
-                white_stone i, j
-      
-      
-            _.each _.range(1, n, 2), (i, index) ->
-              _.each _.range(0, n, 2), (j, index) ->
-                black_stone i, j
-      
-      
-            _.each _.range(0, n, 2), (i, index) ->
-              _.each _.range(1, n, 2), (j, index) ->
-                black_stone i, j
-      */
-
       paper.safari();
       paper.renderfix();
       /*
@@ -291,6 +270,27 @@ define(function(require) {
       canvas.height(length).width(length);
       paper.setViewBox(0, 0, canvas_length, canvas_length, false);
       paper.setSize(length, length);
+      /*
+            _.each _.range(0, n, 2), (i, index) ->
+              _.each _.range(0, n, 2), (j, index) ->
+                white_stone i, j
+      
+      
+            _.each _.range(1, n, 2), (i, index) ->
+              _.each _.range(1, n, 2), (j, index) ->
+                white_stone i, j
+      
+      
+            _.each _.range(1, n, 2), (i, index) ->
+              _.each _.range(0, n, 2), (j, index) ->
+                black_stone i, j
+      
+      
+            _.each _.range(0, n, 2), (i, index) ->
+              _.each _.range(1, n, 2), (j, index) ->
+                black_stone i, j
+      */
+
       return _GoBoard;
     };
 
