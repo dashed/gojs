@@ -52,7 +52,7 @@ define(function(require) {
     _GoBoard.prototype.VERSION = '0.1';
 
     function _GoBoard(container, container_size, board_size) {
-      var $, Board, Raphael, black_stone, board_outline, canvas, canvas_length, cell_radius, circle_radius, get_this, group, length, n, paper, remove_stone, text_buffer, text_movement, text_size, track_stone, track_stone_pointer, virtual_board, white_stone, x, y, _;
+      var $, Board, Raphael, black_stone, board_outline, canvas, canvas_length, cell_radius, circle_radius, get_this, length, n, paper, remove_stone, stone_click_detect, text_buffer, text_movement, text_size, track_stone, track_stone_pointer, virtual_board, white_stone, x, y, _;
       this.container = container;
       this.container_size = container_size;
       this.board_size = board_size;
@@ -96,19 +96,6 @@ define(function(require) {
       x = text_buffer;
       board_outline = paper.rect(x, y, cell_radius * (n - 1), cell_radius * (n - 1)).attr('stroke-width', 2);
       paper.rect(x, y, cell_radius * (n - 1), cell_radius * (n - 1)).attr('stroke-width', 1);
-      _.each(_.range(n), function(index) {
-        var i, letter, line_horiz, line_vert;
-        if (index < n - 1) {
-          i = index;
-          line_vert = paper.path('M' + (x + cell_radius * (i + 1)) + ',' + (y + cell_radius * (n - 1)) + 'V' + y);
-          line_horiz = paper.path('M' + x + ',' + (y + cell_radius * (i + 1)) + 'H' + (x + cell_radius * (n - 1)));
-        }
-        letter = String.fromCharCode(65 + index);
-        paper.text(x + cell_radius * index, y + cell_radius * (n - 1) + text_movement, letter).attr('font-size', text_size);
-        paper.text(x + cell_radius * index, y - text_movement, letter).attr('font-size', text_size);
-        paper.text(x - text_movement, y + cell_radius * (n - 1 - index), index + 1).attr('font-size', text_size);
-        return paper.text(x + cell_radius * (n - 1) + text_movement, y + cell_radius * (n - 1 - index), index + 1).attr('font-size', text_size);
-      });
       (function() {
         var generate_star;
         generate_star = function(_x, _y) {
@@ -140,6 +127,46 @@ define(function(require) {
           return generate_star(6, 6);
         }
       })();
+      stone_click_detect = paper.set();
+      _.each(_.range(n), function(index) {
+        var i, letter, line_horiz, line_vert;
+        i = index;
+        if (index < n - 1) {
+          line_vert = paper.path('M' + (x + cell_radius * (i + 1)) + ',' + (y + cell_radius * (n - 1)) + 'V' + y);
+          line_horiz = paper.path('M' + x + ',' + (y + cell_radius * (i + 1)) + 'H' + (x + cell_radius * (n - 1)));
+        }
+        letter = String.fromCharCode(65 + index);
+        paper.text(x + cell_radius * index, y + cell_radius * (n - 1) + text_movement, letter).attr('font-size', text_size);
+        paper.text(x + cell_radius * index, y - text_movement, letter).attr('font-size', text_size);
+        paper.text(x - text_movement, y + cell_radius * (n - 1 - index), index + 1).attr('font-size', text_size);
+        paper.text(x + cell_radius * (n - 1) + text_movement, y + cell_radius * (n - 1 - index), index + 1).attr('font-size', text_size);
+        return _.each(_.range(n), function(j, index) {
+          var clicker;
+          clicker = paper.rect(x - cell_radius / 2 + cell_radius * i, y - cell_radius / 2 + cell_radius * j, cell_radius, cell_radius);
+          clicker.attr('fill', '#fff');
+          clicker.attr('fill-opacity', 0);
+          clicker.attr('opacity', 0);
+          clicker.attr('stroke-width', 0);
+          clicker.attr('stroke', '#fff');
+          clicker.attr('stroke-opacity', 0);
+          clicker.data('coord', [i, j]);
+          return stone_click_detect.push(clicker);
+        });
+      });
+      /*
+            _.each _.range(n), (i, index) ->
+              _.each _.range(n), (j, index) ->
+                clicker = paper.rect(x - cell_radius / 2 + cell_radius * i, y - cell_radius / 2 + cell_radius * j, cell_radius, cell_radius)
+                clicker.attr 'fill', '#fff'
+                clicker.attr 'fill-opacity', 0
+                clicker.attr 'opacity', 0
+                clicker.attr 'stroke-width', 0
+                clicker.attr 'stroke', '#fff'
+                clicker.attr 'stroke-opacity', 0
+                clicker.data 'coord', [i, j]
+                stone_click_detect.push clicker
+      */
+
       track_stone_pointer = null;
       track_stone = function(i, j) {
         var _x, _y;
@@ -211,21 +238,6 @@ define(function(require) {
         group.push(stone_fg.id);
         return group;
       };
-      group = paper.set();
-      _.each(_.range(n), function(i, index) {
-        return _.each(_.range(n), function(j, index) {
-          var clicker;
-          clicker = paper.rect(x - cell_radius / 2 + cell_radius * i, y - cell_radius / 2 + cell_radius * j, cell_radius, cell_radius);
-          clicker.attr('fill', '#fff');
-          clicker.attr('fill-opacity', 0);
-          clicker.attr('opacity', 0);
-          clicker.attr('stroke-width', 0);
-          clicker.attr('stroke', '#fff');
-          clicker.attr('stroke-opacity', 0);
-          clicker.data('coord', [i, j]);
-          return group.push(clicker);
-        });
-      });
       get_this = this;
       remove_stone = function(coord) {
         _.each(get_this.RAPH_BOARD_STATE[coord], function(id) {
@@ -234,7 +246,7 @@ define(function(require) {
       };
       virtual_board = new Board(n);
       get_this = this;
-      group.click(function(e) {
+      stone_click_detect.click(function(e) {
         var coord, move_results;
         coord = this.data('coord');
         move_results = virtual_board.move(coord);

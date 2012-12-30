@@ -115,31 +115,8 @@ define (require) ->
       
       # construct the board
       board_outline = paper.rect(x, y, cell_radius * (n - 1), cell_radius * (n - 1)).attr('stroke-width', 2)
-      paper.rect(x, y, cell_radius * (n - 1), cell_radius * (n - 1)).attr 'stroke-width', 1
+      paper.rect(x, y, cell_radius * (n - 1), cell_radius * (n - 1)).attr 'stroke-width', 1      
 
-      #paper.rect(x- text_movement, y-text_movement*1, cell_radius * (n)+text_movement, cell_radius * (n)+text_movement*2).attr 'stroke-width', 3
-      
-      # draw lines and coordinate labels
-      _.each _.range(n), (index) ->
-
-
-        # construct lines
-        # ignore outlines
-        if index < n - 1 
-          i = index
-          line_vert = paper.path('M' + (x + cell_radius * (i + 1)) + ',' + (y + cell_radius * (n - 1)) + 'V' + (y))
-          line_horiz = paper.path('M' + x + ',' + (y + cell_radius * (i + 1)) + 'H' + (x + cell_radius * (n - 1)))
-
-        # Alphabet
-        letter = String.fromCharCode(65 + index)
-        paper.text(x + cell_radius * (index), y + cell_radius * (n - 1) + text_movement, letter).attr 'font-size', text_size
-        paper.text(x + cell_radius * (index), y - text_movement, letter).attr 'font-size', text_size
-
-        # Numbers
-        paper.text(x - text_movement, y + cell_radius * (n - 1 - index), index+1).attr 'font-size', text_size
-        paper.text(x + cell_radius * (n - 1) + text_movement, y + cell_radius * (n - 1 - index), index+1).attr 'font-size', text_size
-
-      
       # Star point markers (handicap markers)
       # See: http://senseis.xmp.net/?Hoshi
       do () ->
@@ -169,6 +146,57 @@ define (require) ->
           generate_star 4, 4
           generate_star 2, 6
           generate_star 6, 6
+
+
+      # draw lines and coordinate labels
+      stone_click_detect = paper.set()
+      _.each _.range(n), (index) ->
+
+        i = index
+
+        # construct lines
+        # ignore outlines
+        if index < n - 1 
+          
+          line_vert = paper.path('M' + (x + cell_radius * (i + 1)) + ',' + (y + cell_radius * (n - 1)) + 'V' + (y))
+          line_horiz = paper.path('M' + x + ',' + (y + cell_radius * (i + 1)) + 'H' + (x + cell_radius * (n - 1)))
+
+        # Alphabet
+        letter = String.fromCharCode(65 + index)
+        paper.text(x + cell_radius * (index), y + cell_radius * (n - 1) + text_movement, letter).attr 'font-size', text_size
+        paper.text(x + cell_radius * (index), y - text_movement, letter).attr 'font-size', text_size
+
+        # Numbers
+        paper.text(x - text_movement, y + cell_radius * (n - 1 - index), index+1).attr 'font-size', text_size
+        paper.text(x + cell_radius * (n - 1) + text_movement, y + cell_radius * (n - 1 - index), index+1).attr 'font-size', text_size
+
+        # Place click detectors
+        _.each _.range(n), (j, index) ->
+          clicker = paper.rect(x - cell_radius / 2 + cell_radius * i, y - cell_radius / 2 + cell_radius * j, cell_radius, cell_radius)
+          clicker.attr 'fill', '#fff'
+          clicker.attr 'fill-opacity', 0
+          clicker.attr 'opacity', 0
+          clicker.attr 'stroke-width', 0
+          clicker.attr 'stroke', '#fff'
+          clicker.attr 'stroke-opacity', 0
+          clicker.data 'coord', [i, j]
+          stone_click_detect.push clicker
+
+      # Put stones on board if user has clicked
+      ###
+      _.each _.range(n), (i, index) ->
+        _.each _.range(n), (j, index) ->
+          clicker = paper.rect(x - cell_radius / 2 + cell_radius * i, y - cell_radius / 2 + cell_radius * j, cell_radius, cell_radius)
+          clicker.attr 'fill', '#fff'
+          clicker.attr 'fill-opacity', 0
+          clicker.attr 'opacity', 0
+          clicker.attr 'stroke-width', 0
+          clicker.attr 'stroke', '#fff'
+          clicker.attr 'stroke-opacity', 0
+          clicker.data 'coord', [i, j]
+          stone_click_detect.push clicker
+      ###
+
       
 
       # Populate with stones
@@ -250,19 +278,7 @@ define (require) ->
         group.push stone_fg.id
         return group
       
-      # Put stones on board if user has clicked
-      group = paper.set()
-      _.each _.range(n), (i, index) ->
-        _.each _.range(n), (j, index) ->
-          clicker = paper.rect(x - cell_radius / 2 + cell_radius * i, y - cell_radius / 2 + cell_radius * j, cell_radius, cell_radius)
-          clicker.attr 'fill', '#fff'
-          clicker.attr 'fill-opacity', 0
-          clicker.attr 'opacity', 0
-          clicker.attr 'stroke-width', 0
-          clicker.attr 'stroke', '#fff'
-          clicker.attr 'stroke-opacity', 0
-          clicker.data 'coord', [i, j]
-          group.push clicker
+
 
       get_this = this
       remove_stone = (coord) ->
@@ -275,9 +291,9 @@ define (require) ->
       # this is a singleton instance
       virtual_board = new Board(n)
 
-      
+      # Click event
       get_this = this
-      group.click (e) ->
+      stone_click_detect.click (e) ->
 
         coord = @data('coord')
 
