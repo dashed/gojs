@@ -28,35 +28,58 @@
         </ul>
       </header>
       <section>
-        <h3>Demo</h3>
+<!-- start pandoc output -->
 
-<h4>Syntax</h4>
-
-Maximum board size is 19.
-
-<pre><code>var goboard = new GoBoard([container id], [length], [board size]);</code></pre>
-
-
-
-<h4>19 x 19 board</h4>
-
-<p>Render a 19x19 Go board in a div with id "canvas" of length 500px:</p>
-
-<pre><code>var goboard = new GoBoard("canvas", 500, 19);</code></pre>
-
+<h1 id="gojs">gojs</h1>
+<p>Go board game in Javascript.</p>
+<h1 id="syntax">syntax</h1>
+<p><code>var some_var = GoBoard(container_id, length, board_size);</code></p>
+<ul>
+<li><p><code>container_id</code>: an element container with with a unique <code>id</code> attribute</p></li>
+<li><p><code>length</code>: render the element container into a square of length <code>length</code></p></li>
+<li><p><code>board_size</code>: render the go board of grid <code>board_size</code> x <code>board_size</code>. Must be an integer between <code>2</code> and <code>19</code>.</p></li>
+</ul>
+<h1 id="usage">usage</h1>
+<ol style="list-style-type: decimal">
+<li><p>Place <code>&lt;script src=&quot;path/to/gojs.js&quot;&gt;&lt;/script&gt;</code> in the <code>head</code> element, or right before the <code>body</code> tag.</p></li>
+<li><p>Place an empty <code>div</code> container with a unique <code>id</code> attribute. A <code>div</code> element is preferred, but other elements such as <code>p</code> may be used.</p>
+<p>Example: <code>&lt;div id=&quot;go_board&quot;&gt;&lt;/div&gt;</code></p>
+<p><strong>Note:</strong> If the container is not empty, gojs will empty it!</p></li>
+<li><p>Render the go board via</p>
+<p><code>var go_board = GoBoard(&quot;go_board&quot;, 500, 19)</code></p></li>
+</ol>
+<h1 id="demo">demo</h1>
+<h2 id="x-19-board">19 x 19 board</h2>
+<pre><code>var goboard = GoBoard(&quot;canvas&quot;, 500, 19);</code></pre>
 <div id="canvas"></div>
 
-<h4> 9x9 board</h4>
-<pre><code>var goboard = new GoBoard("canvas", 300, 9);</code></pre>
-
-
+<h2 id="x9-board">9x9 board</h2>
+<pre><code>var goboard2 = GoBoard(&quot;canvas2&quot;, 200, 9);</code></pre>
 <div id="canvas2"></div>
 
-<h4> 13x13 board</h4>
-
-<pre><code>var goboard = new GoBoard("canvas", 300, 13);</code></pre>
+<h2 id="x13-board">13x13 board</h2>
+<pre><code>var goboard3 = GoBoard(&quot;canvas3&quot;, 300, 13);</code></pre>
 <div id="canvas3"></div>
 
+
+<h2 id="x16-board-non-standard">16x16 board (non-standard)</h2>
+<pre><code>var goboard4 = GoBoard(&quot;canvas4&quot;, 400, 16);</code></pre>
+<div id="canvas4"></div>
+
+
+<h1 id="colophon">colophon</h1>
+<ul>
+<li><p>All code excluding libraries are written in <a href="http://coffeescript.org/">coffeescript</a> which compiles into JavaScript.</p></li>
+<li><p><a href="http://raphaeljs.com/">Raphael JS</a> is primarily used to render the Go board.</p></li>
+<li><p>Utility libraries:</p>
+<ul>
+<li><p><a href="http://jquery.com/">jQuery</a></p></li>
+<li><p><a href="http://underscorejs.org/">underscore.js</a></p></li>
+</ul></li>
+<li><p>All JavaScript files are packaged together with <a href="http://requirejs.org/">RequireJS</a> and its <a href="http://requirejs.org/docs/optimization.html">optimizer</a>, and minified through <a href="https://github.com/mishoo/UglifyJS2">UglifyJS2</a>.</p></li>
+</ul>
+
+<!-- end pandoc output -->
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/Dashed">Dashed</a></p>
@@ -67,8 +90,9 @@ Maximum board size is 19.
 <script src="javascripts/gojs.js"></script>
 <script>
 var goboard = GoBoard("canvas", 500, 19);
-var goboard2 = GoBoard("canvas2", 300, 9);
+var goboard2 = GoBoard("canvas2", 200, 9);
 var goboard3 = GoBoard("canvas3", 300, 13);
+var goboard4 = GoBoard("canvas4", 400, 16);
 </script>
   </body>
 </html>
