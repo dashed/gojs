@@ -8,7 +8,7 @@ syntax
 
 `var some_var = GoBoard(container_id, length, board_size);`
 
-* `container_id`: a element container with with a unique `id` attribute
+* `container_id`: an element container with with a unique `id` attribute
 
 * `length`: render the element container into a square of length `length`
 
@@ -30,8 +30,10 @@ usage
 
 	`var go_board = GoBoard("go_board", 500, 19)`
 
+demo
+====
 
-
+[Click here](http://dashed.github.com/gojs/#demo) to view the demo
 
 colophon
 ========
@@ -47,3 +49,5 @@ colophon
 	* [underscore.js](http://underscorejs.org/)
 
 * All JavaScript files are packaged together with [RequireJS](http://requirejs.org/) and its [optimizer](http://requirejs.org/docs/optimization.html), and minified through [UglifyJS2](https://github.com/mishoo/UglifyJS2).
+
+
