@@ -2,7 +2,7 @@
 
   class _GoBoard
 
-    @VERSION: '0.1'
+    
 
     constructor: (@container, @container_size, @board_size) ->
 
@@ -15,16 +15,20 @@
           "app":
             exports: "_GoBoard"
 
-
-
+      get_this = this
+      
       setTimeout (->
         require ["app"], (_GoBoard)->
-          lol = new _GoBoard(container, container_size, board_size)
-          return
+          get_this.lol = new _GoBoard(container, container_size, board_size)
       ), 0
+      ###
+      
+      require ["app"], (_GoBoard)->
+        get_this.lol = new _GoBoard(container, container_size, board_size)
+      ###
+      return @lol
+      
 
-
-      return
   if global.GoBoard
     throw new Error("GoBoard has already been defined")
   else

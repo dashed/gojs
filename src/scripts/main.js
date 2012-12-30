@@ -4,9 +4,8 @@
   var _GoBoard;
   _GoBoard = (function() {
 
-    _GoBoard.VERSION = '0.1';
-
     function _GoBoard(container, container_size, board_size) {
+      var get_this;
       this.container = container;
       this.container_size = container_size;
       this.board_size = board_size;
@@ -22,13 +21,19 @@
           }
         }
       });
+      get_this = this;
       setTimeout((function() {
         return require(["app"], function(_GoBoard) {
-          var lol;
-          lol = new _GoBoard(container, container_size, board_size);
+          return get_this.lol = new _GoBoard(container, container_size, board_size);
         });
       }), 0);
-      return;
+      /*
+            
+            require ["app"], (_GoBoard)->
+              get_this.lol = new _GoBoard(container, container_size, board_size)
+      */
+
+      return this.lol;
     }
 
     return _GoBoard;

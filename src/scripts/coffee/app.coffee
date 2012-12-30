@@ -48,6 +48,9 @@ define (require) ->
 
   class _GoBoard
 
+    VERSION: '0.1'
+
+
     constructor: (@container, @container_size, @board_size) ->
 
       if typeof @container != 'string' or typeof(@container_size) != 'number' or typeof @board_size != 'number'
@@ -59,8 +62,8 @@ define (require) ->
       if @board_size > 19
         @board_size = 19
 
-      if @board_size < 0
-        @board_size = 0
+      if @board_size <= 1
+        return
 
       @RAPH_BOARD_STATE = {} # track raphael ids
 
@@ -71,11 +74,6 @@ define (require) ->
       if @canvas.length is 0
         return
 
-
-
-      @draw_board()
-
-    draw_board: () ->
 
       Raphael = require('raphael')
       _ = require('underscore')
@@ -121,7 +119,7 @@ define (require) ->
 
       #paper.rect(x- text_movement, y-text_movement*1, cell_radius * (n)+text_movement, cell_radius * (n)+text_movement*2).attr 'stroke-width', 3
       
-      # text labels
+      # draw lines and coordinate labels
       _.each _.range(n), (index) ->
 
 
@@ -357,6 +355,8 @@ define (require) ->
           black_stone i, j
       ###
 
-      return _GoBoard
+      return @
+
+  return _GoBoard
 
 

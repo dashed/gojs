@@ -47,10 +47,12 @@ requirejs.config({
 
 define(function(require) {
   var _GoBoard;
-  return _GoBoard = (function() {
+  _GoBoard = (function() {
+
+    _GoBoard.prototype.VERSION = '0.1';
 
     function _GoBoard(container, container_size, board_size) {
-      var $;
+      var $, Board, Raphael, black_stone, board_outline, canvas, canvas_length, cell_radius, circle_radius, get_this, group, length, n, paper, remove_stone, text_buffer, text_movement, text_size, track_stone, track_stone_pointer, virtual_board, white_stone, x, y, _;
       this.container = container;
       this.container_size = container_size;
       this.board_size = board_size;
@@ -63,8 +65,8 @@ define(function(require) {
       if (this.board_size > 19) {
         this.board_size = 19;
       }
-      if (this.board_size < 0) {
-        this.board_size = 0;
+      if (this.board_size <= 1) {
+        return;
       }
       this.RAPH_BOARD_STATE = {};
       $ = require('jquery');
@@ -72,11 +74,6 @@ define(function(require) {
       if (this.canvas.length === 0) {
         return;
       }
-      this.draw_board();
-    }
-
-    _GoBoard.prototype.draw_board = function() {
-      var Board, Raphael, black_stone, board_outline, canvas, canvas_length, cell_radius, circle_radius, get_this, group, length, n, paper, remove_stone, text_buffer, text_movement, text_size, track_stone, track_stone_pointer, virtual_board, white_stone, x, y, _;
       Raphael = require('raphael');
       _ = require('underscore');
       Board = require('Board');
@@ -291,10 +288,11 @@ define(function(require) {
                 black_stone i, j
       */
 
-      return _GoBoard;
-    };
+      return this;
+    }
 
     return _GoBoard;
 
   })();
+  return _GoBoard;
 });
