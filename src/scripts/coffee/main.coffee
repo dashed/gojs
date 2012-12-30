@@ -15,7 +15,7 @@
           "app":
             exports: "_GoBoard"
 
-      get_this = this
+      
 
       ###
       setTimeout (->
@@ -23,11 +23,10 @@
           get_this.lol = new _GoBoard(container, container_size, board_size)
       ), 0
       ###
-      
+      get_this = this
       require ["app"], (_GoBoard)->
-        get_this.lol = new _GoBoard(container, container_size, board_size)
-      
-      return @lol
+        get_this.go_board = new _GoBoard(container, container_size, board_size)
+      return @go_board
       
 
   if global.GoBoard

@@ -21,7 +21,6 @@
           }
         }
       });
-      get_this = this;
       /*
             setTimeout (->
               require ["app"], (_GoBoard)->
@@ -29,10 +28,11 @@
             ), 0
       */
 
+      get_this = this;
       require(["app"], function(_GoBoard) {
-        return get_this.lol = new _GoBoard(container, container_size, board_size);
+        return get_this.go_board = new _GoBoard(container, container_size, board_size);
       });
-      return this.lol;
+      return this.go_board;
     }
 
     return _GoBoard;
