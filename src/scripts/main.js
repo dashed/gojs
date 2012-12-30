@@ -22,17 +22,16 @@
         }
       });
       get_this = this;
-      setTimeout((function() {
-        return require(["app"], function(_GoBoard) {
-          return get_this.lol = new _GoBoard(container, container_size, board_size);
-        });
-      }), 0);
       /*
-            
-            require ["app"], (_GoBoard)->
-              get_this.lol = new _GoBoard(container, container_size, board_size)
+            setTimeout (->
+              require ["app"], (_GoBoard)->
+                get_this.lol = new _GoBoard(container, container_size, board_size)
+            ), 0
       */
 
+      require(["app"], function(_GoBoard) {
+        return get_this.lol = new _GoBoard(container, container_size, board_size);
+      });
       return this.lol;
     }
 

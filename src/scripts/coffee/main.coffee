@@ -16,7 +16,8 @@
             exports: "_GoBoard"
 
       get_this = this
-      
+
+      ###
       setTimeout (->
         require ["app"], (_GoBoard)->
           get_this.lol = new _GoBoard(container, container_size, board_size)
@@ -25,7 +26,7 @@
       
       require ["app"], (_GoBoard)->
         get_this.lol = new _GoBoard(container, container_size, board_size)
-      ###
+      
       return @lol
       
 
