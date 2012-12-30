@@ -64,7 +64,7 @@ define (require) ->
         return
 
       $ = require('jquery')
-      @canvas = $('#'+ @container.toString()).html('')
+      @canvas = $('#'+ @container.toString())
 
       # check if canvas exists
       if @canvas.length is 0
@@ -86,8 +86,29 @@ define (require) ->
       Raphael = require('raphael')
       Board = require('Board')
 
-      canvas = @canvas
-      canvas.css('overflow', 'hidden').css('border', '1px solid black')
+      canvas = @canvas.html('')
+
+      spanner = $('<span style="display: block; text-align: center;">').appendTo(canvas)
+
+      $('<button value="|<">|<</button>').click((e)->
+        console.log "click!"
+      ).appendTo(spanner)
+
+      $('<button value="<">Previous</button>').click((e)->
+        console.log "click!"
+      ).appendTo(spanner)
+
+      $('<button value=">">Next</button>').click((e)->
+        console.log "click!"
+      ).appendTo(spanner)
+
+      $('<button value=">|">>|</button>').click((e)->
+        console.log "click!"
+      ).appendTo(spanner)
+
+
+      #canvas.css('overflow', 'hidden')
+      canvas.css('border', '1px solid black')
 
       if !$.support.inlineBlockNeedsLayout
         canvas.css('display', 'inline-block')
@@ -352,7 +373,7 @@ define (require) ->
       ###
       
       length = this.container_size;
-      canvas.height(length).width(length);
+      canvas.width(length);
       #viewbox_length = canvas_length * canvas_length / canvas.width();
       paper.setViewBox(0, 0, canvas_length, canvas_length, false);
       paper.setSize(length, length);

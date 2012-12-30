@@ -52,7 +52,7 @@ define(function(require) {
     _GoBoard.prototype.VERSION = '0.1';
 
     function _GoBoard(container, container_size, board_size) {
-      var $, Board, Raphael, black_stone, board_outline, canvas, canvas_length, cell_radius, circle_radius, clicker, get_this, i, index, isNumber, j, length, letter, line_horiz, line_vert, n, paper, remove_stone, stone_click_detect, text_buffer, text_movement, text_size, track_stone, track_stone_pointer, virtual_board, white_stone, x, y, _;
+      var $, Board, Raphael, black_stone, board_outline, canvas, canvas_length, cell_radius, circle_radius, clicker, get_this, i, index, isNumber, j, length, letter, line_horiz, line_vert, n, paper, remove_stone, spanner, stone_click_detect, text_buffer, text_movement, text_size, track_stone, track_stone_pointer, virtual_board, white_stone, x, y, _;
       this.container = container;
       this.container_size = container_size;
       this.board_size = board_size;
@@ -64,7 +64,7 @@ define(function(require) {
         return;
       }
       $ = require('jquery');
-      this.canvas = $('#' + this.container.toString()).html('');
+      this.canvas = $('#' + this.container.toString());
       if (this.canvas.length === 0) {
         return;
       }
@@ -80,8 +80,21 @@ define(function(require) {
       this.RAPH_BOARD_STATE = {};
       Raphael = require('raphael');
       Board = require('Board');
-      canvas = this.canvas;
-      canvas.css('overflow', 'hidden').css('border', '1px solid black');
+      canvas = this.canvas.html('');
+      spanner = $('<span style="display: block; text-align: center;">').appendTo(canvas);
+      $('<button value="|<">|<</button>').click(function(e) {
+        return console.log("click!");
+      }).appendTo(spanner);
+      $('<button value="<">Previous</button>').click(function(e) {
+        return console.log("click!");
+      }).appendTo(spanner);
+      $('<button value=">">Next</button>').click(function(e) {
+        return console.log("click!");
+      }).appendTo(spanner);
+      $('<button value=">|">>|</button>').click(function(e) {
+        return console.log("click!");
+      }).appendTo(spanner);
+      canvas.css('border', '1px solid black');
       if (!$.support.inlineBlockNeedsLayout) {
         canvas.css('display', 'inline-block');
       } else {
@@ -274,7 +287,7 @@ define(function(require) {
       */
 
       length = this.container_size;
-      canvas.height(length).width(length);
+      canvas.width(length);
       paper.setViewBox(0, 0, canvas_length, canvas_length, false);
       paper.setSize(length, length);
       /*
