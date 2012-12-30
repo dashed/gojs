@@ -3,9 +3,9 @@ define (require) ->
 
   $ = require('jquery')
   _ = require('underscore')
+  History = require('History')
+  BoardState = require('BoardState')
 
-
-  # The actual Singleton class
   class Board
 
     # class variables
@@ -14,16 +14,29 @@ define (require) ->
     @WHITE: 2
     @CURRENT_STONE: @BLACK
 
+    isNumber: (n) ->
+      return !isNaN(parseFloat(n)) && isFinite(n)
+
     constructor: (@size) ->
 
       @EMPTY = 0
       @BLACK = 1
       @WHITE = 2
       @CURRENT_STONE = @BLACK
-      @KO_POINT = []
 
-      if typeof @size != "number"
+      # repetition rule constants
+      @KR = 0 # one stone ko rule (non-superko)
+      @PSK = 1 # positional superko
+      @SSK = 2 # situational superko
+      @NSSK = 3 # natural superko
+
+      @REPETITION_RULE = @PSK
+
+
+
+      if !@isNumber(@size)
         @size = 0
+
 
 
       # create virtual board      
@@ -33,6 +46,9 @@ define (require) ->
         get_this.virtual_board[i] = new Array(get_this.size)
         _.each _.range(get_this.size), (j) ->
           get_this.virtual_board[i][j] = get_this.EMPTY
+
+      # initialize History
+      @history = new History(@virtual_board)
 
       return
 
@@ -144,7 +160,7 @@ define (require) ->
 
       # check if the move is legal
 
-      # legal move metadata
+      # process_results metadata
       process_results = 
         legal: true
         dead: []
@@ -155,11 +171,6 @@ define (require) ->
         process_results.legal = false
         return process_results
 
-      # check if move is legal under ko rule
-      # see: http://en.wikipedia.org/wiki/Rules_of_Go#Ko_and_Superko
-      if _coord[0] is @KO_POINT[0] and _coord[1] is @KO_POINT[1]
-        process_results.legal = false
-        return process_results        
 
 
       # hypothetical board state
@@ -194,8 +205,7 @@ define (require) ->
               # chain is dead
               dead_stones[member] = member
 
-            # update
-            # hypothetical board state
+            # update hypothetical board state
             # remove dead stones
             _.each dead_stones, (dead_stone) ->
               virtual_board_hypothetical = get_this.set_color(virtual_board_hypothetical, dead_stone, get_this.EMPTY)
@@ -210,12 +220,78 @@ define (require) ->
         virtual_board_hypothetical = @set_color(virtual_board_clone, _coord, @EMPTY)
         process_results.legal = false
 
-      # add dead stones to process_results
-      _.each dead_stones, (dead_stone) ->
-        process_results.dead.push(dead_stone)
 
-      # ko rule (positional superko)
-      # 
+      # check if move is legal under ko & superko rule
+      # see: http://en.wikipedia.org/wiki/Rules_of_Go#Ko_and_Superko
+
+      # Ko rule: One may not capture just one stone, if that stone was played on the previous move, and that move also captured just one stone.
+      if @REPETITION_RULE is @KR
+        # need at least 2 board states for this rule
+        num_board_states = @history.getNumBoardStates()
+        if _.size(dead_stones) is 1 and num_board_states >= 2
+
+          current_board_state = @history.goBack(0)
+          previous_board_state = @history.goBack(1)
+
+          board_state_difference = @history.difference(previous_board_state,current_board_state)
+
+          # get stone being captured
+          key = _.keys(dead_stones)
+          stone_being_captured = dead_stones[key[0]]
+          stone_being_captured_color = @virtual_board[stone_being_captured[0]][stone_being_captured[1]]
+
+          # check if stone being captured was played on the previous move
+          stones_added = []
+          if stone_being_captured_color is @BLACK
+            stones_added = board_state_difference.stones_added.BLACK
+          else if stone_being_captured_color is @WHITE
+            stones_added = board_state_difference.stones_added.WHITE
+
+          # check if stone being captured also captured just one stone
+          truth_test = _.find stones_added, (coord) ->
+            coord[0] is stone_being_captured[0] and coord[1] is stone_being_captured[1]
+
+          if truth_test
+            if (_.size(board_state_difference.stones_removed.BLACK) + _.size(board_state_difference.stones_removed.WHITE)) is 1
+              # ko rule violated
+              process_results.legal = false
+
+
+      # Positional superko:  The hypothetical board position of the attempted move shouldn't be the same as any of the previous board states
+      if @REPETITION_RULE is @PSK
+        
+        # get hash of hypothetical board state
+        hypothetical_board_state = new BoardState(virtual_board_hypothetical, @CURRENT_STONE)
+        hypothetical_board_state_hash = hypothetical_board_state.getHash()
+        
+        if @isNumber(@history.getBoardState(hypothetical_board_state_hash)?.getHash())
+          # PSK rule violated
+          process_results.legal = false
+
+
+      # situational superko: The hypothetical board position of the attempted move shouldn't be the 
+      # same as any of the previous board states, and the board state was on the player's turn (the player moving next)
+      if @REPETITION_RULE is @SSK
+        
+        # get hash of hypothetical board state
+        hypothetical_board_state = new BoardState(virtual_board_hypothetical, @CURRENT_STONE)
+        hypothetical_board_state_hash = hypothetical_board_state.getHash()
+        
+        if @isNumber(@history.getBoardState(hypothetical_board_state_hash)?.getHash()) and hypothetical_board_state.getWhoMoved() is @CURRENT_STONE
+          # SSK rule violated
+          process_results.legal = false
+
+
+      if @REPETITION_RULE is @NSSK
+        1+1
+        # passing must be implemented
+
+
+
+      # add dead stones to process_results (if move is still legal)
+      if process_results.legal is true
+        _.each dead_stones, (dead_stone) ->
+          process_results.dead.push(dead_stone)
 
 
       process_results.board_state = virtual_board_hypothetical
@@ -233,13 +309,21 @@ define (require) ->
       # check if move is legal
       process_results = @process_move(_coord)
       move_results.dead = $.extend(true, [], process_results.dead)
-      @virtual_board = process_results.board_state
 
+    
       # put stone on board
       if process_results.legal is true
 
+        # update board state
+        @virtual_board = process_results.board_state
+
+        # add to history
+        @history.add(@virtual_board, @CURRENT_STONE)
+
         # put stone on board
         move_results.color = @CURRENT_STONE
+
+        # switch to opponent's turn
         @CURRENT_STONE = @get_opposite_color(@CURRENT_STONE)
 
 

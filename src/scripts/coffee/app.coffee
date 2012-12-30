@@ -12,7 +12,9 @@ requirejs.config
     'underscore': 'libs/underscore-min'
     'murmurhash3': 'libs/murmurhash3'
     'Board': 'Board'
-    "domReady": "helper/domReady"
+    #'domReady': 'helper/domReady'
+    'History': 'History',
+    'BoardState': 'BoardState'
 
   shim:
 
@@ -33,7 +35,13 @@ requirejs.config
       exports: '_'
 
     'Board':
-      deps: ["underscore", "jquery"]
+      deps: ["underscore", "jquery", 'History', 'BoardState']
+
+    'History':
+      deps: ['BoardState', 'underscore', 'jquery']
+
+    'BoardState':
+      deps: ['murmurhash3']
 
     murmurhash3:
       exports: 'murmurhash3'
@@ -94,11 +102,11 @@ define (require) ->
         console.log "click!"
       ).appendTo(spanner)
 
-      $('<button value="<">Previous</button>').click((e)->
+      $('<button value="<"><</button>').click((e)->
         console.log "click!"
       ).appendTo(spanner)
 
-      $('<button value=">">Next</button>').click((e)->
+      $('<button value=">">></button>').click((e)->
         console.log "click!"
       ).appendTo(spanner)
 
@@ -106,6 +114,7 @@ define (require) ->
         console.log "click!"
       ).appendTo(spanner)
 
+      $('<div>Black to move</div>').appendTo(spanner)
 
       #canvas.css('overflow', 'hidden')
       canvas.css('border', '1px solid black')

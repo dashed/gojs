@@ -40,3 +40,44 @@ while(!not_valid ){
    valid_play = true;
  }
 } 
+
+
+
+Ko and Superko
+==============
+
+Ko rule: One may not capture just one stone, if that stone was played on the previous move, and that move also captured just one stone.
+
+Positional superko:  The hypothetical board position of the attempted move shouldn't be the same as any of the previous board states
+
+situational superko: The hypothetical board position of the attempted move shouldn't be the same as any of the previous board states, and the board state was on the player's turn (the player moving next)
+
+natural situtional superko: The hypothetical board position of the attempted move shouldn't be the same as any of the previous board states, and the board state was on the player's turn (the player moving next). Ignore all passes.
+
+
+History
+=======
+
+hash table:
+    history = {}
+    history[hash] = []
+
+board state:
+    turn_color (whose turn it is)
+        @BLACK or @WHITE
+    stones_added:
+        {WHITE:[collection of coords], BLACK:[collection of coords]}
+
+    stones_removed:
+        {WHITE:[collection of coords], BLACK:[collection of coords]}    
+
+difference?
+
+add white stone: @EMPTY -> @WHITE     
+add black stone: @EMPTY -> @BLACK
+
+removed black and replaced with white: @BLACK -> @WHITE
+removed black stone: @BLACK -> @EMPTY
+
+removed white and replaced with black: @WHITE -> @BLACK
+removed white stone: @WHITE -> @EMPTY

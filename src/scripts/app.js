@@ -14,7 +14,8 @@ requirejs.config({
     'underscore': 'libs/underscore-min',
     'murmurhash3': 'libs/murmurhash3',
     'Board': 'Board',
-    "domReady": "helper/domReady"
+    'History': 'History',
+    'BoardState': 'BoardState'
   },
   shim: {
     'raphael.core': {
@@ -37,7 +38,13 @@ requirejs.config({
       exports: '_'
     },
     'Board': {
-      deps: ["underscore", "jquery"]
+      deps: ["underscore", "jquery", 'History', 'BoardState']
+    },
+    'History': {
+      deps: ['BoardState', 'underscore', 'jquery']
+    },
+    'BoardState': {
+      deps: ['murmurhash3']
     },
     murmurhash3: {
       exports: 'murmurhash3'
@@ -85,15 +92,16 @@ define(function(require) {
       $('<button value="|<">|<</button>').click(function(e) {
         return console.log("click!");
       }).appendTo(spanner);
-      $('<button value="<">Previous</button>').click(function(e) {
+      $('<button value="<"><</button>').click(function(e) {
         return console.log("click!");
       }).appendTo(spanner);
-      $('<button value=">">Next</button>').click(function(e) {
+      $('<button value=">">></button>').click(function(e) {
         return console.log("click!");
       }).appendTo(spanner);
       $('<button value=">|">>|</button>').click(function(e) {
         return console.log("click!");
       }).appendTo(spanner);
+      $('<div>Black to move</div>').appendTo(spanner);
       canvas.css('border', '1px solid black');
       if (!$.support.inlineBlockNeedsLayout) {
         canvas.css('display', 'inline-block');
