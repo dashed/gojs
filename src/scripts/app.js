@@ -52,14 +52,15 @@ define(function(require) {
     _GoBoard.prototype.VERSION = '0.1';
 
     function _GoBoard(container, container_size, board_size) {
-      var $, Board, Raphael, black_stone, board_outline, canvas, canvas_length, cell_radius, circle_radius, get_this, isNumber, length, n, paper, remove_stone, stone_click_detect, text_buffer, text_movement, text_size, track_stone, track_stone_pointer, virtual_board, white_stone, x, y, _;
+      var $, Board, Raphael, black_stone, board_outline, canvas, canvas_length, cell_radius, circle_radius, clicker, get_this, i, index, isNumber, j, length, letter, line_horiz, line_vert, n, paper, remove_stone, stone_click_detect, text_buffer, text_movement, text_size, track_stone, track_stone_pointer, virtual_board, white_stone, x, y, _;
       this.container = container;
       this.container_size = container_size;
       this.board_size = board_size;
       isNumber = function(n) {
         return !isNaN(parseFloat(n)) && isFinite(n);
       };
-      if (typeof this.container !== 'string' || !isNumber(this.container_size) || !isNumber(this.board_size)) {
+      _ = require('underscore');
+      if (!_.isString(this.container) || !isNumber(this.container_size) || !isNumber(this.board_size)) {
         return;
       }
       $ = require('jquery');
@@ -78,7 +79,6 @@ define(function(require) {
       }
       this.RAPH_BOARD_STATE = {};
       Raphael = require('raphael');
-      _ = require('underscore');
       Board = require('Board');
       canvas = this.canvas;
       canvas.css('overflow', 'hidden').css('border', '1px solid black');
@@ -103,8 +103,7 @@ define(function(require) {
         var generate_star;
         generate_star = function(_x, _y) {
           var handicap;
-          handicap = paper.circle(x + cell_radius * _x, y + cell_radius * _y, 0.20 * circle_radius);
-          return handicap.attr('fill', '#000');
+          return handicap = paper.circle(x + cell_radius * _x, y + cell_radius * _y, 0.20 * circle_radius).attr('fill', '#000');
         };
         if (n === 19) {
           generate_star(3, 3);
@@ -131,8 +130,8 @@ define(function(require) {
         }
       })();
       stone_click_detect = paper.set();
-      _.each(_.range(n), function(index) {
-        var i, letter, line_horiz, line_vert;
+      index = 0;
+      while (index < n) {
         i = index;
         if (index < n - 1) {
           line_vert = paper.path('M' + (x + cell_radius * (i + 1)) + ',' + (y + cell_radius * (n - 1)) + 'V' + y);
@@ -143,19 +142,15 @@ define(function(require) {
         paper.text(x + cell_radius * index, y - text_movement, letter).attr('font-size', text_size);
         paper.text(x - text_movement, y + cell_radius * (n - 1 - index), index + 1).attr('font-size', text_size);
         paper.text(x + cell_radius * (n - 1) + text_movement, y + cell_radius * (n - 1 - index), index + 1).attr('font-size', text_size);
-        return _.each(_.range(n), function(j, index) {
-          var clicker;
+        j = 0;
+        while (j < n) {
           clicker = paper.rect(x - cell_radius / 2 + cell_radius * i, y - cell_radius / 2 + cell_radius * j, cell_radius, cell_radius);
-          clicker.attr('fill', '#fff');
-          clicker.attr('fill-opacity', 0);
-          clicker.attr('opacity', 0);
-          clicker.attr('stroke-width', 0);
-          clicker.attr('stroke', '#fff');
-          clicker.attr('stroke-opacity', 0);
-          clicker.data('coord', [i, j]);
-          return stone_click_detect.push(clicker);
-        });
-      });
+          clicker.attr('fill', '#fff').attr('fill-opacity', 0).attr('opacity', 0).attr('stroke-width', 0).attr('stroke', '#fff').attr('stroke-opacity', 0).data('coord', [i, j]);
+          stone_click_detect.push(clicker);
+          j++;
+        }
+        index++;
+      }
       /*
             _.each _.range(n), (i, index) ->
               _.each _.range(n), (j, index) ->

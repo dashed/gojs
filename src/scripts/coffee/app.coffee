@@ -58,7 +58,9 @@ define (require) ->
       isNumber = (n) ->
         return !isNaN(parseFloat(n)) && isFinite(n)
 
-      if typeof @container != 'string' or !isNumber(@container_size) or !isNumber(@board_size)
+      _ = require('underscore')
+
+      if !_.isString(@container) or !isNumber(@container_size) or !isNumber(@board_size)
         return
 
       $ = require('jquery')
@@ -82,7 +84,6 @@ define (require) ->
       @RAPH_BOARD_STATE = {} # track raphael ids
 
       Raphael = require('raphael')
-      _ = require('underscore')
       Board = require('Board')
 
       canvas = @canvas
@@ -127,8 +128,7 @@ define (require) ->
       # See: http://senseis.xmp.net/?Hoshi
       do () ->
         generate_star = (_x, _y) ->
-          handicap = paper.circle(x + cell_radius * _x, y + cell_radius * _y, 0.20 * circle_radius)
-          handicap.attr 'fill', '#000'
+          handicap = paper.circle(x + cell_radius * _x, y + cell_radius * _y, 0.20 * circle_radius).attr 'fill', '#000'
 
         if n is 19
           generate_star 3, 3
@@ -156,7 +156,9 @@ define (require) ->
 
       # draw lines and coordinate labels
       stone_click_detect = paper.set()
-      _.each _.range(n), (index) ->
+      #_.each _.range(n), (index) ->
+      index = 0
+      while index < n
 
         i = index
 
@@ -177,16 +179,16 @@ define (require) ->
         paper.text(x + cell_radius * (n - 1) + text_movement, y + cell_radius * (n - 1 - index), index+1).attr 'font-size', text_size
 
         # Place click detectors
-        _.each _.range(n), (j, index) ->
+
+        #_.each _.range(n), (j) ->
+        j = 0
+        while j < n
           clicker = paper.rect(x - cell_radius / 2 + cell_radius * i, y - cell_radius / 2 + cell_radius * j, cell_radius, cell_radius)
-          clicker.attr 'fill', '#fff'
-          clicker.attr 'fill-opacity', 0
-          clicker.attr 'opacity', 0
-          clicker.attr 'stroke-width', 0
-          clicker.attr 'stroke', '#fff'
-          clicker.attr 'stroke-opacity', 0
-          clicker.data 'coord', [i, j]
+          clicker.attr('fill', '#fff').attr('fill-opacity', 0).attr('opacity', 0).attr('stroke-width', 0).attr('stroke', '#fff').attr('stroke-opacity', 0).data('coord', [i, j])
           stone_click_detect.push clicker
+          j++
+
+        index++
 
       # Put stones on board if user has clicked
       ###
