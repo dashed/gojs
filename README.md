@@ -51,3 +51,8 @@ colophon
 * All JavaScript files are packaged together with [RequireJS](http://requirejs.org/) and its [optimizer](http://requirejs.org/docs/optimization.html), and minified through [UglifyJS2](https://github.com/mishoo/UglifyJS2).
 
 
+License
+=======
+
+MIT License
+
