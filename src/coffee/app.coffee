@@ -1,52 +1,3 @@
-requirejs.config
-  enforceDefine: true
-  urlArgs: 'bust=' + (new Date()).getTime()
-  paths:
-    'raphael': 'libs/raphael/raphael.amd'
-    'raphael.svg': 'libs/raphael/raphael.svg'
-    'raphael.vml': 'libs/raphael/raphael.vml'
-    'raphael.core': 'libs/raphael/raphael.core'
-    'eve': 'libs/raphael/eve'
-    'jquery': 'libs/jquery-1.8.3.min'
-    'underscore': 'libs/underscore-min'
-    'murmurhash3': 'libs/murmurhash3'
-    'Board': 'Board'
-    #'domReady': 'helper/domReady'
-    'History': 'History',
-    'BoardState': 'BoardState'
-
-  shim:
-
-    'raphael.core':
-      deps: ['eve']
-    'raphael.svg':
-      deps: ['raphael.core']
-    'raphael.vml':
-      deps: ['raphael.core']
-    'raphael':
-      deps: ['raphael.core', 'raphael.svg', 'raphael.vml']
-      exports: 'Raphael'
-
-    jquery:
-      exports: '$'
-
-    underscore:
-      exports: '_'
-
-    'Board':
-      deps: ["underscore", "jquery", 'History', 'BoardState']
-
-    'History':
-      deps: ['BoardState', 'underscore', 'jquery']
-
-    'BoardState':
-      deps: ['murmurhash3']
-
-    murmurhash3:
-      exports: 'murmurhash3'
-
-
-
 define (require) ->
   
   #This function is called once the DOM is ready.
@@ -332,8 +283,18 @@ define (require) ->
         return
 
 
+      # A move is either a pass play or a board play.
+
+
+      # pass play
+      pass = () ->
+        pass_results = virtual_board.pass()
+        return
+
       # make a move (record in history)
+      # board play
       move = (coord) ->
+
         move_results = virtual_board.move(coord)
 
         # remove_stones
@@ -352,6 +313,7 @@ define (require) ->
             
           else
             # do nothing
+
         return
 
   
@@ -380,6 +342,7 @@ define (require) ->
 
       # Replicate board in memory
       Board = require('Board')
+      # black plays first
       virtual_board = new Board(@board_size, Board.BLACK)
       @virtual_board = virtual_board
 
@@ -426,6 +389,7 @@ define (require) ->
           move([0,2])
 
 
+
       tripleko_test = ->
         # tripleko (SSK test)
         # http://gif-explode.com/?explode=http://www.britgo.org/files/gifs/tripleko.gif
@@ -461,6 +425,7 @@ define (require) ->
           move([0,3])
           move([4,4])
           move([2,3])
+          pass()
         # end triple ko test
 
       #eternal_life_test()

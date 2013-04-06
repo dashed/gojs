@@ -21,6 +21,7 @@ define (require) ->
       @EMPTY = 0
       @BLACK = 1
       @WHITE = 2
+      #CURRENT_STONE defines whose turn it is
       #@CURRENT_STONE = @BLACK
 
       # repetition rule constants
@@ -162,6 +163,96 @@ define (require) ->
 
       return chain_info
 
+    check_ko_rule: () ->
+      # Ko rule: One may not capture just one stone, if that stone was played on the previous move, and that move also captured just one stone.
+
+      # need at least 2 board states for this rule
+      num_board_states = @history.getNumBoardStates()
+      if _.size(dead_stones) is 1 and num_board_states >= 2
+
+        current_board_state = @history.goBack(0)
+        previous_board_state = @history.goBack(1)
+
+        board_state_difference = @history.difference(previous_board_state,current_board_state)
+
+        # get stone being captured
+        key = _.keys(dead_stones)
+        stone_being_captured = dead_stones[key[0]]
+        stone_being_captured_color = @virtual_board[stone_being_captured[0]][stone_being_captured[1]]
+
+        # check if stone being captured was played on the previous move
+        stones_added = []
+        if stone_being_captured_color is @BLACK
+          stones_added = board_state_difference.stones_added.BLACK
+        else if stone_being_captured_color is @WHITE
+          stones_added = board_state_difference.stones_added.WHITE
+
+        # check if stone being captured also captured just one stone
+        truth_test = _.find stones_added, (coord) ->
+          coord[0] is stone_being_captured[0] and coord[1] is stone_being_captured[1]
+
+        if truth_test
+          if (_.size(board_state_difference.stones_removed.BLACK) + _.size(board_state_difference.stones_removed.WHITE)) is 1
+            # ko rule violated
+            console.log "ko rule violated"
+            return false
+          else
+            return true
+
+      # default return
+      return true
+
+    check_psk: (virtual_board_hypothetical) ->
+      # Positional superko:  The hypothetical board position of the attempted move shouldn't be the same as any of the previous board states
+
+      # get hash of hypothetical board state
+      hypothetical_board_state = new BoardState(virtual_board_hypothetical, @CURRENT_STONE)
+      hypothetical_board_state_hash = hypothetical_board_state.getHash()
+      
+      if @isNumber(@history.getBoardState(hypothetical_board_state_hash)?.getHash())
+        # PSK rule violated
+        return false
+
+      # default return
+      return true
+
+    # situational superko: A player may not play a stone so as to create a board position which existed previously in the game, 
+    # and in which it was the opponent's turn to move next. 
+    # 
+    # A player may not recreate a board position he/she has created
+    check_ssk: (virtual_board_hypothetical) ->
+
+      # get hash of hypothetical board state
+      hypothetical_board_state = new BoardState(virtual_board_hypothetical, @CURRENT_STONE)
+      hypothetical_board_state_hash = hypothetical_board_state.getHash()
+      
+      # see if hypothetical board state already exists
+      board_state_test = @history.getBoardState(hypothetical_board_state_hash)
+      board_state_test_hash = board_state_test?.getHash()
+
+      if @isNumber(board_state_test_hash) 
+
+        # check if it was the opponent's turn to move next
+        board_state_test_hash_index = _.lastIndexOf(@history.history_hash_order, board_state_test_hash)
+        board_state_test_next = @history.getBoardStateFromIndex(board_state_test_hash_index+1)
+        if board_state_test_next?.getWhoMoved() is @get_opposite_color(@CURRENT_STONE)
+          # SSK rule violated
+          return false
+        else
+          return true
+
+      # default return
+      return true
+
+
+    process_pass: () ->
+
+      process_results =
+        legal: true
+
+      return process_results
+
+    # process a placement of stone
     process_move: (_coord) ->
 
       # check if the move is legal
@@ -181,6 +272,13 @@ define (require) ->
       # hypothetical board state
       # place the stone and see what happens
       virtual_board_clone = $.extend(true, [], @virtual_board)
+
+
+      ###
+      start board play logic
+      ###
+
+
       virtual_board_hypothetical= @set_color(virtual_board_clone, _coord, @CURRENT_STONE)
 
 
@@ -226,83 +324,46 @@ define (require) ->
         virtual_board_hypothetical = @set_color(virtual_board_clone, _coord, @EMPTY)
         process_results.legal = false
 
+      ###
+      end board play logic
+      ###
 
-      # check if move is legal under ko & superko rule
-      # see: http://en.wikipedia.org/wiki/Rules_of_Go#Ko_and_Superko
+      # if move is still legal, check superko
+      if process_results.legal == true
 
-      # Ko rule: One may not capture just one stone, if that stone was played on the previous move, and that move also captured just one stone.
-      if @REPETITION_RULE is @KR
-        # need at least 2 board states for this rule
-        num_board_states = @history.getNumBoardStates()
-        if _.size(dead_stones) is 1 and num_board_states >= 2
+        # check if move is legal under ko & superko rule
+        # see: http://en.wikipedia.org/wiki/Rules_of_Go#Ko_and_Superko
 
-          current_board_state = @history.goBack(0)
-          previous_board_state = @history.goBack(1)
+        if @REPETITION_RULE is @KR
+          if @check_ko_rule() == false
+            process_results.legal = false
 
-          board_state_difference = @history.difference(previous_board_state,current_board_state)
+        # Positional superko:  The hypothetical board position of the attempted move shouldn't be the same as any of the previous board states
+        if @REPETITION_RULE is @PSK
 
-          # get stone being captured
-          key = _.keys(dead_stones)
-          stone_being_captured = dead_stones[key[0]]
-          stone_being_captured_color = @virtual_board[stone_being_captured[0]][stone_being_captured[1]]
+          if @check_psk(virtual_board_hypothetical) == false
+            process_results.legal = false
 
-          # check if stone being captured was played on the previous move
-          stones_added = []
-          if stone_being_captured_color is @BLACK
-            stones_added = board_state_difference.stones_added.BLACK
-          else if stone_being_captured_color is @WHITE
-            stones_added = board_state_difference.stones_added.WHITE
+          if process_results.legal == false
+            console.log "PSK violated at " + _coord
 
-          # check if stone being captured also captured just one stone
-          truth_test = _.find stones_added, (coord) ->
-            coord[0] is stone_being_captured[0] and coord[1] is stone_being_captured[1]
+        # situational superko: A player may not play a stone so as to create a board position which existed previously in the game, 
+        # and in which it was the opponent's turn to move next. 
+        # 
+        # A player may not recreate a board position he/she has created
+        if @REPETITION_RULE is @SSK
 
-          if truth_test
-            if (_.size(board_state_difference.stones_removed.BLACK) + _.size(board_state_difference.stones_removed.WHITE)) is 1
-              # ko rule violated
-              console.log "ko rule violated"
-              process_results.legal = false
-
-
-      # Positional superko:  The hypothetical board position of the attempted move shouldn't be the same as any of the previous board states
-      if @REPETITION_RULE is @PSK
-        
-        # get hash of hypothetical board state
-        hypothetical_board_state = new BoardState(virtual_board_hypothetical, @CURRENT_STONE)
-        hypothetical_board_state_hash = hypothetical_board_state.getHash()
-        
-        if @isNumber(@history.getBoardState(hypothetical_board_state_hash)?.getHash())
-          # PSK rule violated
-          console.log "PSK violated at " + _coord
-          process_results.legal = false
-
-
-      # situational superko: A player may not play a stone so as to create a board position which existed previously in the game, 
-      # and in which it was the opponent's turn to move next.
-      if @REPETITION_RULE is @SSK
-        
-        # get hash of hypothetical board state
-        hypothetical_board_state = new BoardState(virtual_board_hypothetical, @CURRENT_STONE)
-        hypothetical_board_state_hash = hypothetical_board_state.getHash()
-        
-        # see if hypothetical board state already exists
-        board_state_test = @history.getBoardState(hypothetical_board_state_hash)
-        board_state_test_hash = board_state_test?.getHash()
-
-        if @isNumber(board_state_test_hash) 
-
-          # check if it was the opponent's turn to move next
-          board_state_test_hash_index = _.lastIndexOf(@history.history_hash_order, board_state_test_hash)
-          board_state_test_next = @history.getBoardStateFromIndex(board_state_test_hash_index+1)
-          if board_state_test_next?.getWhoMoved() is @get_opposite_color(@CURRENT_STONE)
-            # SSK rule violated
-            console.log "SSK violated at " + _coord
+          if @check_ssk(virtual_board_hypothetical) == false
             process_results.legal = false
 
 
-      if @REPETITION_RULE is @NSSK
-        1+1
-        # passing must be implemented
+          if process_results.legal == false
+            console.log "SSK violated at " + _coord
+
+
+        if @REPETITION_RULE is @NSSK
+          1+1
+          # passing must be implemented
 
 
 
@@ -316,12 +377,8 @@ define (require) ->
 
       return process_results
 
-    pass: () ->
 
-      #todo: implement
-
-      return
-
+    # for board setup purposes (not actual moves made by a player)
     place: (_coord, _color) ->
 
       place_results = 
@@ -339,13 +396,30 @@ define (require) ->
 
       return place_results
 
+    # A move is either a pass play or a board play.
+    # defined in http://home.snafu.de/jasiek/superko.html
+
+    # pass play
+    pass: () ->
+      pass_results = 
+        # color that is doing the passing
+        color: @EMPTY
+        legal: false
+
+      process_results = @process_pass()
+
+      return pass_results
+
+    # board play
     move: (_coord) ->
 
       move_results = 
+        # color making the move
         color: @EMPTY
         x: _coord[0]
         y: _coord[1]
         dead: []
+
 
       # check if move is legal
       process_results = @process_move(_coord)

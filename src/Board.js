@@ -143,8 +143,75 @@ define(function(require) {
       return chain_info;
     };
 
+    Board.prototype.check_ko_rule = function() {
+      var board_state_difference, current_board_state, key, num_board_states, previous_board_state, stone_being_captured, stone_being_captured_color, stones_added, truth_test;
+      num_board_states = this.history.getNumBoardStates();
+      if (_.size(dead_stones) === 1 && num_board_states >= 2) {
+        current_board_state = this.history.goBack(0);
+        previous_board_state = this.history.goBack(1);
+        board_state_difference = this.history.difference(previous_board_state, current_board_state);
+        key = _.keys(dead_stones);
+        stone_being_captured = dead_stones[key[0]];
+        stone_being_captured_color = this.virtual_board[stone_being_captured[0]][stone_being_captured[1]];
+        stones_added = [];
+        if (stone_being_captured_color === this.BLACK) {
+          stones_added = board_state_difference.stones_added.BLACK;
+        } else if (stone_being_captured_color === this.WHITE) {
+          stones_added = board_state_difference.stones_added.WHITE;
+        }
+        truth_test = _.find(stones_added, function(coord) {
+          return coord[0] === stone_being_captured[0] && coord[1] === stone_being_captured[1];
+        });
+        if (truth_test) {
+          if ((_.size(board_state_difference.stones_removed.BLACK) + _.size(board_state_difference.stones_removed.WHITE)) === 1) {
+            console.log("ko rule violated");
+            return false;
+          } else {
+            return true;
+          }
+        }
+      }
+      return true;
+    };
+
+    Board.prototype.check_psk = function(virtual_board_hypothetical) {
+      var hypothetical_board_state, hypothetical_board_state_hash, _ref;
+      hypothetical_board_state = new BoardState(virtual_board_hypothetical, this.CURRENT_STONE);
+      hypothetical_board_state_hash = hypothetical_board_state.getHash();
+      if (this.isNumber((_ref = this.history.getBoardState(hypothetical_board_state_hash)) != null ? _ref.getHash() : void 0)) {
+        return false;
+      }
+      return true;
+    };
+
+    Board.prototype.check_ssk = function(virtual_board_hypothetical) {
+      var board_state_test, board_state_test_hash, board_state_test_hash_index, board_state_test_next, hypothetical_board_state, hypothetical_board_state_hash;
+      hypothetical_board_state = new BoardState(virtual_board_hypothetical, this.CURRENT_STONE);
+      hypothetical_board_state_hash = hypothetical_board_state.getHash();
+      board_state_test = this.history.getBoardState(hypothetical_board_state_hash);
+      board_state_test_hash = board_state_test != null ? board_state_test.getHash() : void 0;
+      if (this.isNumber(board_state_test_hash)) {
+        board_state_test_hash_index = _.lastIndexOf(this.history.history_hash_order, board_state_test_hash);
+        board_state_test_next = this.history.getBoardStateFromIndex(board_state_test_hash_index + 1);
+        if ((board_state_test_next != null ? board_state_test_next.getWhoMoved() : void 0) === this.get_opposite_color(this.CURRENT_STONE)) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+      return true;
+    };
+
+    Board.prototype.process_pass = function() {
+      var process_results;
+      process_results = {
+        legal: true
+      };
+      return process_results;
+    };
+
     Board.prototype.process_move = function(_coord) {
-      var adjacent_points, board_state_difference, board_state_test, board_state_test_hash, board_state_test_hash_index, board_state_test_next, chain_meta, current_board_state, dead_stones, enemy_color, get_this, hypothetical_board_state, hypothetical_board_state_hash, key, num_board_states, previous_board_state, process_results, stone_being_captured, stone_being_captured_color, stones_added, truth_test, virtual_board_clone, virtual_board_hypothetical, _ref;
+      var adjacent_points, chain_meta, dead_stones, enemy_color, get_this, process_results, virtual_board_clone, virtual_board_hypothetical;
       process_results = {
         legal: true,
         dead: [],
@@ -155,6 +222,10 @@ define(function(require) {
         return process_results;
       }
       virtual_board_clone = $.extend(true, [], this.virtual_board);
+      /*
+            start board play logic
+      */
+
       virtual_board_hypothetical = this.set_color(virtual_board_clone, _coord, this.CURRENT_STONE);
       dead_stones = {};
       adjacent_points = this.get_adjacent_points(_coord);
@@ -179,56 +250,35 @@ define(function(require) {
         virtual_board_hypothetical = this.set_color(virtual_board_clone, _coord, this.EMPTY);
         process_results.legal = false;
       }
-      if (this.REPETITION_RULE === this.KR) {
-        num_board_states = this.history.getNumBoardStates();
-        if (_.size(dead_stones) === 1 && num_board_states >= 2) {
-          current_board_state = this.history.goBack(0);
-          previous_board_state = this.history.goBack(1);
-          board_state_difference = this.history.difference(previous_board_state, current_board_state);
-          key = _.keys(dead_stones);
-          stone_being_captured = dead_stones[key[0]];
-          stone_being_captured_color = this.virtual_board[stone_being_captured[0]][stone_being_captured[1]];
-          stones_added = [];
-          if (stone_being_captured_color === this.BLACK) {
-            stones_added = board_state_difference.stones_added.BLACK;
-          } else if (stone_being_captured_color === this.WHITE) {
-            stones_added = board_state_difference.stones_added.WHITE;
-          }
-          truth_test = _.find(stones_added, function(coord) {
-            return coord[0] === stone_being_captured[0] && coord[1] === stone_being_captured[1];
-          });
-          if (truth_test) {
-            if ((_.size(board_state_difference.stones_removed.BLACK) + _.size(board_state_difference.stones_removed.WHITE)) === 1) {
-              console.log("ko rule violated");
-              process_results.legal = false;
-            }
-          }
-        }
-      }
-      if (this.REPETITION_RULE === this.PSK) {
-        hypothetical_board_state = new BoardState(virtual_board_hypothetical, this.CURRENT_STONE);
-        hypothetical_board_state_hash = hypothetical_board_state.getHash();
-        if (this.isNumber((_ref = this.history.getBoardState(hypothetical_board_state_hash)) != null ? _ref.getHash() : void 0)) {
-          console.log("PSK violated at " + _coord);
-          process_results.legal = false;
-        }
-      }
-      if (this.REPETITION_RULE === this.SSK) {
-        hypothetical_board_state = new BoardState(virtual_board_hypothetical, this.CURRENT_STONE);
-        hypothetical_board_state_hash = hypothetical_board_state.getHash();
-        board_state_test = this.history.getBoardState(hypothetical_board_state_hash);
-        board_state_test_hash = board_state_test != null ? board_state_test.getHash() : void 0;
-        if (this.isNumber(board_state_test_hash)) {
-          board_state_test_hash_index = _.lastIndexOf(this.history.history_hash_order, board_state_test_hash);
-          board_state_test_next = this.history.getBoardStateFromIndex(board_state_test_hash_index + 1);
-          if ((board_state_test_next != null ? board_state_test_next.getWhoMoved() : void 0) === this.get_opposite_color(this.CURRENT_STONE)) {
-            console.log("SSK violated at " + _coord);
+      /*
+            end board play logic
+      */
+
+      if (process_results.legal === true) {
+        if (this.REPETITION_RULE === this.KR) {
+          if (this.check_ko_rule() === false) {
             process_results.legal = false;
           }
         }
-      }
-      if (this.REPETITION_RULE === this.NSSK) {
-        1 + 1;
+        if (this.REPETITION_RULE === this.PSK) {
+          if (this.check_psk(virtual_board_hypothetical) === false) {
+            process_results.legal = false;
+          }
+          if (process_results.legal === false) {
+            console.log("PSK violated at " + _coord);
+          }
+        }
+        if (this.REPETITION_RULE === this.SSK) {
+          if (this.check_ssk(virtual_board_hypothetical) === false) {
+            process_results.legal = false;
+          }
+          if (process_results.legal === false) {
+            console.log("SSK violated at " + _coord);
+          }
+        }
+        if (this.REPETITION_RULE === this.NSSK) {
+          1 + 1;
+        }
       }
       if (process_results.legal === true) {
         _.each(dead_stones, function(dead_stone) {
@@ -238,8 +288,6 @@ define(function(require) {
       process_results.board_state = virtual_board_hypothetical;
       return process_results;
     };
-
-    Board.prototype.pass = function() {};
 
     Board.prototype.place = function(_coord, _color) {
       var place_results;
@@ -255,6 +303,16 @@ define(function(require) {
         place_results.color = _color;
       }
       return place_results;
+    };
+
+    Board.prototype.pass = function() {
+      var pass_results, process_results;
+      pass_results = {
+        color: this.EMPTY,
+        legal: false
+      };
+      process_results = this.process_pass();
+      return pass_results;
     };
 
     Board.prototype.move = function(_coord) {
