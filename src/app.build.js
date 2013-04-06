@@ -1,11 +1,12 @@
 ({
     mainConfigFile: "app.js",
     //exclude: ['main'],
+    /*skipDirOptimize: true,
     wrap: true,
     optimize: "uglify2",
     appDir: "../",
-    baseUrl: "scripts",
-    dir: "../../build",
+    baseUrl: "src",
+    dir: "../build",
     paths: {
         //jquery: "empty:"
         requireLib: 'require'
@@ -18,5 +19,18 @@
             include: ["requireLib", "main"],
             create: true
         }
-    ]
+    ]*/
+
+    baseUrl: ".",
+    optimize: "none",
+    wrap: true,
+    paths: {
+        //jquery: "empty:"
+        requireLib: 'require'
+    },
+    name: "gojs",
+    include: ["requireLib", "main"],
+    create: true,
+    out: "../dist/gojs.js"
+
 })

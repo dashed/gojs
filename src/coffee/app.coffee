@@ -1,5 +1,4 @@
 requirejs.config
-  baseUrl: 'scripts'
   enforceDefine: true
   urlArgs: 'bust=' + (new Date()).getTime()
   paths:

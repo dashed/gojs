@@ -2,7 +2,13 @@
 <html>
 <head>
 <title>Sandbox</title>
-<script src="scripts/gojs.js"></script>
+<script src="src/require.js"></script>
+<script>
+requirejs.config({
+baseUrl: "src"
+});
+</script>
+<script src="src/main.js"></script>
 <script>
 /*
 requirejs.config({
@@ -15,9 +21,11 @@ require(['main'], function () {
 
 
 
-var lol = GoBoard("moo", 500, 19);
-var lol2 = GoBoard("canvas", 200, 6);
+
+var lol = GoBoard("moo", 500, 8);
 var lol3 = GoBoard("canvas2", 500, 13);
+var lol2 = GoBoard("canvas", 150, 6);
+
 
 
 </script>
@@ -30,6 +38,8 @@ var lol3 = GoBoard("canvas2", 500, 13);
 
 <h1>lol</h1>
 <div id="canvas"></div>asdasdsd
+
+<br>
 
 <div id="canvas2"></div>
 </body>
