@@ -418,6 +418,7 @@ define (require) ->
         
           virtual_board.set_starting_board_state(Board.WHITE)
 
+
           move([2,3])
           move([0,4])
           move([4,3])

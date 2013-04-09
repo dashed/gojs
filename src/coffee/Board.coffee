@@ -232,6 +232,7 @@ define (require) ->
 
       if @isNumber(board_state_test_hash) 
 
+        ###
         # check if it was the opponent's turn to move next
         board_state_test_hash_index = _.lastIndexOf(@history.history_hash_order, board_state_test_hash)
 
@@ -244,8 +245,12 @@ define (require) ->
         if board_state_test_next?.getWhoMoved() is @get_opposite_color(@CURRENT_STONE)
           # SSK rule violated
           return false
-        else
-          return true
+        ###
+
+        # check if board state is created on player's turn
+        # note that board state may be the passed turn
+        if board_state_test?.getWhoMoved() is @CURRENT_STONE
+          return false
 
       # default return
       return true
@@ -258,7 +263,10 @@ define (require) ->
     But natural situational superko also allows the other order: Black first creates a position by passing, then re-creates it by playing a stone.
 
     2. A player may not play a stone so as to create a board position which existed previously in the game, 
-    if s/he played to create it previously.
+    if s/he played (placed a stone) to create it previously.
+
+    http://home.snafu.de/jasiek/superko.html
+    3. A player may not use a board play (plcing a stone; pass play is not a board play) to recreate a position if he has used one to create it.
     ###
     check_nssk: (virtual_board_hypothetical) ->
 
@@ -272,6 +280,11 @@ define (require) ->
 
       if @isNumber(board_state_test_hash) 
 
+        # get all instances of board states belonging to current player
+
+        # filter out board states that were passes
+
+
         # check if it was the opponent's turn to move next
         board_state_test_hash_index = _.lastIndexOf(@history.history_hash_order, board_state_test_hash)
 
@@ -291,59 +304,11 @@ define (require) ->
       return true
 
 
-    process_pass: () ->
 
-      process_results =
-        legal: true
-        board_state: @virtual_board
-
-
-      # check if move is legal under ko & superko rule
-      # see: http://en.wikipedia.org/wiki/Rules_of_Go#Ko_and_Superko
-      if @REPETITION_RULE is @KR
-        if @check_ko_rule() == false
-          process_results.legal = false
-
-
-      # hypothetical board state (same as current i.e @virtual_board)
-      # all superkos requires thi
-      virtual_board_hypothetical = $.extend(true, [], @virtual_board)
-
-
-      # Positional superko:  The hypothetical board position of the attempted move shouldn't be the same as any of the previous board states
-      if @REPETITION_RULE is @PSK
-
-        if @check_psk(virtual_board_hypothetical) == false
-          process_results.legal = false
-          console.log "pass PSK violated"
 
           
 
-      # situational superko: A player may not play a stone so as to create a board position which existed previously in the game, 
-      # and in which it was the opponent's turn to move next. 
-      # 
-      # A player may not recreate a board position he/she has created
-      if @REPETITION_RULE is @SSK
 
-        if @check_ssk(virtual_board_hypothetical) == false
-          process_results.legal = false
-          console.log "pass SSK violated"
-
-          
-
-      ###
-      # For Natural situational superko, passes may matter
-      # http://www.lifein19x19.com/forum/viewtopic.php?f=45&t=1479
-
-      1. All the superko rules allow this order of plays: Black first creates a position by playing a stone, then re-creates it by passing. 
-      But natural situational superko also allows the other order: Black first creates a position by passing, then re-creates it by playing a stone.
-
-      2. A player may not play a stone so as to create a board position which existed previously in the game, 
-      if s/he played to create it previously.
-      ###
-      if @REPETITION_RULE is @NSSK
-        if @check_nssk(virtual_board_hypothetical) == false
-          process_results.legal = false
 
       process_results.board_state = virtual_board_hypothetical
 
@@ -458,9 +423,19 @@ define (require) ->
             console.log "SSK violated at " + _coord
 
 
-        if @REPETITION_RULE is @NSSK
-          1+1
-          # passing must be implemented
+      ###
+      # For Natural situational superko, passes may matter
+      # http://www.lifein19x19.com/forum/viewtopic.php?f=45&t=1479
+
+      1. All the superko rules allow this order of plays: Black first creates a position by playing a stone, then re-creates it by passing. 
+      But natural situational superko also allows the other order: Black first creates a position by passing, then re-creates it by playing a stone.
+
+      2. A player may not play a stone so as to create a board position which existed previously in the game, 
+      if s/he played to create it previously.
+      ###
+      if @REPETITION_RULE is @NSSK
+        if @check_nssk(virtual_board_hypothetical) == false
+          process_results.legal = false
 
 
 
@@ -478,13 +453,17 @@ define (require) ->
     # for board setup purposes (not actual moves made by a player)
     place: (_coord, _color) ->
 
-      place_results = 
+      place_results =
+        # @EMPTY - nothing was placed (error)
+        # @WHITE - placed white stone
+        # @BLACK - placed black stone
         color: @EMPTY
         x: _coord[0]
         y: _coord[1]
 
 
-
+      # dont place anything if it is occupied
+      # TODO: overwrite?
       if @get_color(@virtual_board, _coord) != @EMPTY
         return place_results
       else if _color is @BLACK or _color is @WHITE
@@ -501,25 +480,17 @@ define (require) ->
       pass_results = 
         # color that is doing the passing
         color: @CURRENT_STONE
-        legal: false
+        legal: true
 
-      process_results = @process_pass()
+      # http://en.wikipedia.org/wiki/Rules_of_Go#Ko
+      # Though a pass is a kind of "move," it is not a "play." Therefore, Rule 8 (superko) never bars a player from passing.
 
 
-      # put stone on board
-      if process_results.legal is true
+      # add current board to history
+      @history.add(@virtual_board, @CURRENT_STONE)
 
-        # update board state
-        @virtual_board = process_results.board_state
-
-        # add to history
-        @history.add(@virtual_board, @CURRENT_STONE)
-
-        # update metadata
-        pass_results.legal = true
-
-        # switch to opponent's turn
-        @CURRENT_STONE = @get_opposite_color(@CURRENT_STONE)
+      # switch to opponent's turn
+      @CURRENT_STONE = @get_opposite_color(@CURRENT_STONE)
 
       return pass_results
 

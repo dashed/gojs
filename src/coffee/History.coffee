@@ -19,6 +19,8 @@ define (require) ->
       @history_hash_order = []
 
       # add the starting board state
+      # starting board state has no color; meaning no player constructed this board state
+      # the second board state in history will determine the player who is going first
       @add(@starting_board_state, @EMPTY)
 
     getHashIndex: (n)->

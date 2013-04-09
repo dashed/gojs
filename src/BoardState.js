@@ -31,7 +31,7 @@ define(function(require) {
 
     BoardState.prototype.getHash = function() {
       var virtual_board_string;
-      virtual_board_string = this.board_state.toString();
+      virtual_board_string = this.board_state.toString().concat(this.move_color.toString());
       return murmurhash3.murmurhash3_32_gc(virtual_board_string, 1);
     };
 

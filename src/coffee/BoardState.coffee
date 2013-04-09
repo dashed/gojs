@@ -27,6 +27,7 @@ define (require) ->
 
     getHash: () ->
 
-      virtual_board_string = @board_state.toString()
+      virtual_board_string = @board_state.toString().concat(@move_color.toString())
+
       return murmurhash3.murmurhash3_32_gc(virtual_board_string, 1)
   return BoardState
