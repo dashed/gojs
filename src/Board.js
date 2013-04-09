@@ -178,7 +178,7 @@ define(function(require) {
       var hypothetical_board_state, hypothetical_board_state_hash, _ref;
       hypothetical_board_state = new BoardState(virtual_board_hypothetical, this.CURRENT_STONE);
       hypothetical_board_state_hash = hypothetical_board_state.getHash();
-      if (this.isNumber((_ref = this.history.getBoardState(hypothetical_board_state_hash)) != null ? _ref.getHash() : void 0)) {
+      if (((_ref = this.history.getBoardState(hypothetical_board_state_hash)) != null ? _ref.getHash().toString().length : void 0) > 0) {
         return false;
       }
       return true;
@@ -190,7 +190,7 @@ define(function(require) {
       hypothetical_board_state_hash = hypothetical_board_state.getHash();
       board_state_test = this.history.getBoardState(hypothetical_board_state_hash);
       board_state_test_hash = board_state_test != null ? board_state_test.getHash() : void 0;
-      if (this.isNumber(board_state_test_hash)) {
+      if (typeof board_state_test_hash !== 'undefined') {
         /*
                 # check if it was the opponent's turn to move next
                 board_state_test_hash_index = _.lastIndexOf(@history.history_hash_order, board_state_test_hash)
@@ -232,7 +232,7 @@ define(function(require) {
       var board_state_test, board_state_test_hash, board_state_test_hash_index, board_state_test_next, hypothetical_board_state, hypothetical_board_state_hash;
       hypothetical_board_state = new BoardState(virtual_board_hypothetical, this.CURRENT_STONE);
       hypothetical_board_state_hash = hypothetical_board_state.getHash();
-      board_state_test = this.history.getBoardState(hypothetical_board_state_hash);
+      board_state_test = this.history.getAllBoardStates(hypothetical_board_state_hash);
       board_state_test_hash = board_state_test != null ? board_state_test.getHash() : void 0;
       if (this.isNumber(board_state_test_hash)) {
         board_state_test_hash_index = _.lastIndexOf(this.history.history_hash_order, board_state_test_hash);

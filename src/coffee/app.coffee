@@ -463,25 +463,29 @@ define (require) ->
       ###
       _.each _.range(0, n, 2), (i, index) ->
         _.each _.range(0, n, 2), (j, index) ->
-          white_stone i, j
+          #white_stone i, j
+          place([i,j], virtual_board.WHITE)
 
 
       _.each _.range(1, n, 2), (i, index) ->
         _.each _.range(1, n, 2), (j, index) ->
-          white_stone i, j
+          #white_stone i, j
+          place([i,j], virtual_board.WHITE)
 
 
       _.each _.range(1, n, 2), (i, index) ->
         _.each _.range(0, n, 2), (j, index) ->
-          black_stone i, j
+          #black_stone i, j
+          place([i,j], virtual_board.BLACK)
 
 
       _.each _.range(0, n, 2), (i, index) ->
         _.each _.range(1, n, 2), (j, index) ->
-          black_stone i, j
-      ###
+          #black_stone i, j
+          place([i,j], virtual_board.BLACK)
 
-      
+      virtual_board.set_starting_board_state(Board.WHITE)
+      ###
 
   return _GoBoard
 

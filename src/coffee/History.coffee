@@ -30,6 +30,9 @@ define (require) ->
 
       return undefined
 
+    getAllBoardStates: (hash) ->
+      return null
+
     getBoardState: (hash) ->
       return @history[hash]
 
@@ -41,6 +44,7 @@ define (require) ->
 
       board_state = new BoardState(raw_board_state, move_color)
       hash = board_state.getHash()
+
 
       # add to history
       @history[hash] = board_state

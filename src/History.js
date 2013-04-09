@@ -26,6 +26,10 @@ define(function(require) {
       return void 0;
     };
 
+    History.prototype.getAllBoardStates = function(hash) {
+      return null;
+    };
+
     History.prototype.getBoardState = function(hash) {
       return this.history[hash];
     };

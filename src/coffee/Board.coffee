@@ -209,7 +209,8 @@ define (require) ->
       hypothetical_board_state = new BoardState(virtual_board_hypothetical, @CURRENT_STONE)
       hypothetical_board_state_hash = hypothetical_board_state.getHash()
       
-      if @isNumber(@history.getBoardState(hypothetical_board_state_hash)?.getHash())
+      #if @isNumber(@history.getBoardState(hypothetical_board_state_hash)?.getHash())
+      if @history.getBoardState(hypothetical_board_state_hash)?.getHash().toString().length > 0
         # PSK rule violated
         return false
 
@@ -230,7 +231,8 @@ define (require) ->
       board_state_test = @history.getBoardState(hypothetical_board_state_hash)
       board_state_test_hash = board_state_test?.getHash()
 
-      if @isNumber(board_state_test_hash) 
+      #if @isNumber(board_state_test_hash) 
+      if typeof board_state_test_hash != 'undefined'
 
         ###
         # check if it was the opponent's turn to move next
@@ -275,7 +277,7 @@ define (require) ->
       hypothetical_board_state_hash = hypothetical_board_state.getHash()
       
       # see if hypothetical board state already exists
-      board_state_test = @history.getBoardState(hypothetical_board_state_hash)
+      board_state_test = @history.getAllBoardStates(hypothetical_board_state_hash)
       board_state_test_hash = board_state_test?.getHash()
 
       if @isNumber(board_state_test_hash) 
