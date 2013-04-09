@@ -297,11 +297,11 @@ define (require) ->
 
         move_results = virtual_board.move(coord)
 
-        # remove_stones
+        # remove dead stones
         _.each move_results.dead, (dead_stone) ->
           remove_stone(dead_stone) 
          
-
+        # place the stone
         switch move_results.color
           when virtual_board.BLACK
 
@@ -425,6 +425,9 @@ define (require) ->
           move([0,3])
           move([4,4])
           move([2,3])
+          pass()
+          pass()
+          pass()
           pass()
         # end triple ko test
 

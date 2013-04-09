@@ -315,6 +315,9 @@ define(function(require) {
           move([0, 3]);
           move([4, 4]);
           move([2, 3]);
+          pass();
+          pass();
+          pass();
           return pass();
         }
       };

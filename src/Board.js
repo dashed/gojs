@@ -192,6 +192,42 @@ define(function(require) {
       board_state_test_hash = board_state_test != null ? board_state_test.getHash() : void 0;
       if (this.isNumber(board_state_test_hash)) {
         board_state_test_hash_index = _.lastIndexOf(this.history.history_hash_order, board_state_test_hash);
+        if (board_state_test_hash_index === this.history.getNumBoardStates() - 1) {
+          return false;
+        }
+        board_state_test_next = this.history.getBoardStateFromIndex(board_state_test_hash_index + 1);
+        if ((board_state_test_next != null ? board_state_test_next.getWhoMoved() : void 0) === this.get_opposite_color(this.CURRENT_STONE)) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+      return true;
+    };
+
+    /*
+        # For Natural situational superko, passes may matter
+        # http://www.lifein19x19.com/forum/viewtopic.php?f=45&t=1479
+    
+        1. All the superko rules allow this order of plays: Black first creates a position by playing a stone, then re-creates it by passing. 
+        But natural situational superko also allows the other order: Black first creates a position by passing, then re-creates it by playing a stone.
+    
+        2. A player may not play a stone so as to create a board position which existed previously in the game, 
+        if s/he played to create it previously.
+    */
+
+
+    Board.prototype.check_nssk = function(virtual_board_hypothetical) {
+      var board_state_test, board_state_test_hash, board_state_test_hash_index, board_state_test_next, hypothetical_board_state, hypothetical_board_state_hash;
+      hypothetical_board_state = new BoardState(virtual_board_hypothetical, this.CURRENT_STONE);
+      hypothetical_board_state_hash = hypothetical_board_state.getHash();
+      board_state_test = this.history.getBoardState(hypothetical_board_state_hash);
+      board_state_test_hash = board_state_test != null ? board_state_test.getHash() : void 0;
+      if (this.isNumber(board_state_test_hash)) {
+        board_state_test_hash_index = _.lastIndexOf(this.history.history_hash_order, board_state_test_hash);
+        if (board_state_test_hash_index === this.history.getNumBoardStates() - 1) {
+          return false;
+        }
         board_state_test_next = this.history.getBoardStateFromIndex(board_state_test_hash_index + 1);
         if ((board_state_test_next != null ? board_state_test_next.getWhoMoved() : void 0) === this.get_opposite_color(this.CURRENT_STONE)) {
           return false;
@@ -203,10 +239,46 @@ define(function(require) {
     };
 
     Board.prototype.process_pass = function() {
-      var process_results;
+      var process_results, virtual_board_hypothetical;
       process_results = {
-        legal: true
+        legal: true,
+        board_state: this.virtual_board
       };
+      if (this.REPETITION_RULE === this.KR) {
+        if (this.check_ko_rule() === false) {
+          process_results.legal = false;
+        }
+      }
+      virtual_board_hypothetical = $.extend(true, [], this.virtual_board);
+      if (this.REPETITION_RULE === this.PSK) {
+        if (this.check_psk(virtual_board_hypothetical) === false) {
+          process_results.legal = false;
+          console.log("pass PSK violated");
+        }
+      }
+      if (this.REPETITION_RULE === this.SSK) {
+        if (this.check_ssk(virtual_board_hypothetical) === false) {
+          process_results.legal = false;
+          console.log("pass SSK violated");
+        }
+      }
+      /*
+            # For Natural situational superko, passes may matter
+            # http://www.lifein19x19.com/forum/viewtopic.php?f=45&t=1479
+      
+            1. All the superko rules allow this order of plays: Black first creates a position by playing a stone, then re-creates it by passing. 
+            But natural situational superko also allows the other order: Black first creates a position by passing, then re-creates it by playing a stone.
+      
+            2. A player may not play a stone so as to create a board position which existed previously in the game, 
+            if s/he played to create it previously.
+      */
+
+      if (this.REPETITION_RULE === this.NSSK) {
+        if (this.check_nssk(virtual_board_hypothetical) === false) {
+          process_results.legal = false;
+        }
+      }
+      process_results.board_state = virtual_board_hypothetical;
       return process_results;
     };
 
@@ -308,10 +380,16 @@ define(function(require) {
     Board.prototype.pass = function() {
       var pass_results, process_results;
       pass_results = {
-        color: this.EMPTY,
+        color: this.CURRENT_STONE,
         legal: false
       };
       process_results = this.process_pass();
+      if (process_results.legal === true) {
+        this.virtual_board = process_results.board_state;
+        this.history.add(this.virtual_board, this.CURRENT_STONE);
+        pass_results.legal = true;
+        this.CURRENT_STONE = this.get_opposite_color(this.CURRENT_STONE);
+      }
       return pass_results;
     };
 

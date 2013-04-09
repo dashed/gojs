@@ -25,6 +25,7 @@ define (require) ->
       hash_index_size = @getNumBoardStates()
       if n >= 0 and n <= hash_index_size-1
         return @history_hash_order[n]
+
       return undefined
 
     getBoardState: (hash) ->

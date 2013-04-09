@@ -234,6 +234,52 @@ define (require) ->
 
         # check if it was the opponent's turn to move next
         board_state_test_hash_index = _.lastIndexOf(@history.history_hash_order, board_state_test_hash)
+
+        # board_state may be the previous one! (i.e passed)
+        # if it is, the next turn is obviously the opponent's
+        if board_state_test_hash_index == @history.getNumBoardStates() - 1
+          return false
+
+        board_state_test_next = @history.getBoardStateFromIndex(board_state_test_hash_index+1)
+        if board_state_test_next?.getWhoMoved() is @get_opposite_color(@CURRENT_STONE)
+          # SSK rule violated
+          return false
+        else
+          return true
+
+      # default return
+      return true
+
+    ###
+    # For Natural situational superko, passes may matter
+    # http://www.lifein19x19.com/forum/viewtopic.php?f=45&t=1479
+
+    1. All the superko rules allow this order of plays: Black first creates a position by playing a stone, then re-creates it by passing. 
+    But natural situational superko also allows the other order: Black first creates a position by passing, then re-creates it by playing a stone.
+
+    2. A player may not play a stone so as to create a board position which existed previously in the game, 
+    if s/he played to create it previously.
+    ###
+    check_nssk: (virtual_board_hypothetical) ->
+
+      # get hash of hypothetical board state
+      hypothetical_board_state = new BoardState(virtual_board_hypothetical, @CURRENT_STONE)
+      hypothetical_board_state_hash = hypothetical_board_state.getHash()
+      
+      # see if hypothetical board state already exists
+      board_state_test = @history.getBoardState(hypothetical_board_state_hash)
+      board_state_test_hash = board_state_test?.getHash()
+
+      if @isNumber(board_state_test_hash) 
+
+        # check if it was the opponent's turn to move next
+        board_state_test_hash_index = _.lastIndexOf(@history.history_hash_order, board_state_test_hash)
+
+        # board_state may be the previous one! (i.e passed)
+        # if it is, the next turn is obviously the opponent's
+        if board_state_test_hash_index == @history.getNumBoardStates() - 1
+          return false
+
         board_state_test_next = @history.getBoardStateFromIndex(board_state_test_hash_index+1)
         if board_state_test_next?.getWhoMoved() is @get_opposite_color(@CURRENT_STONE)
           # SSK rule violated
@@ -249,6 +295,57 @@ define (require) ->
 
       process_results =
         legal: true
+        board_state: @virtual_board
+
+
+      # check if move is legal under ko & superko rule
+      # see: http://en.wikipedia.org/wiki/Rules_of_Go#Ko_and_Superko
+      if @REPETITION_RULE is @KR
+        if @check_ko_rule() == false
+          process_results.legal = false
+
+
+      # hypothetical board state (same as current i.e @virtual_board)
+      # all superkos requires thi
+      virtual_board_hypothetical = $.extend(true, [], @virtual_board)
+
+
+      # Positional superko:  The hypothetical board position of the attempted move shouldn't be the same as any of the previous board states
+      if @REPETITION_RULE is @PSK
+
+        if @check_psk(virtual_board_hypothetical) == false
+          process_results.legal = false
+          console.log "pass PSK violated"
+
+          
+
+      # situational superko: A player may not play a stone so as to create a board position which existed previously in the game, 
+      # and in which it was the opponent's turn to move next. 
+      # 
+      # A player may not recreate a board position he/she has created
+      if @REPETITION_RULE is @SSK
+
+        if @check_ssk(virtual_board_hypothetical) == false
+          process_results.legal = false
+          console.log "pass SSK violated"
+
+          
+
+      ###
+      # For Natural situational superko, passes may matter
+      # http://www.lifein19x19.com/forum/viewtopic.php?f=45&t=1479
+
+      1. All the superko rules allow this order of plays: Black first creates a position by playing a stone, then re-creates it by passing. 
+      But natural situational superko also allows the other order: Black first creates a position by passing, then re-creates it by playing a stone.
+
+      2. A player may not play a stone so as to create a board position which existed previously in the game, 
+      if s/he played to create it previously.
+      ###
+      if @REPETITION_RULE is @NSSK
+        if @check_nssk(virtual_board_hypothetical) == false
+          process_results.legal = false
+
+      process_results.board_state = virtual_board_hypothetical
 
       return process_results
 
@@ -403,10 +500,26 @@ define (require) ->
     pass: () ->
       pass_results = 
         # color that is doing the passing
-        color: @EMPTY
+        color: @CURRENT_STONE
         legal: false
 
       process_results = @process_pass()
+
+
+      # put stone on board
+      if process_results.legal is true
+
+        # update board state
+        @virtual_board = process_results.board_state
+
+        # add to history
+        @history.add(@virtual_board, @CURRENT_STONE)
+
+        # update metadata
+        pass_results.legal = true
+
+        # switch to opponent's turn
+        @CURRENT_STONE = @get_opposite_color(@CURRENT_STONE)
 
       return pass_results
 
@@ -445,7 +558,6 @@ define (require) ->
 
       # update board state
       # TODO: track placement and removal of stones
-      # TODO: dedicated history class?
 
 
 
