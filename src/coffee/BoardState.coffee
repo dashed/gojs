@@ -50,6 +50,8 @@ define (require) ->
         
         # get running length of this character
         l = @runlength(c, t, i)
+        if l is -1
+          break
 
         # variable-length repetitions
         if l > 2
@@ -101,6 +103,8 @@ define (require) ->
         
         # get running length of this character
         l = @runlength(c, n, i)
+        if l is -1
+          break
 
         if l > 2
           n_final += c
@@ -110,7 +114,7 @@ define (require) ->
         n_final += c
         i += 1
 
-
+      #console.log n_final.length/t.length
       return n_final
 
     getHash: () ->
@@ -120,6 +124,7 @@ define (require) ->
 
       final_rle = @rle_encode(virtual_board_string) + @move_color.toString()
 
+      console.log final_rle
       #console.log final_rle.length + " " + virtual_board_string.length
 
       #return murmurhash3.murmurhash3_32_gc(virtual_board_string, 1)

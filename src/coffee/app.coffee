@@ -433,7 +433,7 @@ define (require) ->
         # end triple ko test
 
       #eternal_life_test()
-      tripleko_test()
+      #tripleko_test()
       
 
       paper.safari()
@@ -458,6 +458,13 @@ define (require) ->
       #viewbox_length = canvas_length * canvas_length / canvas.width();
       paper.setViewBox(0, 0, canvas_length, canvas_length, false);
       paper.setSize(length, length);
+
+      _.each _.range(0, n), (i) ->
+        _.each _.range(0, n), (j) ->
+          switch j % 3
+            when 2 then place([i,j], virtual_board.WHITE)
+            when 1 then place([i,j], virtual_board.BLACK)
+      virtual_board.set_starting_board_state(Board.WHITE)
 
       # Fill board with all stones 
       ###

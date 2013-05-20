@@ -1,5 +1,5 @@
 ({
-    mainConfigFile: "app.js",
+    mainConfigFile: "main.js",
     //exclude: ['main'],
     /*skipDirOptimize: true,
     wrap: true,
@@ -21,16 +21,24 @@
         }
     ]*/
 
-    baseUrl: ".",
-    optimize: "none",
-    wrap: true,
-    paths: {
-        //jquery: "empty:"
-        requireLib: 'require'
-    },
-    name: "gojs",
-    include: ["requireLib", "main"],
-    create: true,
-    out: "../dist/gojs.js"
+    // baseUrl: ".",
+    // optimize: "uglify2",
+    // wrap: true,
+    // paths: {
+    //     //jquery: "empty:"
+    //     requireLib: 'require'
+    // },
+    // name: "gojs",
+    // include: ["requireLib", "main"],
+    // create: true,
+    // out: "../dist/gojs_old_optimized.js"
+
+    optimize: "uglify2",
+    baseUrl: '.',
+    name: './almond',
+    include: ['main'],
+    insertRequire: ['main'],
+    out: "../dist/gojs.js",
+    wrap: true
 
 })

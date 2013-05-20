@@ -51,6 +51,9 @@ define(function(require) {
       while (i < t.length) {
         c = t[i];
         l = this.runlength(c, t, i);
+        if (l === -1) {
+          break;
+        }
         if (l > 2) {
           switch (c) {
             case "0":
@@ -103,6 +106,9 @@ define(function(require) {
       while (i < n.length) {
         c = n[i];
         l = this.runlength(c, n, i);
+        if (l === -1) {
+          break;
+        }
         if (l > 2) {
           n_final += c;
           n_final += l;
@@ -119,6 +125,7 @@ define(function(require) {
       var final_rle, virtual_board_string;
       virtual_board_string = _.flatten(this.board_state).join("");
       final_rle = this.rle_encode(virtual_board_string) + this.move_color.toString();
+      console.log(final_rle);
       return final_rle;
     };
 

@@ -321,7 +321,6 @@ define(function(require) {
           return pass();
         }
       };
-      tripleko_test();
       paper.safari();
       paper.renderfix();
       /*
@@ -338,6 +337,17 @@ define(function(require) {
       canvas.width(length);
       paper.setViewBox(0, 0, canvas_length, canvas_length, false);
       paper.setSize(length, length);
+      _.each(_.range(0, n), function(i) {
+        return _.each(_.range(0, n), function(j) {
+          switch (j % 3) {
+            case 2:
+              return place([i, j], virtual_board.WHITE);
+            case 1:
+              return place([i, j], virtual_board.BLACK);
+          }
+        });
+      });
+      virtual_board.set_starting_board_state(Board.WHITE);
       /*
             _.each _.range(0, n, 2), (i, index) ->
               _.each _.range(0, n, 2), (j, index) ->
