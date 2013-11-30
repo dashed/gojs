@@ -3,6 +3,26 @@ gojs
 
 Go board game in Javascript.
 
+REWRTIE
+=======
+
+This git branch is a rewrite of the original gojs library.
+
+The rewrite will include a variety of new features, as well as making the library flexible.
+
+## Features
+
+* SGF parser/writer for game history
+* Export SGF (perhaps to github gists)
+* Engine is completely independent of gfx (raphaeljs)
+* Utilize JS templates (lodash or doT) to customize interface
+* Go rule customization: PSK, NSSK, and SSK.
+  * Rule presets: Japanese, Chinese, etc.
+* Internationalisation support (i18n) to allow translations.
+* Complete history support
+* Utilize HTML5 features (browser data)
+* Multiplayer support
+
 syntax
 ======
 
