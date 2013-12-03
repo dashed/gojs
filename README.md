@@ -23,6 +23,19 @@ The rewrite will include a variety of new features, as well as making the librar
 * Utilize HTML5 features (browser data)
 * Multiplayer support
 
+## Proposed repo
+
+The gojs repo should only hold the core library.
+
+* **gojs** - core library
+* **SGF-js** - SGF to json (or custom) and vice versa
+* **gojs-raphael** - gojs with raphael frontend
+* **gojs-goinstant** - gojs with goinstant (multiplayer)
+
+## Ideas
+
+Consider using: https://github.com/bramstein/bit-array
+
 syntax
 ======
 
