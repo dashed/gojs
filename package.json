@@ -15,5 +15,11 @@
   "bugs": {
     "url": "https://github.com/gobanjs/gobanjs/issues"
   },
-  "homepage": "https://github.com/gobanjs/gobanjs"
+  "homepage": "https://github.com/gobanjs/gobanjs",
+  "devDependencies": {
+    "grunt-cli": "~0.1.11",
+    "requirejs": "~2.1.9",
+    "grunt": "~0.4.2",
+    "coffee-script": "~1.6.3"
+  }
 }
