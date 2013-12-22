@@ -1,0 +1,19 @@
+{
+  "name": "gobanjs",
+  "version": "0.0.0",
+  "description": "goban.js is a go engine in JavaScript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Dashed/gojs.git"
+  },
+  "author": "Alberto Leal",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gobanjs/gobanjs/issues"
+  },
+  "homepage": "https://github.com/gobanjs/gobanjs"
+}

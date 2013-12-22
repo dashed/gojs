@@ -40,3 +40,26 @@ Thumbs.db
 # files
 /etc/*
 /build/*
+
+*.7z
+*.csv
+*.dat
+*.gz
+*.log
+*.o
+*.out
+*.pid
+*.seed
+*.tgz
+*.txz
+*.xz
+*.zip
+
+gitmsg
+lib-cov
+logs
+pids
+results
+
+npm-debug.log
+node_modules
