@@ -5,7 +5,7 @@ goban.js
 go.js
 =====
 
-**goban.js** is a rewrite of `go.js`. 
+**goban.js** is a rewrite of `go.js`.
 
 The latest and last version of `go.js` can be found at commit `7bc33ea18d9c137b12f3521fd93508119ba603c7`.
 
@@ -17,6 +17,9 @@ go.js was split into the following repositories:
 
 This is done to reorganize the project to make other projects under the gobanjs umbrella possible.
 
+Changelog
+=========
+* Updated package.json to reflect repo changes.
 
 License
 =======

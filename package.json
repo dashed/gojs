@@ -1,21 +1,20 @@
 {
   "name": "gobanjs",
   "version": "0.0.0",
-  "description": "goban.js is a go engine in JavaScript",
-  "main": "index.js",
+  "description": "Go engine logic backend written in JavaScript",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Dashed/gojs.git"
+    "url": "https://github.com/gobanjs/gojs.git"
   },
-  "author": "Alberto Leal",
+  "author": "Alberto Leal and David Tran",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/gobanjs/gobanjs/issues"
+    "url": "https://github.com/gobanjs/gojs/issues"
   },
-  "homepage": "https://github.com/gobanjs/gobanjs",
+  "homepage": "https://github.com/gobanjs/gojs",
   "devDependencies": {
     "grunt-cli": "~0.1.11",
     "requirejs": "~2.1.9",
