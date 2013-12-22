@@ -16,3 +16,9 @@ go.js was split into the following repositories:
 2. **goban.js-raphael** - the 'GUI' of go.js, also re-written from scratch
 
 This is done to reorganize the project to make other projects under the gobanjs umbrella possible.
+
+
+License
+=======
+
+MIT License. See LICENSE file.
