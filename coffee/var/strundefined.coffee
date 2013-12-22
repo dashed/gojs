@@ -1,0 +1,2 @@
+define ->
+  return typeof `undefined`
