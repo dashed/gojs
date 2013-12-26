@@ -24,9 +24,11 @@ Release Notes
 
 **Dec 2013**
 
-* Project set up. 
+* Project set up.
 
 License
 =======
 
 MIT License. See LICENSE file.
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/gobanjs/gojs/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
