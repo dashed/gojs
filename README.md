@@ -17,12 +17,14 @@ go.js was split into the following repositories:
 
 This is done to reorganize the project to make other projects under the gobanjs umbrella possible.
 
-Changelog
-=========
+Release Notes
+=============
 
-* Cleaning files for extra whitespaces.
-* Added mocha and chai tests.
-* Updated package.json to reflect repo changes.
+## 0.0.0
+
+**Dec 2013**
+
+* Project set up. 
 
 License
 =======
