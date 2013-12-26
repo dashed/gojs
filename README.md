@@ -19,6 +19,9 @@ This is done to reorganize the project to make other projects under the gobanjs 
 
 Changelog
 =========
+
+* Cleaning files for extra whitespaces.
+* Added mocha and chai tests.
 * Updated package.json to reflect repo changes.
 
 License
