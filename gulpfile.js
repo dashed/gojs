@@ -2,7 +2,6 @@
 
 var gulp = require('gulp');
 var coffee = require('gulp-coffee');
-var watch = require('glob-watcher');
 
 var path = require('path');
 var fs = require('fs');
@@ -11,8 +10,6 @@ var srcCoffeeDir = './coffee/';
 var destDir = './src/';
 
 var gulpCoffee = function(coffeeFile) {
-
-
 
     // Mirror srcCoffeeDir dir structure to destDir
     var normSrc = path.normalize(__dirname + '/' + srcCoffeeDir + '/');
@@ -23,12 +20,16 @@ var gulpCoffee = function(coffeeFile) {
 
     gulp.task('coffee', function() {
 
-        var lol = gulp.src(coffeeFile)
-            .pipe(coffee({bare: true}))
+        var coffeeStream = coffee({bare: true});
+        coffeeStream.on('error', function(err) {
+            if(err) console.log(''+err);
+        });
+
+        gulp.src(coffeeFile)
+            .pipe(coffeeStream)
             .pipe(gulp.dest(normDestPath));
 
     });
-
 
     fs.stat(normDestPath, function(err, stats) {
 

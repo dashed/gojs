@@ -3,8 +3,14 @@ Development
 
 1. `npm install`
 
-2. Edit coffeescript files in `./coffee/` folder.
+2. Run `gulp` to watch coffeescript files.
 
+3. Edit coffeescript files in `./coffee/` folder.
+
+Gulp
+====
+
+[Gulp](https://github.com/wearefractal/gulp) is used as an alternative of gruntjs for the build system.
 
 Testing
 =======
