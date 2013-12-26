@@ -23,7 +23,9 @@ describe 'goban', (done) ->
   # 'setup' before each test
   beforeEach((done) ->
     
-    requirejs.config baseUrl: './src'
+    requirejs.config 
+      baseUrl: './src' 
+      nodeRequire: require
 
     requirejs ["config", "main"], (config, _goban) ->
 
@@ -36,8 +38,8 @@ describe 'goban', (done) ->
 
   ################## Tests ##################
 
-  describe "constructor", ->
-    it "Other.test", ->
+  describe "#constructor", ->
+    it "should Other.test", ->
       
       expect(goban.VERSION).to.be.a('string');
 
@@ -45,5 +47,5 @@ describe 'goban', (done) ->
     it "Boo.test", ->
 
       foo = "私はダビドです。";
-      expect(foo[2]).to.be.a('number');
+      expect(foo[2]).to.be.a('string');
 
