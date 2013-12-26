@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "description": "Go engine logic backend written in JavaScript",
   "scripts": {
-    "test": "mocha",
+    "test": "istanbul test --hook-run-in-context _mocha",
     "coverage": "istanbul cover --hook-run-in-context _mocha -- -R spec"
   },
   "repository": {

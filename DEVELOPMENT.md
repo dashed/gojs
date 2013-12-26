@@ -9,9 +9,18 @@ Development
 Testing
 =======
 
-Testing is done using mocha and chai (assert lib).
+Testing is done using mocha and chai (assert lib). Tests/specs are written in coffeescript and placed within the ./test/ folder.
 
-mocha tests are in coffeescript and placed within the ./test/ folder.
+To run the tests:
+
+`npm test`
+
+To run the tests and generate the coverage report:
+
+`npm test --coverage`
+
+**Note:** `--coverage` flag requires node 0.6 or better.
+
 
 ## Code coverage
 
