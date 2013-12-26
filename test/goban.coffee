@@ -43,6 +43,7 @@ describe 'goban', (done) ->
 
   describe "#2 Boo Suite:", ->
     it "Boo.test", ->
-      foo = '5'
-      expect(foo).to.be.a('string');
+
+      foo = "私はダビドです。";
+      expect(foo[2]).to.be.a('number');
 
