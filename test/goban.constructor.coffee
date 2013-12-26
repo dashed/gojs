@@ -7,7 +7,7 @@ should = chai.should()
 expect = chai.expect
 
 # Source: http://stackoverflow.com/a/15464313/412627
-describe 'goban', (done) ->
+describe 'goban constructor', (done) ->
 
   ###
   Notes:
@@ -38,12 +38,12 @@ describe 'goban', (done) ->
 
   ################## Tests ##################
 
-  describe "#constructor", ->
-    it "should Other.test", ->
+  describe "when has no arguments", ->
+    it "should create 19x19 board", ->
       
-      expect(goban.VERSION).to.be.a('string');
+      expect(goban.VERSION).to.be.a('number');
 
-  describe "#2 Boo Suite:", ->
+  describe "when has ", ->
     it "Boo.test", ->
 
       foo = "私はダビドです。";
