@@ -23,6 +23,9 @@
     "coffee-script": "~1.6.3",
     "mocha": "*",
     "chai": "*",
-    "istanbul": "~0.2.1"
+    "istanbul": "~0.2.1",
+    "gulp": "~3.2.1",
+    "gulp-coffee": "~1.2.2",
+    "glob-watcher": "0.0.1"
   }
 }

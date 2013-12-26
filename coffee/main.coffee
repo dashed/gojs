@@ -15,3 +15,4 @@ define ["./var/arr", "lodash"], (lodash) ->
         return
 
   return goban
+  
