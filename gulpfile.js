@@ -1,6 +1,7 @@
 /* gulpfile.js - https://github.com/wearefractal/gulp */
 
 var gulp = require('gulp');
+var gutil = require('gulp-util');
 var coffee = require('gulp-coffee');
 
 var path = require('path');
@@ -9,6 +10,7 @@ var fs = require('fs');
 var srcCoffeeDir = './coffee/';
 var destDir = './src/';
 
+// Emulate coffee -b -w -c -o ./src/ ./coffee
 var gulpCoffee = function(coffeeFile) {
 
     // Mirror srcCoffeeDir dir structure to destDir
@@ -20,14 +22,16 @@ var gulpCoffee = function(coffeeFile) {
 
     gulp.task('coffee', function() {
 
-        var coffeeStream = coffee({bare: true});
-        coffeeStream.on('error', function(err) {
-            if(err) console.log(''+err);
-        });
-
         gulp.src(coffeeFile)
-            .pipe(coffeeStream)
-            .pipe(gulp.dest(normDestPath));
+            .pipe(coffee({bare: true})
+                .on('error', gutil.log))
+                // Trigger system bell
+                .on('error', function() {process.stdout.write('\u0007');})
+
+            .pipe(gulp.dest(normDestPath)
+                .on('end', function() {
+                    gutil.log("Compiled '" + path.relative(__dirname, coffeeFile))
+                }));
 
     });
 
@@ -76,4 +80,14 @@ gulp.task('default', function() {
         gulpCoffee(event.path);
     });
 
+});
+
+gulp.task('build', function() {
+
+    // Future...
+});
+
+gulp.task('requirejs', function() {
+
+    // Future...
 });

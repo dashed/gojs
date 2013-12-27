@@ -23,6 +23,7 @@
     "chai": "*",
     "istanbul": "~0.2.1",
     "gulp": "~3.2.1",
-    "gulp-coffee": "~1.2.2"
+    "gulp-coffee": "~1.2.2",
+    "gulp-util": "~2.2.0"
   }
 }

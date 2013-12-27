@@ -12,6 +12,8 @@ Gulp
 
 [Gulp](https://github.com/wearefractal/gulp) is used as an alternative of gruntjs for the build system.
 
+See https://github.com/substack/stream-handbook for info on stream.
+
 Testing
 =======
 
