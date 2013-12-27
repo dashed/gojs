@@ -26,11 +26,11 @@ var gulpCoffee = function(coffeeFile) {
             .pipe(coffee({bare: true})
                 .on('error', gutil.log))
                 // Trigger system bell
-                .on('error', function() {process.stdout.write('\u0007');})
+                .on('error', gutil.beep)
 
             .pipe(gulp.dest(normDestPath)
                 .on('end', function() {
-                    gutil.log("Compiled '" + path.relative(__dirname, coffeeFile))
+                    gutil.log("Compiled '" + path.relative(__dirname, coffeeFile) + "'");
                 }));
 
     });
@@ -38,7 +38,7 @@ var gulpCoffee = function(coffeeFile) {
     fs.stat(normDestPath, function(err, stats) {
 
         if(stats && err) {
-            console.log('(fs.stat) ' + err);
+            gutil.log('(fs.stat) ' + err) && gutil.beep();
             return;
         }
 
@@ -46,16 +46,9 @@ var gulpCoffee = function(coffeeFile) {
         if(!stats) {
             fs.mkdir(normDestPath, function(err) {
 
-                if (err) {
-                    console.log('(fs.mkdir) ' + err);
-                    return;
+                // Gulp some coffee or shout error
+                err ? gutil.log('(fs.mkdir) ' + err) && gutil.beep() : gulp.run('coffee');
 
-                } else {
-
-                    // Gulp some coffee
-                    gulp.run('coffee');
-
-                }
             });
             return;
 
@@ -66,7 +59,7 @@ var gulpCoffee = function(coffeeFile) {
         
 
         } else {
-            console.log(normDestPath + " is probably not a directory");
+            gutil.log(normDestPath + " is probably not a directory") && gutil.beep();
         }
 
     });
