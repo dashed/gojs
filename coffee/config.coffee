@@ -6,4 +6,4 @@ requirejs.config
     # urlArgs: 'bust=' + (new Date()).getTime()
 
     paths:
-        'lodash': 'libs/lodash.compat'
+        'lodash': '../vendor/lodash.compat'
