@@ -1,24 +1,23 @@
 define(["./var/isInteger", "lodash"], function(isInteger, lodash) {
   var goban;
-  console.log(lodash.VERSION);
   goban = (function() {
-    goban.VERSION = '0.1';
+    goban.VERSION = '0.0.1';
 
-    function goban(width, length) {
-      this.width = width != null ? width : 19;
-      this.length = length;
+    function goban(length, width) {
+      this.length = length != null ? length : 19;
+      this.width = width;
       /*
       1. no args: 
-          @width = @length = 19
+          @length = @width = 19
       
-      2. one arg (i.e. @width):
-          @length = @width
+      2. one arg (i.e. @length):
+          @width = @length
       
       3. two arg: trivial
       */
 
-      if (this.length == null) {
-        this.length = this.width;
+      if (this.width == null) {
+        this.width = this.length;
       }
       if (!isInteger(this.width)) {
         throw new Error("First param of goban (width) must be an integer");

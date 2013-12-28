@@ -13,7 +13,7 @@ describe 'goban constructor', (done) ->
 
   ###
   Notes:
-    before(...) runs executing necessary requirejs code to fetch exported _goban var 
+    beforeEach(...) runs executing necessary requirejs code to fetch exported _goban var 
     and attaching it to the global test var goban.
 
     This allows all describe(...) code to have access to _goban.
@@ -23,7 +23,7 @@ describe 'goban constructor', (done) ->
   goban = undefined
 
   # 'setup' before each test
-  before((done) ->
+  beforeEach((done) ->
     
     requirejs.config 
       baseUrl: './src' 

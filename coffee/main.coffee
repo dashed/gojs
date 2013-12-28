@@ -1,29 +1,29 @@
 define ["./var/isInteger", "lodash"], (isInteger, lodash) ->
-  
-  console.log(lodash.VERSION)
 
   class goban
 
-    @VERSION: '0.1'
+    @VERSION: '0.0.1'
 
-    constructor: (@width=19, @length) ->
+    constructor: (@length=19, @width) ->
 
         ###
         1. no args: 
-            @width = @length = 19
+            @length = @width = 19
 
-        2. one arg (i.e. @width):
-            @length = @width
+        2. one arg (i.e. @length):
+            @width = @length
 
         3. two arg: trivial
         ###
 
-        # if @length === null then @length = @width
-        @length ?= @width
+        # if @width === null then @width = @length
+        @width ?= @length
 
+        # Ensure param(s) is/are integer(s)
         if !isInteger(@width) then throw new Error("First param of goban (width) must be an integer")
         if !isInteger(@length) then throw new Error("Second param of goban (length) must be an integer")
 
+        # Ensure param(s) is/are not zero
         if @width <= 0 then throw new Error("First param of goban (width) must be at least 1")
         if @length <= 0 then throw new Error("Second param of goban (length) must be at least 1")
 

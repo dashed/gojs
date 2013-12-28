@@ -11,7 +11,7 @@ describe 'goban', (done) ->
 
   ###
   Notes:
-    before(...) runs executing necessary requirejs code to fetch exported _goban var 
+    beforeEach(...) runs executing necessary requirejs code to fetch exported _goban var 
     and attaching it to the global test var goban.
 
     This allows all describe(...) code to have access to _goban.
@@ -20,8 +20,8 @@ describe 'goban', (done) ->
   # Test global var(s)
   goban = undefined
 
-  # 'setup' before
-  before((done) ->
+  # 'setup' before each test
+  beforeEach((done) ->
     
     requirejs.config 
       baseUrl: './src' 
@@ -43,5 +43,20 @@ describe 'goban', (done) ->
     it "should be string", ->
       
       expect(goban.VERSION).to.be.a('string');
+
+    it "should be a valid semver", ->
+
+      # copied from https://github.com/isaacs/node-semver/blob/master/semver.js
+
+      NUMERICIDENTIFIER = '0|[1-9]\\d*'
+
+      MAINVERSION = '^(' + NUMERICIDENTIFIER + ')\\.' +
+                    '(' + NUMERICIDENTIFIER + ')\\.' +
+                    '(' + NUMERICIDENTIFIER + ')$';
+
+      m = goban.VERSION.trim().match(MAINVERSION)
+
+      expect(m).to.be.instanceof(Array)
+      expect(m).not.be.null
 
 
