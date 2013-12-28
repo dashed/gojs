@@ -29,12 +29,11 @@ To run the tests and generate the coverage report:
 
 **Note:** `--coverage` flag requires node 0.6 or better.
 
-
 ## Code coverage
 
 Code coverage is done with [istanbul](https://github.com/gotwarlost/istanbul) in tandem with mocha.
 
-For code coverage report generation:
+For code coverage report generation, run:
 
 `istanbul cover --hook-run-in-context _mocha`
 
@@ -45,4 +44,5 @@ This generates html files in `./coverage/`.
 **Note**:
 
 `--hook-run-in-context` is needed to play nicely with requirejs.
+
 See: https://github.com/gotwarlost/istanbul/issues/125
