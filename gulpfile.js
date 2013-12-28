@@ -14,62 +14,55 @@ var destDir = './src/';
 var gulpCoffee = function(coffeeFile) {
 
     // Mirror srcCoffeeDir dir structure to destDir
+    //
+    // From: srcCoffeeDir/[intermediate_dirs]/coffeeFile
+    // To: destDir/[intermediate_dirs]/coffeeFile
+
+    // __dirname/srcCoffeeDir/
     var normSrc = path.normalize(__dirname + '/' + srcCoffeeDir + '/');
 
-    var relativeDestPath = path.relative(normSrc, path.dirname(coffeeFile));
-    var normDestPath = path.normalize(destDir + '/' + relativeDestPath + '/');
+    // __dirname/srcCoffeeDir/[intermediate_dirs]/coffeeFile
+    var intermediate_dirs = path.relative(normSrc, path.dirname(coffeeFile));
 
+    var normDestPath = path.normalize(destDir + '/' + intermediate_dirs + '/');
+    var finalDestFilePath;
 
-    gulp.task('coffee', function() {
+    gulp.src(coffeeFile)
+        .pipe(coffee({bare: true}))
+            .on('error', gutil.log)
+            // Trigger system bell
+            .on('error', gutil.beep)
 
-        gulp.src(coffeeFile)
-            .pipe(coffee({bare: true})
-                .on('error', gutil.log))
-                // Trigger system bell
-                .on('error', gutil.beep)
+        // Note: gulp.dest uses mkdirp.
+        .pipe(gulp.dest(normDestPath))
+            .on('data', function(file) {
+                finalDestFilePath = path.normalize(normDestPath + '/' + path.basename(file.path));
+            })
+            .on('end', function() {
+                
+                var from = path.relative(__dirname, coffeeFile);
+                var to = path.relative(__dirname, finalDestFilePath);
 
-            .pipe(gulp.dest(normDestPath)
-                .on('end', function() {
-                    gutil.log("Compiled '" + path.relative(__dirname, coffeeFile) + "'");
-                }));
-
-    });
-
-    fs.stat(normDestPath, function(err, stats) {
-
-        if(stats && err) {
-            gutil.log('(fs.stat) ' + err) && gutil.beep();
-            return;
-        }
-
-        // Create intermediate dirs in destDir as needed
-        if(!stats) {
-            fs.mkdir(normDestPath, function(err) {
-
-                // Gulp some coffee or shout error
-                err ? gutil.log('(fs.mkdir) ' + err) && gutil.beep() : gulp.run('coffee');
+                gutil.log("Compiled '" + from + "' to '" + to + "'");
 
             });
-            return;
+    return;
 
-        } else if(stats && stats.isDirectory()) {
-
-            // Gulp some coffee
-            gulp.run('coffee');
-        
-
-        } else {
-            gutil.log(normDestPath + " is probably not a directory") && gutil.beep();
-        }
-
-    });
 }
 
 // The default task (called when you run `gulp`)
 gulp.task('default', function() {
 
+    var target = path.normalize(srcCoffeeDir + '/**/*.coffee');
+
+    // Process all coffee files.
+    gulp.src(target)
+        .on('data', function(file) {
+            gulpCoffee(file.path);
+        });
+
     // Watch coffeescript files and compile them if they change
-    gulp.watch(srcCoffeeDir + '/**/*.coffee', function(event) {
+    gulp.watch(target, function(event) {
         gulpCoffee(event.path);
     });
 
