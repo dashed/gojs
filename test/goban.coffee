@@ -1,3 +1,5 @@
+# Test set up from http://stackoverflow.com/a/15464313/412627 and https://github.com/clubajax/mocha-bootstrap
+
 chai = require('chai')
 requirejs = require('requirejs')
 
@@ -6,7 +8,7 @@ assert = chai.assert
 should = chai.should()
 expect = chai.expect
 
-# Source: http://stackoverflow.com/a/15464313/412627
+
 describe 'goban', (done) ->
 
   ###

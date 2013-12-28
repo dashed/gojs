@@ -46,10 +46,6 @@ describe 'goban constructor', (done) ->
     
       no_arg = new goban()
 
-      # type check
-      expect(no_arg.width).to.be.a('number');
-      expect(no_arg.length).to.be.a('number');
-
       no_arg.width.should.equal(no_arg.length)
       
       no_arg.width.should.equal(19)
