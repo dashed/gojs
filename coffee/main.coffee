@@ -1,4 +1,4 @@
-define ["./var/arr", "lodash"], (arr, lodash) ->
+define ["./var/isInteger", "lodash"], (isInteger, lodash) ->
   
   console.log(lodash.VERSION)
 
@@ -21,6 +21,8 @@ define ["./var/arr", "lodash"], (arr, lodash) ->
         # if @size_length === null then @size_length = @size_width
         @size_length ?= @size_width
 
+        if !isInteger(@size_width) then throw new Error("First param of goban (size_width) must be an integer")
+        if !isInteger(@size_length) then throw new Error("Second param of goban (size_length) must be an integer")
 
         return
 

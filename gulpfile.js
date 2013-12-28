@@ -54,7 +54,7 @@ var gulpCoffee = function(coffeeFile) {
 gulp.task('default', function() {
 
     var target = path.normalize(srcCoffeeDir + '/**/*.coffee');
-
+    
     // Process all coffee files.
     gulp.src(target)
         .on('data', function(file) {

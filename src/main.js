@@ -1,4 +1,4 @@
-define(["./var/arr", "lodash"], function(arr, lodash) {
+define(["./var/isInteger", "lodash"], function(isInteger, lodash) {
   var goban;
   console.log(lodash.VERSION);
   goban = (function() {
@@ -19,6 +19,12 @@ define(["./var/arr", "lodash"], function(arr, lodash) {
 
       if (this.size_length == null) {
         this.size_length = this.size_width;
+      }
+      if (!isInteger(this.size_width)) {
+        throw new Error("First param of goban (size_width) must be an integer");
+      }
+      if (!isInteger(this.size_length)) {
+        throw new Error("Second param of goban (size_length) must be an integer");
       }
       return;
     }
