@@ -23,7 +23,7 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
         ###
 
         ###
-        1. no args: 
+        1. no args:
             @length = @width = 19
 
         2. one arg (i.e. @length):
@@ -66,7 +66,7 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
         @config = {}
 
         # User defined stone values
-        # Note: This isn't used internally. 
+        # Note: This isn't used internally.
         #       It's used for user fetching value of stone color at a position.
         @config['stone'] =
             'EMPTY': 'empty'
@@ -108,11 +108,11 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
 
 
     set: (color, x, y, callback) ->
-        
+
         return @
 
     place: (color, x, y, callback) ->
-        
+
         return @
 
 
