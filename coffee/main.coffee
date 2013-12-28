@@ -6,23 +6,26 @@ define ["./var/isInteger", "lodash"], (isInteger, lodash) ->
 
     @VERSION: '0.1'
 
-    constructor: (@size_width=19, @size_length) ->
+    constructor: (@width=19, @length) ->
 
         ###
         1. no args: 
-            @size_width = @size_length = 19
+            @width = @length = 19
 
-        2. one arg (i.e. @size_width):
-            @size_length = @size_width
+        2. one arg (i.e. @width):
+            @length = @width
 
         3. two arg: trivial
         ###
 
-        # if @size_length === null then @size_length = @size_width
-        @size_length ?= @size_width
+        # if @length === null then @length = @width
+        @length ?= @width
 
-        if !isInteger(@size_width) then throw new Error("First param of goban (size_width) must be an integer")
-        if !isInteger(@size_length) then throw new Error("Second param of goban (size_length) must be an integer")
+        if !isInteger(@width) then throw new Error("First param of goban (width) must be an integer")
+        if !isInteger(@length) then throw new Error("Second param of goban (length) must be an integer")
+
+        if @width <= 0 then throw new Error("First param of goban (width) must be at least 1")
+        if @length <= 0 then throw new Error("Second param of goban (length) must be at least 1")
 
         return
 
