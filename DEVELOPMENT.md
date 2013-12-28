@@ -36,7 +36,11 @@ Code coverage is done with [istanbul](https://github.com/gotwarlost/istanbul) in
 
 For code coverage report generation:
 
-`istanbul cover --hook-run-in-context _mocha -- -R spec`
+`istanbul cover --hook-run-in-context _mocha`
+
+or `npm test --coverage`
+
+This generates html files in `./coverage/`.
 
 **Note**:
 
