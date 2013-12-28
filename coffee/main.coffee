@@ -74,7 +74,8 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
             'WHITE': 'white'
         return
 
-    config: (opts) ->
+    # merge config with current
+    setConfig: (opts) ->
         @config = _.merge(@config, opts)
         return @
 
@@ -91,6 +92,8 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
         if(_y < 0) then _y *= -1
         return [x, _y]
 
+    # get stone color of (x, y)
+    # Returns: stone color defined in config.
     get: (x, y) ->
         ###
         length => cols
@@ -106,9 +109,31 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
             when WHITE then return @config['stone']['WHITE']
             else throw new Error("Goban.get(x,y) is broken!")
 
-
+    # set stone color of (x, y) defined in config
     set: (color, x, y, callback) ->
         
+        [_x, _y] = normalizeCoord(x, y)
+
+        _color = undefined
+
+        if (color is not @config['stone']['EMPTY'] and
+        color is not @config['stone']['BLACK'] and
+        color is not @config['stone']['WHITE'])
+            throw new Error("Invalid color for Goban.set(x,y)")
+        else
+            _color = @config['stone']['EMPTY']
+
+        # switch color
+        #     when @config['stone']['EMPTY']
+        #         _color = @config['stone']['EMPTY']
+        #     when @config['stone']['BLACK']
+        #         _color = @config['stone']['BLACK']
+        #     when @config['stone']['WHITE']
+        #         _color = @config['stone']['WHITE']
+        #     else throw new Error("Invalid color for Goban.set(x,y)")
+
+        callback()
+
         return @
 
     place: (color, x, y, callback) ->

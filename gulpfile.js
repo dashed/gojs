@@ -61,6 +61,7 @@ gulp.task('default', function() {
             gulpCoffee(file.path);
         });
 
+
     // Watch coffeescript files and compile them if they change
     gulp.watch(target, function(event) {
         gulpCoffee(event.path);

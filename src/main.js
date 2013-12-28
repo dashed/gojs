@@ -71,7 +71,7 @@ define(["./var/isInteger", "lodash"], function(isInteger, _) {
       };
     };
 
-    Goban.prototype.config = function(opts) {
+    Goban.prototype.setConfig = function(opts) {
       this.config = _.merge(this.config, opts);
       return this;
     };
@@ -117,6 +117,15 @@ define(["./var/isInteger", "lodash"], function(isInteger, _) {
     };
 
     Goban.prototype.set = function(color, x, y, callback) {
+      var _color, _ref, _x, _y;
+      _ref = normalizeCoord(x, y), _x = _ref[0], _y = _ref[1];
+      _color = void 0;
+      if (color === !this.config['stone']['EMPTY'] && color === !this.config['stone']['BLACK'] && color === !this.config['stone']['WHITE']) {
+        throw new Error("Invalid color for Goban.set(x,y)");
+      } else {
+        _color = this.config['stone']['EMPTY'];
+      }
+      callback();
       return this;
     };
 
