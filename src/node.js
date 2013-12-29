@@ -2,7 +2,8 @@ var requirejs;
 
 requirejs = require('requirejs');
 
-requirejs(['config', 'goban', 'lodash'], function(config, goban, _) {
-  console.log(Object.keys(new goban()));
-  return console.log(Object.keys(goban()));
+requirejs(['config', 'goban', 'lodash'], function(config, Goban, _) {
+  var lol;
+  lol = Goban();
+  return console.log(lol.config);
 });

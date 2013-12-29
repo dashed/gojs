@@ -1,6 +1,6 @@
 requirejs = require('requirejs')
 
-requirejs(['config', 'goban', 'lodash'], (config, goban, _)->
+requirejs(['config', 'goban', 'lodash'], (config, Goban, _)->
 
 
     # _.each(_.keys(goban), (key, val)->
@@ -8,9 +8,13 @@ requirejs(['config', 'goban', 'lodash'], (config, goban, _)->
     #     )
 
 
-    # console.log
-    console.log Object.keys(new goban())
-    console.log Object.keys(goban())
+    # lol = Goban(1)
+
+    lol = Goban()
+
+    console.log lol.config
+    # console.log Object.keys(new goban())
+    # console.log Object.keys(goban())
     # console.log lol.width()
     # console.log lol.length()
 

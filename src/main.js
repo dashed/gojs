@@ -75,7 +75,7 @@ define(["./var/isInteger", "lodash"], function(isInteger, _) {
 
     Goban.prototype.config = function(opts) {
       if (!_.isPlainObject(opts)) {
-        throw new Error('Attempt to load Goban config that is not plain object.');
+        throw new Error('Attempt to load Goban config that is not a plain object.');
       }
       this._config = _.assign({}, this._config, opts);
       return this;
@@ -125,7 +125,7 @@ define(["./var/isInteger", "lodash"], function(isInteger, _) {
       var _color, _ref, _x, _y;
       _ref = normalizeCoord(x, y), _x = _ref[0], _y = _ref[1];
       _color = void 0;
-      if (color === !this._config['stone']['EMPTY'] && color === !this._config['stone']['BLACK'] && color === !this._config['stone']['WHITE']) {
+      if (color !== this._config['stone']['EMPTY'] && color !== this._config['stone']['BLACK'] && color !== this._config['stone']['WHITE']) {
         throw new Error("Invalid color for Goban.set(x,y)");
       } else {
         _color = this._config['stone']['EMPTY'];

@@ -80,7 +80,7 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
     config: (opts)->
 
         if(!_.isPlainObject(opts))
-            throw new Error('Attempt to load Goban config that is not plain object.')
+            throw new Error('Attempt to load Goban config that is not a plain object.')
 
         @_config = _.assign({}, @_config, opts)
         return @
@@ -122,9 +122,9 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
 
         _color = undefined
 
-        if (color is not @_config['stone']['EMPTY'] and
-        color is not @_config['stone']['BLACK'] and
-        color is not @_config['stone']['WHITE'])
+        if (color isnt @_config['stone']['EMPTY'] and
+        color isnt @_config['stone']['BLACK'] and
+        color isnt @_config['stone']['WHITE'])
             throw new Error("Invalid color for Goban.set(x,y)")
         else
             _color = @_config['stone']['EMPTY']
