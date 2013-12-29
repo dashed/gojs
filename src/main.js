@@ -26,7 +26,7 @@ define(["./var/isInteger", "lodash"], function(isInteger, _) {
       */
 
       /*
-      1. no args: 
+      1. no args:
           @length = @width = 19
       
       2. one arg (i.e. @length):
@@ -71,8 +71,8 @@ define(["./var/isInteger", "lodash"], function(isInteger, _) {
       };
     };
 
-    Goban.prototype.setConfig = function(opts) {
-      this.config = _.merge(this.config, opts);
+    Goban.prototype.config = function(opts) {
+      this.config = _.assign({}, this.config, opts);
       return this;
     };
 

@@ -13,29 +13,29 @@ describe 'goban', (done) ->
 
   ###
   Notes:
-    beforeEach(...) runs executing necessary requirejs code to fetch exported _goban var 
+    beforeEach(...) runs executing necessary requirejs code to fetch exported _goban var
     and attaching it to the global test var goban.
 
     This allows all describe(...) code to have access to _goban.
   ###
 
   # Test global var(s)
-  goban = undefined
+  Goban = undefined
 
   # 'setup' before each test
   beforeEach((done) ->
-    
-    requirejs.config 
-      baseUrl: './src' 
+
+    requirejs.config
+      baseUrl: './src'
       nodeRequire: require
 
-    requirejs ["config", "main"], (config, _goban) ->
+    requirejs ["config", "goban"], (config, _goban) ->
 
       # Attach to global var
-      goban = _goban
+      Goban = _goban
 
       # Tests will run after this is called
-      done() 
+      done()
     )
 
   ################## Tests ##################

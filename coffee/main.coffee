@@ -75,8 +75,8 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
         return
 
     # merge config with current
-    setConfig: (opts) ->
-        @config = _.merge(@config, opts)
+    config: (opts) ->
+        @config = _.assign({}, @config, opts)
         return @
 
     getConfig: () ->
@@ -111,7 +111,7 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
 
     # set stone color of (x, y) defined in config
     set: (color, x, y, callback) ->
-        
+
         [_x, _y] = normalizeCoord(x, y)
 
         _color = undefined

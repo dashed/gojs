@@ -13,29 +13,29 @@ describe 'goban constructor', (done) ->
 
   ###
   Notes:
-    beforeEach(...) runs executing necessary requirejs code to fetch exported _goban var 
+    beforeEach(...) runs executing necessary requirejs code to fetch exported _goban var
     and attaching it to the global test var goban.
 
     This allows all describe(...) code to have access to _goban.
   ###
 
   # Test global var(s)
-  goban = undefined
+  Goban = undefined
 
   # 'setup' before each test
   beforeEach((done) ->
-    
-    requirejs.config 
-      baseUrl: './src' 
+
+    requirejs.config
+      baseUrl: './src'
       nodeRequire: require
 
-    requirejs ["config", "main"], (config, _goban) ->
+    requirejs ["config", "goban"], (config, _goban) ->
 
       # Attach to global var
-      goban = _goban
+      Goban = _goban
 
       # Tests will run after this is called
-      done() 
+      done()
     )
 
   ################## Tests ##################
@@ -43,11 +43,11 @@ describe 'goban constructor', (done) ->
   describe "when has no arguments", ->
 
     it "should create 19x19 board", ->
-    
-      no_arg = new goban()
+
+      no_arg = Goban()
 
       no_arg.width.should.equal(no_arg.length)
-      
+
       no_arg.width.should.equal(19)
       no_arg.length.should.equal(19)
 
@@ -60,13 +60,13 @@ describe 'goban constructor', (done) ->
     it "should not throw error on one valid param", ->
 
       for valid in valid_input
-        (-> new goban(valid)).should.not.throw(Error);    
+        (-> Goban(valid)).should.not.throw(Error);
 
     it "should not throw error on two valid params", ->
-      
+
       for valid in valid_input
         for valid2 in valid_input
-          (-> new goban(valid, valid2)).should.not.throw(Error);    
+          (-> Goban(valid, valid2)).should.not.throw(Error);
 
 
   describe "when has invalid params", ->
@@ -75,19 +75,19 @@ describe 'goban constructor', (done) ->
 
       # invalid first param
       for invalid in invalid_input
-        (-> new goban(invalid)).should.throw(Error);
-    
+        (-> Goban(invalid)).should.throw(Error);
+
       # invalid second param with valid first param
       for invalid in invalid_input
         for valid in valid_input
-          (-> new goban(valid, invalid)).should.throw(Error);     
+          (-> Goban(valid, invalid)).should.throw(Error);
 
       for valid in valid_input
-        (-> new goban(valid, valid)).should.not.throw(Error);   
+        (-> Goban(valid, valid)).should.not.throw(Error);
 
     it "should throw error on two invalid params", ->
 
       for invalid in invalid_input
         for invalid2 in invalid_input
-          (-> new goban(invalid, invalid2)).should.throw(Error);
+          (-> Goban(invalid, invalid2)).should.throw(Error);
 
