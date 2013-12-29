@@ -2,7 +2,7 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
 
   class Goban
 
-    @VERSION: '0.0.1'
+    @VERSION: '0.1.0'
 
     # Stone color constants
     EMPTY = 0

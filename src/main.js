@@ -3,7 +3,7 @@ define(["./var/isInteger", "lodash"], function(isInteger, _) {
   Goban = (function() {
     var BLACK, EMPTY, WHITE, boardGet, boardSet, normalizeCoord, setupConfig;
 
-    Goban.VERSION = '0.0.1';
+    Goban.VERSION = '0.1.0';
 
     EMPTY = 0;
 

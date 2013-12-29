@@ -24,11 +24,13 @@ This is done to reorganize and modularize the project, while making other projec
 Release Notes
 =============
 
-## 0.0.0
+## 0.X.Y
 
 **Dec 2013**
 
 * Project set up.
+
+* Initial unstable public API
 
 License
 =======
