@@ -41,7 +41,7 @@ var gulpCoffee = function(coffeeFile) {
             .on('end', function() {
 
                 var from = path.relative(__dirname, coffeeFile);
-                var to = path.relative(__dirname, finalDestFilePath);
+                var to = finalDestFilePath && path.relative(__dirname, finalDestFilePath);
 
                 gutil.log("Compiled '" + from + "' to '" + to + "'");
 
