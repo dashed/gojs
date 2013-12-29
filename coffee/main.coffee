@@ -36,12 +36,12 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
         @width ?= @length
 
         # Ensure param(s) is/are integer(s)
-        if !isInteger(@length) then throw new Error("Second param of Goban (length) must be an integer")
-        if !isInteger(@width) then throw new Error("First param of Goban (width) must be an integer")
+        if !isInteger(@length) then throw new Error("First param of Goban (length) must be an integer")
+        if !isInteger(@width) then throw new Error("Second param of Goban (width) must be an integer")
 
         # Ensure param(s) is/are not zero
-        if @length <= 0 then throw new Error("Second param of Goban (length) must be at least 1")
-        if @width <= 0 then throw new Error("First param of Goban (width) must be at least 1")
+        if @length <= 0 then throw new Error("First param of Goban (length) must be at least 1")
+        if @width <= 0 then throw new Error("Second param of Goban (width) must be at least 1")
 
 
         # set up config

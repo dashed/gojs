@@ -39,16 +39,16 @@ define(["./var/isInteger", "lodash"], function(isInteger, _) {
         this.width = this.length;
       }
       if (!isInteger(this.length)) {
-        throw new Error("Second param of Goban (length) must be an integer");
+        throw new Error("First param of Goban (length) must be an integer");
       }
       if (!isInteger(this.width)) {
-        throw new Error("First param of Goban (width) must be an integer");
+        throw new Error("Second param of Goban (width) must be an integer");
       }
       if (this.length <= 0) {
-        throw new Error("Second param of Goban (length) must be at least 1");
+        throw new Error("First param of Goban (length) must be at least 1");
       }
       if (this.width <= 0) {
-        throw new Error("First param of Goban (width) must be at least 1");
+        throw new Error("Second param of Goban (width) must be at least 1");
       }
       setupConfig();
       this.history = {};
