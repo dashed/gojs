@@ -1,7 +1,7 @@
 define(["./var/isInteger", "lodash"], function(isInteger, _) {
   var Goban;
   Goban = (function() {
-    var BLACK, EMPTY, WHITE, normalizeCoord, setupConfig;
+    var BLACK, EMPTY, WHITE, boardGet, boardSet, normalizeCoord, setupConfig;
 
     Goban.VERSION = '0.0.1';
 
@@ -70,6 +70,15 @@ define(["./var/isInteger", "lodash"], function(isInteger, _) {
         'BLACK': 'black',
         'WHITE': 'white'
       };
+      /*
+      values: japanese, western, matrix, cartesian
+      See: http://senseis.xmp.net/?Coordinates
+      
+      matrix: from top-left to bottom-right
+      cartesian: from bottom-left to top-right
+      */
+
+      _config['coordinate_system'] = 'western';
       this._config = _config;
     };
 
@@ -100,6 +109,20 @@ define(["./var/isInteger", "lodash"], function(isInteger, _) {
       return [x, _y];
     };
 
+    /*
+    Note: origin (0,0) is bottom-left corner
+    */
+
+
+    boardGet = function(x, y) {};
+
+    /*
+    Note: origin (0,0) is bottom-left corner
+    */
+
+
+    boardSet = function(color, x, y) {};
+
     Goban.prototype.get = function(x, y) {
       /*
       length => cols
@@ -121,14 +144,14 @@ define(["./var/isInteger", "lodash"], function(isInteger, _) {
       }
     };
 
-    Goban.prototype.set = function(color, x, y, callback) {
-      var _color, _ref, _x, _y;
-      _ref = normalizeCoord(x, y), _x = _ref[0], _y = _ref[1];
-      _color = void 0;
-      if (color !== this._config['stone']['EMPTY'] && color !== this._config['stone']['BLACK'] && color !== this._config['stone']['WHITE']) {
+    Goban.prototype.set = function(_color, _x, _y, callback) {
+      var color, x, y, _ref;
+      _ref = normalizeCoord(_x, _y), x = _ref[0], y = _ref[1];
+      color = void 0;
+      if (_color !== this._config['stone']['EMPTY'] && _color !== this._config['stone']['BLACK'] && _color !== this._config['stone']['WHITE']) {
         throw new Error("Invalid color for Goban.set(x,y)");
       } else {
-        _color = this._config['stone']['EMPTY'];
+        color = _color;
       }
       callback();
       return this;

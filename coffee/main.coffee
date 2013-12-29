@@ -73,6 +73,16 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
             'BLACK': 'black'
             'WHITE': 'white'
 
+        ###
+        values: japanese, western, matrix, cartesian
+        See: http://senseis.xmp.net/?Coordinates
+
+        matrix: from top-left to bottom-right
+        cartesian: from bottom-left to top-right
+
+        ###
+        _config['coordinate_system'] = 'western'
+
         @_config = _config
         return
 
@@ -98,6 +108,18 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
         if(_y < 0) then _y *= -1
         return [x, _y]
 
+    ###
+    Note: origin (0,0) is bottom-left corner
+    ###
+    boardGet = (x, y) ->
+        return
+
+    ###
+    Note: origin (0,0) is bottom-left corner
+    ###
+    boardSet = (color, x, y) ->
+        return
+
     # get stone color of (x, y)
     # Returns: stone color defined in config.
     get: (x, y) ->
@@ -116,18 +138,18 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
             else throw new Error("Goban.get(x,y) is broken!")
 
     # set stone color of (x, y) defined in config
-    set: (color, x, y, callback) ->
+    set: (_color, _x, _y, callback) ->
 
-        [_x, _y] = normalizeCoord(x, y)
+        [x, y] = normalizeCoord(_x, _y)
 
-        _color = undefined
+        color = undefined
 
-        if (color isnt @_config['stone']['EMPTY'] and
-        color isnt @_config['stone']['BLACK'] and
-        color isnt @_config['stone']['WHITE'])
+        if (_color isnt @_config['stone']['EMPTY'] and
+        _color isnt @_config['stone']['BLACK'] and
+        _color isnt @_config['stone']['WHITE'])
             throw new Error("Invalid color for Goban.set(x,y)")
         else
-            _color = @_config['stone']['EMPTY']
+            color = _color
 
         # switch color
         #     when @_config['stone']['EMPTY']
