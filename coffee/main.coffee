@@ -45,7 +45,7 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
 
 
         # set up config
-        setupConfig()
+        setupConfig.call(@)
 
         # Track changes to Goban
         @history = {}
@@ -63,24 +63,30 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
 
     # Set up config with default values
     setupConfig = () ->
-        @config = {}
+        _config = {}
 
         # User defined stone values
         # Note: This isn't used internally.
         #       It's used for user fetching value of stone color at a position.
-        @config['stone'] =
+        _config['stone'] =
             'EMPTY': 'empty'
             'BLACK': 'black'
             'WHITE': 'white'
+
+        @_config = _config
         return
 
     # merge config with current
-    config: (opts) ->
-        @config = _.assign({}, @config, opts)
+    config: (opts)->
+
+        if(!_.isPlainObject(opts))
+            throw new Error('Attempt to load Goban config that is not plain object.')
+
+        @_config = _.assign({}, @_config, opts)
         return @
 
-    getConfig: () ->
-        return @config
+    getConfig: ->
+        return @_config
 
     ###
     (x,y) is assumed to be relative to bottom-left corner.
@@ -104,9 +110,9 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
         color = @board[@length * _y + _x]
 
         switch color
-            when EMPTY then return @config['stone']['EMPTY']
-            when BLACK then return @config['stone']['BLACK']
-            when WHITE then return @config['stone']['WHITE']
+            when EMPTY then return @_config['stone']['EMPTY']
+            when BLACK then return @_config['stone']['BLACK']
+            when WHITE then return @_config['stone']['WHITE']
             else throw new Error("Goban.get(x,y) is broken!")
 
     # set stone color of (x, y) defined in config
@@ -116,20 +122,20 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
 
         _color = undefined
 
-        if (color is not @config['stone']['EMPTY'] and
-        color is not @config['stone']['BLACK'] and
-        color is not @config['stone']['WHITE'])
+        if (color is not @_config['stone']['EMPTY'] and
+        color is not @_config['stone']['BLACK'] and
+        color is not @_config['stone']['WHITE'])
             throw new Error("Invalid color for Goban.set(x,y)")
         else
-            _color = @config['stone']['EMPTY']
+            _color = @_config['stone']['EMPTY']
 
         # switch color
-        #     when @config['stone']['EMPTY']
-        #         _color = @config['stone']['EMPTY']
-        #     when @config['stone']['BLACK']
-        #         _color = @config['stone']['BLACK']
-        #     when @config['stone']['WHITE']
-        #         _color = @config['stone']['WHITE']
+        #     when @_config['stone']['EMPTY']
+        #         _color = @_config['stone']['EMPTY']
+        #     when @_config['stone']['BLACK']
+        #         _color = @_config['stone']['BLACK']
+        #     when @_config['stone']['WHITE']
+        #         _color = @_config['stone']['WHITE']
         #     else throw new Error("Invalid color for Goban.set(x,y)")
 
         callback()

@@ -9,7 +9,7 @@ should = chai.should()
 expect = chai.expect
 
 
-describe 'goban', (done) ->
+describe 'goban config', (done) ->
 
   ###
   Notes:
@@ -21,6 +21,7 @@ describe 'goban', (done) ->
 
   # Test global var(s)
   Goban = undefined
+  noarg = undefined
 
   # 'setup' before each test
   beforeEach((done) ->
@@ -34,8 +35,35 @@ describe 'goban', (done) ->
       # Attach to global var
       Goban = _goban
 
+      noarg = Goban()
+
       # Tests will run after this is called
       done()
     )
 
   ################## Tests ##################
+
+  describe "when default", ->
+
+    it "should be an object", ->
+
+      config = noarg.getConfig()
+
+      expect(config).to.be.an('object')
+
+    it "should have stone colors", ->
+
+      config = noarg.getConfig()
+
+      expect(config).to.have.deep.property('stone.EMPTY', 'empty')
+      expect(config).to.have.deep.property('stone.BLACK', 'black')
+      expect(config).to.have.deep.property('stone.WHITE', 'white')
+
+  describe "when loaded with custom config", ->
+
+    it "should take only plain object", ->
+
+      (-> noarg.config([1,2,3])).should.throw(Error)
+
+      (-> noarg.config({})).should.not.throw(Error)
+      (-> noarg.config({ 'x': 0, 'y': 0 })).should.not.throw(Error)

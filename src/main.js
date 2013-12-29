@@ -50,7 +50,7 @@ define(["./var/isInteger", "lodash"], function(isInteger, _) {
       if (this.width <= 0) {
         throw new Error("Second param of Goban (width) must be at least 1");
       }
-      setupConfig();
+      setupConfig.call(this);
       this.history = {};
       this.play_history = [];
       this.board = [];
@@ -63,21 +63,26 @@ define(["./var/isInteger", "lodash"], function(isInteger, _) {
     }
 
     setupConfig = function() {
-      this.config = {};
-      this.config['stone'] = {
+      var _config;
+      _config = {};
+      _config['stone'] = {
         'EMPTY': 'empty',
         'BLACK': 'black',
         'WHITE': 'white'
       };
+      this._config = _config;
     };
 
     Goban.prototype.config = function(opts) {
-      this.config = _.assign({}, this.config, opts);
+      if (!_.isPlainObject(opts)) {
+        throw new Error('Attempt to load Goban config that is not plain object.');
+      }
+      this._config = _.assign({}, this._config, opts);
       return this;
     };
 
     Goban.prototype.getConfig = function() {
-      return this.config;
+      return this._config;
     };
 
     /*
@@ -106,11 +111,11 @@ define(["./var/isInteger", "lodash"], function(isInteger, _) {
       color = this.board[this.length * _y + _x];
       switch (color) {
         case EMPTY:
-          return this.config['stone']['EMPTY'];
+          return this._config['stone']['EMPTY'];
         case BLACK:
-          return this.config['stone']['BLACK'];
+          return this._config['stone']['BLACK'];
         case WHITE:
-          return this.config['stone']['WHITE'];
+          return this._config['stone']['WHITE'];
         default:
           throw new Error("Goban.get(x,y) is broken!");
       }
@@ -120,10 +125,10 @@ define(["./var/isInteger", "lodash"], function(isInteger, _) {
       var _color, _ref, _x, _y;
       _ref = normalizeCoord(x, y), _x = _ref[0], _y = _ref[1];
       _color = void 0;
-      if (color === !this.config['stone']['EMPTY'] && color === !this.config['stone']['BLACK'] && color === !this.config['stone']['WHITE']) {
+      if (color === !this._config['stone']['EMPTY'] && color === !this._config['stone']['BLACK'] && color === !this._config['stone']['WHITE']) {
         throw new Error("Invalid color for Goban.set(x,y)");
       } else {
-        _color = this.config['stone']['EMPTY'];
+        _color = this._config['stone']['EMPTY'];
       }
       callback();
       return this;
