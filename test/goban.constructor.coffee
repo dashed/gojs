@@ -52,7 +52,7 @@ describe 'goban constructor', (done) ->
       no_arg.length.should.equal(19)
 
 
-  invalid_input = ['invalid', 4.5, false, true, 0, 0.0]
+  invalid_input = ['invalid', 4.5, false, true, 0, 0.0, -5, -9.5]
   valid_input = [4, null, undefined]
 
   describe "when has valid params", ->
