@@ -24,13 +24,32 @@ define [], () ->
     1-1 is the origin that begins at the upper left corner, and continues to
     19-19 at the lower-right corner
 
-    (X-Y convention)
+    (row-col convention)
     ###
-    coordinates['japanese'] = (x, y) ->
-        return
+    coordinates['japanese'] = (row, col) ->
+        return [row - 1, col - 1]
 
-    coordinates['western'] = (letter, y) ->
-        return
+
+    meta_western = (alphabet, _letter, num) ->
+        if !(_.isString(_letter) and _letter.length is 1)
+            throw new Error('Invalid letter coordinate. Given (#{_letter}, #{num})')
+
+        letter = _letter.toLowerCase()
+
+        col = _.indexOf(alphabet, letter)
+        row = @row_bound - num
+        return [row, col]
+
+    # Note: "I" is not used, historically to avoid confusion with "J"
+    # Assume:
+    #   A <= _letter <= Z (exclude I)
+    #   1 <= num <= row_bound
+    coordinates['western'] = (_letter, num) ->
+        return meta_western("abcdefghjklmnopqrstuvwxyz", _letter, num)
+
+
+    coordinates['western2'] = (letter, y) ->
+        return meta_western("abcdefghijklmnopqrstuvwxyz", _letter, num)
 
     coordinates['matrix'] = (row, col) ->
         return [row, col]
