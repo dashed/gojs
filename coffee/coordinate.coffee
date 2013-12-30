@@ -1,4 +1,4 @@
-define ["lodash"], (_) ->
+define [], () ->
     ###
     Define the various coordinate systems for Goban.
 
@@ -10,8 +10,13 @@ define ["lodash"], (_) ->
     - matrix
     - cartesian
 
-    Coordinates are normalized to row-col matrice convention
+    Coordinates are normalized to row-col matrice convention.
+
+    All coordinate systems normalize to [row, col]
+
+    For all transformation functions, this.row_bound and this.col_bound are available for use.
     ###
+
 
     coordinates = {}
 
@@ -24,17 +29,29 @@ define ["lodash"], (_) ->
     coordinates['japanese'] = (x, y) ->
         return
 
-    coordinates['western'] = (x, y) ->
+    coordinates['western'] = (letter, y) ->
         return
 
     coordinates['matrix'] = (row, col) ->
-
-        if row < 0 then throw new Error('Matrix coordinate (row) should be at least 0.')
-        if col < 0 then throw new Error('Matrix coordinate (col) should be at least 0.')
-
         return [row, col]
 
-    coordinates['cartesian'] = (x, y) ->
-        return
+    # zero-based index
+    # Assume:
+    #   0 <= x < col_bound
+    #   0 <= y < row_bound
+    coordinates['cartesian_zero'] = (x, y) ->
+        col = x
+        row = @row_bound - y - 1
+        return [row, col]
+
+    # one-based index
+    # Assume:
+    #   1 <= x <= col_bound
+    #   1 <= y <= row_bound
+    coordinates['cartesian_one'] = (x, y) ->
+        col = x - 1
+        row = @row_bound - y
+        return [row, col]
+
 
     return coordinates

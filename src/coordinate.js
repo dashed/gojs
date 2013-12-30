@@ -1,4 +1,4 @@
-define(["lodash"], function(_) {
+define([], function() {
   /*
   Define the various coordinate systems for Goban.
   
@@ -10,7 +10,11 @@ define(["lodash"], function(_) {
   - matrix
   - cartesian
   
-  Coordinates are normalized to row-col matrice convention
+  Coordinates are normalized to row-col matrice convention.
+  
+  All coordinate systems normalize to [row, col]
+  
+  For all transformation functions, this.row_bound and this.col_bound are available for use.
   */
 
   var coordinates;
@@ -23,16 +27,21 @@ define(["lodash"], function(_) {
   */
 
   coordinates['japanese'] = function(x, y) {};
-  coordinates['western'] = function(x, y) {};
+  coordinates['western'] = function(letter, y) {};
   coordinates['matrix'] = function(row, col) {
-    if (row < 0) {
-      throw new Error('Matrix coordinate (row) should be at least 0.');
-    }
-    if (col < 0) {
-      throw new Error('Matrix coordinate (col) should be at least 0.');
-    }
     return [row, col];
   };
-  coordinates['cartesian'] = function(x, y) {};
+  coordinates['cartesian_zero'] = function(x, y) {
+    var col, row;
+    col = x;
+    row = this.row_bound - y - 1;
+    return [row, col];
+  };
+  coordinates['cartesian_one'] = function(x, y) {
+    var col, row;
+    col = x - 1;
+    row = this.row_bound - y;
+    return [row, col];
+  };
   return coordinates;
 });
