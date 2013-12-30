@@ -110,24 +110,24 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
 
     normalizeCoord = (first, second) ->
 
-        coordinate = @config['coordinate_system_transformations']
-        coord = coordinate[@config['coordinate_system']]
+        coordinates = @_config['coordinate_system_transformations']
+        coord_trans_func = coordinates[@_config['coordinate_system']]
 
-        if(_.isFunction(coord))
+        if(_.isFunction(coord_trans_func))
 
             data = {}
             data['row_bound'] = @width
             data['col_bound'] = @length
 
-            func = _.bind(coord, data, first, second)
+            func = _.bind(coord_trans_func, data, first, second)
             [row, col] = func()
 
             if(!isInteger(row) or !isInteger(col))
-                throw new Error("Transformation via coordinate system '#{@config['coordinate_system']}' failed.")
+                throw new Error("Transformation via coordinate system '#{@_config['coordinate_system']}' failed.")
 
             return [row, col]
         else
-            throw new Error('Invalid configuration property: "coordinate_system".')
+            throw new Error('Invalid configuration property: "coordinate_system". Given #{@_config[\'coordinate_system\']}')
 
     # transform external color to internal
     internalColor = (external_color) ->
@@ -153,14 +153,14 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
 
         [row, col] = normalizeCoord.call(@, first, second)
 
-        if not (0 <= col <= (@length - 1)) or not (0 <= row <= (@width - 1))
+        if not (0 <= col < @length) or not (0 <= row < @width)
             throw new Error('Goban.get() parameter(s) is/are out of bounds.')
 
         color = @board.get(row, col)
 
         # convert to external color
         try
-            return external_color.call(@, color)
+            return externalColor.call(@, color)
         catch error
             throw new Error("Goban.get(x,y) is broken!")
 
@@ -174,7 +174,7 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
 
         # convert to internal color
         try
-            color = internal_color.call(@, _color)
+            color = internalColor.call(@, _color)
         catch error
             throw new Error("Invalid color for Goban.set(x,y)")
 

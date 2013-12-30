@@ -103,21 +103,21 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
     };
 
     normalizeCoord = function(first, second) {
-      var col, coord, coordinate, data, func, row, _ref;
-      coordinate = this.config['coordinate_system_transformations'];
-      coord = coordinate[this.config['coordinate_system']];
-      if (_.isFunction(coord)) {
+      var col, coord_trans_func, coordinates, data, func, row, _ref;
+      coordinates = this._config['coordinate_system_transformations'];
+      coord_trans_func = coordinates[this._config['coordinate_system']];
+      if (_.isFunction(coord_trans_func)) {
         data = {};
         data['row_bound'] = this.width;
         data['col_bound'] = this.length;
-        func = _.bind(coord, data, first, second);
+        func = _.bind(coord_trans_func, data, first, second);
         _ref = func(), row = _ref[0], col = _ref[1];
         if (!isInteger(row) || !isInteger(col)) {
-          throw new Error("Transformation via coordinate system '" + this.config['coordinate_system'] + "' failed.");
+          throw new Error("Transformation via coordinate system '" + this._config['coordinate_system'] + "' failed.");
         }
         return [row, col];
       } else {
-        throw new Error('Invalid configuration property: "coordinate_system".');
+        throw new Error('Invalid configuration property: "coordinate_system". Given #{@_config[\'coordinate_system\']}');
       }
     };
 
@@ -150,12 +150,12 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
     Goban.prototype.get = function(first, second) {
       var col, color, error, row, _ref;
       _ref = normalizeCoord.call(this, first, second), row = _ref[0], col = _ref[1];
-      if (!((0 <= col && col <= (this.length - 1))) || !((0 <= row && row <= (this.width - 1)))) {
+      if (!((0 <= col && col < this.length)) || !((0 <= row && row < this.width))) {
         throw new Error('Goban.get() parameter(s) is/are out of bounds.');
       }
       color = this.board.get(row, col);
       try {
-        return external_color.call(this, color);
+        return externalColor.call(this, color);
       } catch (_error) {
         error = _error;
         throw new Error("Goban.get(x,y) is broken!");
@@ -166,7 +166,7 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
       var affected, attempt, col, color, err, error, ex_old_color, row, _old_color, _ref;
       color = void 0;
       try {
-        color = internal_color.call(this, _color);
+        color = internalColor.call(this, _color);
       } catch (_error) {
         error = _error;
         throw new Error("Invalid color for Goban.set(x,y)");
