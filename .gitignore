@@ -61,6 +61,13 @@ logs
 pids
 results
 
+# Node stuff #
+###########
 npm-debug.log
 node_modules
 coverage
+
+# Personal #
+##########
+coffee/sandbox
+src/sandbox
