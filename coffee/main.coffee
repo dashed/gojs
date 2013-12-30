@@ -167,14 +167,30 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
 
 
     # set stone color of (first, second) defined in config
-    _set = (_color, first, second, callback, queue_callback) ->
+    _set = (_color=undefined, first=undefined, second=undefined, callback=undefined, queue_callback) ->
+
+        if callback is undefined
+            callback = ->
+
+        err = undefined
+
+        if(_color is undefined)
+            err = new Error("No color give for Goban.set()")
+
+            # _.defer(callback, err, undefined, undefined)
+            return queue_callback(callback(err, undefined,undefined))
+
+        if(first is undefined or second is undefined)
+            err = new Error("Invalid coordinate for Goban.set()")
+
+            # _.defer(callback, err, undefined, undefined)
+            return queue_callback(callback(err, undefined,undefined))
 
         # construct attempt data
         attempt = {}
         attempt['color'] = _color
         attempt['coord'] = [first, second]
 
-        err = undefined
 
         # validate color
         color = undefined
@@ -183,10 +199,10 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
         try
             color = internalColor.call(@, _color)
         catch error
-            err = new Error("Invalid color for Goban.set(x,y). Given: #{_color}")
+            err = new Error("Invalid color for Goban.set(). Given: #{_color}")
 
-            _.defer(callback, err, attempt, null)
-            return queue_callback()
+            # _.defer(callback, err, attempt, undefined)
+            return queue_callback(callback(err, attempt, undefined))
 
 
         # normalize coord and validate
@@ -195,15 +211,15 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
         try
             [row, col] = normalizeCoord.call(@, first, second)
         catch error
-            _.defer(callback, error, attempt, null)
-            return queue_callback()
+            # _.defer(callback, error, attempt, undefined)
+            return queue_callback(callback(error, attempt, undefined))
 
 
         if not (0 <= col < @col) or not (0 <= row < @row)
             err = new Error('Goban.set() coord parameter(s) is/are out of bounds.')
 
-            _.defer(callback, err, attempt, null)
-            return queue_callback()
+            # _.defer(callback, err, attempt, undefined)
+            return queue_callback(callback(err, attempt, undefined))
 
         # get old color
         _old_color = @board.get(row, col)
@@ -217,9 +233,9 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
         affected[ex_old_color][_color] = []
         affected[ex_old_color][_color].push([first, second])
 
-        _.defer(callback, err, attempt, affected)
+        # _.defer(callback, err, attempt, affected)
 
-        return queue_callback()
+        return queue_callback(callback(error, attempt, affected))
 
     set: (_color, first, second, callback) ->
 

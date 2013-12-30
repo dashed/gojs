@@ -164,31 +164,51 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
 
     _set = function(_color, first, second, callback, queue_callback) {
       var affected, attempt, col, color, err, error, ex_old_color, row, _old_color, _ref;
+      if (_color == null) {
+        _color = void 0;
+      }
+      if (first == null) {
+        first = void 0;
+      }
+      if (second == null) {
+        second = void 0;
+      }
+      if (callback == null) {
+        callback = void 0;
+      }
+      if (callback === void 0) {
+        callback = function() {};
+      }
+      err = void 0;
+      if (_color === void 0) {
+        err = new Error("No color give for Goban.set()");
+        return queue_callback(callback(err, void 0, void 0));
+      }
+      if (first === void 0 || second === void 0) {
+        err = new Error("Invalid coordinate for Goban.set()");
+        return queue_callback(callback(err, void 0, void 0));
+      }
       attempt = {};
       attempt['color'] = _color;
       attempt['coord'] = [first, second];
-      err = void 0;
       color = void 0;
       try {
         color = internalColor.call(this, _color);
       } catch (_error) {
         error = _error;
-        err = new Error("Invalid color for Goban.set(x,y). Given: " + _color);
-        _.defer(callback, err, attempt, null);
-        return queue_callback();
+        err = new Error("Invalid color for Goban.set(). Given: " + _color);
+        return queue_callback(callback(err, attempt, void 0));
       }
       row = col = void 0;
       try {
         _ref = normalizeCoord.call(this, first, second), row = _ref[0], col = _ref[1];
       } catch (_error) {
         error = _error;
-        _.defer(callback, error, attempt, null);
-        return queue_callback();
+        return queue_callback(callback(error, attempt, void 0));
       }
       if (!((0 <= col && col < this.col)) || !((0 <= row && row < this.row))) {
         err = new Error('Goban.set() coord parameter(s) is/are out of bounds.');
-        _.defer(callback, err, attempt, null);
-        return queue_callback();
+        return queue_callback(callback(err, attempt, void 0));
       }
       _old_color = this.board.get(row, col);
       ex_old_color = externalColor.call(this, _old_color);
@@ -197,8 +217,7 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
       affected[ex_old_color] = {};
       affected[ex_old_color][_color] = [];
       affected[ex_old_color][_color].push([first, second]);
-      _.defer(callback, err, attempt, affected);
-      return queue_callback();
+      return queue_callback(callback(error, attempt, affected));
     };
 
     Goban.prototype.set = function(_color, first, second, callback) {

@@ -43,6 +43,10 @@ describe 'goban config', (done) ->
 
   ################## Tests ##################
 
+  it "should return itself", ->
+
+    expect(noarg.config({})).to.equal(noarg)
+
   describe "when default", ->
 
     it "should be an object", ->
@@ -69,7 +73,7 @@ describe 'goban config', (done) ->
       expect(config).to.have.property('coordinate_system_transformations')
 
 
-  describe "when loaded with custom config", ->
+  describe "when loaded with some data", ->
 
     it "should take only plain object", ->
 
@@ -78,6 +82,48 @@ describe 'goban config', (done) ->
       (-> noarg.config({})).should.not.throw(Error)
       (-> noarg.config({ 'x': 0, 'y': 0 })).should.not.throw(Error)
 
-    it "should return itself", ->
 
-      expect(noarg.config({})).to.equal(noarg)
+  describe "when loaded with custom coord transformation function", ->
+
+    it "should throw error on none coord trans func", ->
+      custom = {}
+      custom['coordinate_system_transformations'] ={}
+      custom['coordinate_system'] = 'custom'
+
+      # some none function
+      custom['coordinate_system_transformations']['custom'] = {}
+
+      noarg.config(custom)
+
+      (-> noarg.get(1,2)).should.throw(Error)
+
+
+    it "should throw error on coord trans func that returns invalid internal coords", (done)->
+
+      config = noarg.config()
+      black = config['stone']['BLACK']
+
+      custom = {}
+      custom['coordinate_system_transformations'] ={}
+      custom['coordinate_system'] = 'custom'
+
+      # some none function
+      custom['coordinate_system_transformations']['custom'] = () -> return ['invalid']
+
+      noarg.config(custom)
+
+      (-> noarg.get(1,2)).should.throw(Error)
+      noarg.set(black,1,2, (err, attempt, affected)->
+        expect(err).to.be.instanceOf(Error)
+
+        expect(affected).to.equal(undefined)
+
+        expect(_.isPlainObject(attempt)).to.be.true
+
+        expect(attempt).to.have.deep.property('color', black)
+
+        expect(attempt).to.have.deep.property('coord[0]', 1)
+        expect(attempt).to.have.deep.property('coord[1]', 2)
+
+        return done()
+        )
