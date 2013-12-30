@@ -58,7 +58,7 @@ define ['lodash'], (_) ->
     coordinates['matrix'] = (row, col) ->
         return [row, col]
 
-    # zero-based index
+    # Zero-based index
     # Assume:
     #   0 <= x < col_bound
     #   0 <= y < row_bound
@@ -67,7 +67,7 @@ define ['lodash'], (_) ->
         row = @row_bound - y - 1
         return [row, col]
 
-    # one-based index
+    # One-based index
     # Assume:
     #   1 <= x <= col_bound
     #   1 <= y <= row_bound

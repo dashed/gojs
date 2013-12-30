@@ -12,13 +12,13 @@ define [], () ->
 
             @col ?= @row
 
-            # define the board array
+            # Define the board array
             @board = []
 
             if(value isnt undefined)
                 @setDefault(value)
 
-        # fill entire array with default value
+        # Fill entire array with default value
         setDefault: (value) ->
 
             n = @row * @col

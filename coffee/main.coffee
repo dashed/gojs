@@ -31,19 +31,18 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
         3. two arg: trivial
         ###
 
-        # if @col === null then @col = @row
+        # If @col === null then @col = @row
         @col ?= @row
 
         # Ensure param(s) is/are integer(s)
         if !isInteger(@row) then throw new Error("First param of Goban (row) must be an integer")
         if !isInteger(@col) then throw new Error("Second param of Goban (col) must be an integer")
 
-        # Ensure param(s) is/are not zero
+        # Ensure param(s) is/are positive only
         if @row <= 0 then throw new Error("First param of Goban (row) must be at least 1")
         if @col <= 0 then throw new Error("Second param of Goban (col) must be at least 1")
 
-
-        # set up config
+        # Set up config
         setupConfig.call(@)
 
         # Track changes to Goban
@@ -54,14 +53,14 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
         @board_state = {}
 
 
-        # create awesome queue
+        # Create awesome queue
         worker = (_work, callback) ->
-            _f = _work['f'] # function to exec
-            _this = _work['_this'] # context
-            _args = _work['_args'] or [] # an array
+            _f = _work['f'] # Function to exec
+            _this = _work['_this'] # Context
+            _args = _work['_args'] or [] # An array
             _args.push(callback)
 
-            _f.apply(_this,_args)
+            _f.apply(_this, _args)
 
         @queue = async.queue(worker, 1)
 
@@ -94,7 +93,7 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
         @_config = _config
         return
 
-    # merge config with current
+    # Merge config with current
     config: (opts = undefined)->
 
         if(opts is undefined)
@@ -106,7 +105,6 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
         @_config = _.assign({}, @_config, opts)
 
         return @
-
 
     normalizeCoord = (first, second) ->
 
@@ -129,7 +127,7 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
         else
             throw new Error('Invalid configuration property: "coordinate_system". Given #{@_config[\'coordinate_system\']}')
 
-    # transform external color to internal
+    # Transform external color to internal
     internalColor = (external_color) ->
 
         switch external_color
@@ -138,7 +136,7 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
             when @_config['stone']['WHITE'] then return WHITE
             else throw new Error("Invalid external color")
 
-    # transform internal color to external
+    # Transform internal color to external
     externalColor = (internal_color) ->
 
         switch internal_color
@@ -147,7 +145,7 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
             when WHITE then return @_config['stone']['WHITE']
             else throw new Error("Invalid internal color")
 
-    # get stone color of (first, second)
+    # Get stone color of (first, second)
     # Returns: stone color defined in config.
     get: (first, second) ->
 
@@ -158,78 +156,139 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
 
         color = @board.get(row, col)
 
-        # convert to external color
+        # Convert to external color
         try
             return externalColor.call(@, color)
         catch error
-            throw new Error("Goban.get(x,y) is broken!")
+            throw new Error("Goban.get(x, y) is broken!")
 
+    # Set stone color of position (first, second) as defined in config
+    _set = (_color=undefined, _first=undefined, _second=undefined, _callback=undefined, queue_callback) ->
 
+        # Closure variables
+        state = {}
+        state['affected'] = undefined
+        state['attempt'] = undefined
+        state['callback'] = _callback
+        state['color'] = _color
+        state['first'] = _first
+        state['second'] = _second
+        state['queue_callback'] = _queue_callback
 
-    # set stone color of position (first, second) as defined in config
-    _set = (_color=undefined, first=undefined, second=undefined, _callback=undefined, queue_callback) ->
+        meta_function = _.bind(
+            (callback, state) ->
+                callback(null, state)
+            ,
+            this,
+            state
+        )
 
-        if _callback is undefined
-            _callback = ->
+        async.waterfall ([
+            meta_function,
 
-        callback = _.compose(queue_callback, _callback)
+            # Callback function for _callback
+            (state, callback) ->
 
-        err = undefined
+                _callback = state['callback']
 
-        if(_color is undefined)
-            err = new Error("No color give for Goban.set()")
+                if _callback is undefined
+                    _callback = ->
 
-            return callback(err, undefined,undefined)
+                state['callback'] = _.compose(queue_callback, _callback)
 
-        if(first is undefined or second is undefined)
-            err = new Error("Invalid coordinate for Goban.set()")
+                callback(null, state)
+            ,
+            # Callback function for _color
+            (state, callback) ->
 
-            return callback(err, undefined,undefined)
+                _color = state['color']
+                err = undefined
 
-        # construct attempt data
-        # data of attempted stone placement
-        attempt = {}
-        attempt['color'] = _color
-        attempt['coord'] = [first, second]
+                if(_color is undefined)
+                    err = new Error("No color give for Goban.set()")
 
-        color = undefined
+                callback(err, state)
+            ,
+            # Callback function for first/second
+            (state, callback) ->
 
-        # convert to internal color
-        try
-            color = internalColor.call(@, _color)
-        catch error
-            err = new Error("Invalid color for Goban.set(). Given: #{_color}")
+                _first = state['first']
+                _second = state['second']
 
-            return callback(err, attempt, undefined)
+                err = undefined
 
+                if(_first is undefined or _second is undefined)
+                    err = new Error("Invalid coordinate for Goban.set()")
 
-        # normalize coord and validate
-        row = col = undefined
+                callback(err, state)
+            ,
+            # Construct data of attempted stone placement
+            (state, callback) ->
 
-        try
-            [row, col] = normalizeCoord.call(@, first, second)
-        catch error
-            return callback(error, attempt, undefined)
+                _color = state['color']
 
+                attempt = {}
+                attempt['color'] = _color
+                attempt['coord'] = [state['first'], state['second']]
 
-        if not (0 <= col < @col) or not (0 <= row < @row)
-            err = new Error('Goban.set() coord parameter(s) is/are out of bounds.')
+                state['attempt'] = attempt
 
-            return callback(err, attempt, undefined)
+                err = undefined
+                color = undefined
 
-        # get old color
-        _old_color = @board.get(row, col)
-        ex_old_color = externalColor.call(@, _old_color)
+                # Convert to internal color
+                try
+                    attempt['color'] = internalColor.call(@, _color)
+                catch error
+                    err = new Error("Invalid color for Goban.set(). Given: #{_color}")
 
-        # change position's color
-        @board.set(color, row, col)
+                callback(err, state)
+            ,
+            # Normalize coord and validate
+            (state, callback) ->
 
-        affected = {}
-        affected[ex_old_color] = {}
-        affected[ex_old_color][_color] = []
-        affected[ex_old_color][_color].push([first, second])
+                row = col = undefined
+                err = undefined
 
-        return callback(error, attempt, affected)
+                try
+                    [row, col] = normalizeCoord.call(@, state['first'], state['second'])
+                    state['row'] = row
+                    state['col'] = col
+                catch error
+                    callback(error, state)
+
+                if not (0 <= col < @col) or not (0 <= row < @row)
+                    err = new Error('Goban.set() coord parameter(s) is/are out of bounds.')
+
+                callback(err, state)
+            ,
+            # Get old color
+            (state, callback) ->
+
+                state['_old_color'] = @board.get(state['row'], state['col'])
+                state['ex_old_color'] = externalColor.call(@, state['_old_color'])
+
+                callback(null, state)
+            ,
+            # Change position's color
+            (state, callback) ->
+
+                @board.set(state['color'], state['row'], state['col'])
+
+                affected = {}
+                affected[state['ex_old_color']] = {}
+                affected[state['ex_old_color']][state['_color']] = []
+                affected[state['ex_old_color']][state['_color']].push([state['first'], state['second']])
+
+                state['affected'] = affected
+
+                callback(null, state)
+            ,
+        # Execute the end result
+        ], (err, state) ->
+
+            state['callback'](err, state['attempt'], state['affected'])
+        )
 
     set: (_color, first, second, callback) ->
 
@@ -243,7 +302,7 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
 
     _place = (_color=undefined, first=undefined, second=undefined, callback=undefined, queue_callback) ->
 
-        # future
+        # TODO
 
         return
 
@@ -256,6 +315,5 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
 
         @queue.push(work_package)
         return @
-
 
   return Goban
