@@ -71,3 +71,5 @@ coverage
 ##########
 coffee/sandbox
 src/sandbox
+
+.coveralls.yml
