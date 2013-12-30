@@ -1,4 +1,4 @@
-define ["./var/isInteger", "lodash"], (isInteger, _) ->
+define ["./var/isInteger", "lodash", "board", "coordinate"], (isInteger, _, Board, coordinate_trans) ->
 
   class Goban
 
@@ -9,13 +9,12 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
     BLACK = 1
     WHITE = 2
 
-
     constructor: (@length=19, @width) ->
 
         ###
         vars:
-        - length
-        - width
+        - length (cols)
+        - width (rows)
         - history
         - play_history
         - board_state
@@ -51,13 +50,10 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
         @history = {}
         @play_history = []
 
-        @board = []
+        @board = new Board(@length, @width, EMPTY)
         @board_state = {}
 
-        # set up board
-        n = @length * @width
-        while n-- > 0
-            @board.push(EMPTY)
+
 
         return
 
@@ -81,7 +77,9 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
         cartesian: from bottom-left to top-right
 
         ###
-        _config['coordinate_system'] = 'western'
+        _config['coordinate_system'] = 'cartesian_one'
+
+        _config['coordinate_system_transformations'] = coordinate_trans
 
         @_config = _config
         return
@@ -93,74 +91,112 @@ define ["./var/isInteger", "lodash"], (isInteger, _) ->
             throw new Error('Attempt to load Goban config that is not a plain object.')
 
         @_config = _.assign({}, @_config, opts)
+
         return @
 
     getConfig: ->
         return @_config
 
-    ###
-    (x,y) is assumed to be relative to bottom-left corner.
-    x and y are 0-based index.
-    ###
-    normalizeCoord = (x , y) ->
-        # flip y and map to Math.abs(y-[@length-1])
-        _y = y - (@length - 1)
-        if(_y < 0) then _y *= -1
-        return [x, _y]
 
-    ###
-    Note: origin (0,0) is bottom-left corner
-    ###
-    boardGet = (x, y) ->
-        return
+    normalizeCoord = (first, second) ->
 
-    ###
-    Note: origin (0,0) is bottom-left corner
-    ###
-    boardSet = (color, x, y) ->
-        return
+        coordinate = @config['coordinate_system_transformations']
+        coord = coordinate[@config['coordinate_system']]
 
-    # get stone color of (x, y)
-    # Returns: stone color defined in config.
-    get: (x, y) ->
-        ###
-        length => cols
-        width => rows
-        ###
-        [_x, _y] = normalizeCoord(x, y)
+        if(_.isFunction(coord))
 
-        color = @board[@length * _y + _x]
+            data = {}
+            data['row_bound'] = @width
+            data['col_bound'] = @length
 
-        switch color
+            func = _.bind(coord, data, first, second)
+            [row, col] = func()
+
+            if(!isInteger(row) or !isInteger(col))
+                throw new Error("Transformation via coordinate system '#{@config['coordinate_system']}' failed.")
+
+            return [row, col]
+        else
+            throw new Error('Invalid configuration property: "coordinate_system".')
+
+    # transform external color to internal
+    internalColor = (external_color) ->
+
+        switch external_color
+            when @_config['stone']['EMPTY'] then return EMPTY
+            when @_config['stone']['BLACK'] then return BLACK
+            when @_config['stone']['WHITE'] then return WHITE
+            else throw new Error("Invalid external color")
+
+    # transform internal color to external
+    externalColor = (internal_color) ->
+
+        switch internal_color
             when EMPTY then return @_config['stone']['EMPTY']
             when BLACK then return @_config['stone']['BLACK']
             when WHITE then return @_config['stone']['WHITE']
-            else throw new Error("Goban.get(x,y) is broken!")
+            else throw new Error("Invalid internal color")
 
-    # set stone color of (x, y) defined in config
-    set: (_color, _x, _y, callback) ->
+    # get stone color of (first, second)
+    # Returns: stone color defined in config.
+    get: (first, second) ->
 
-        [x, y] = normalizeCoord(_x, _y)
+        [row, col] = normalizeCoord(@, first, second)
 
+        if not (0 <= col <= (@length - 1)) or not (0 <= row <= (@width - 1))
+            throw new Error('Goban.get() parameter(s) is/are out of bounds.')
+
+        color = @board.get(row, col)
+
+        # convert to external color
+        try
+            return external_color.call(@, color)
+        catch error
+            throw new Error("Goban.get(x,y) is broken!")
+
+
+
+    # set stone color of (first, second) defined in config
+    set: (_color, first, second, callback) ->
+
+        # validate color
         color = undefined
 
-        if (_color isnt @_config['stone']['EMPTY'] and
-        _color isnt @_config['stone']['BLACK'] and
-        _color isnt @_config['stone']['WHITE'])
+        # convert to internal color
+        try
+            color = internal_color.call(@, _color)
+        catch error
             throw new Error("Invalid color for Goban.set(x,y)")
-        else
-            color = _color
 
-        # switch color
-        #     when @_config['stone']['EMPTY']
-        #         _color = @_config['stone']['EMPTY']
-        #     when @_config['stone']['BLACK']
-        #         _color = @_config['stone']['BLACK']
-        #     when @_config['stone']['WHITE']
-        #         _color = @_config['stone']['WHITE']
-        #     else throw new Error("Invalid color for Goban.set(x,y)")
 
-        callback()
+        # construct attempt data
+        attempt = {}
+        attempt['color'] = _color
+        attempt['coord'] = [first, second]
+
+        # normalize coord and validate
+        [row, col] = normalizeCoord(@, first, second)
+
+        err = undefined
+
+        if not (0 <= col < @length) or not (0 <= row < @width)
+            err = new Error('Goban.set() coord parameter(s) is/are out of bounds.')
+
+            callback(err, attempt, null)
+            return @
+
+        # get old color
+        _old_color = @board.get(row, col)
+        ex_old_color = internal_color.call(@, _old_color)
+
+        # change position's color
+        @board.set(color, row, col)
+
+        affected = {}
+        affected[ex_old_color] = {}
+        affected[ex_old_color][_color] = [first, second]
+
+        callback(err, attempt, affected)
 
         return @
 

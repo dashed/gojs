@@ -42,7 +42,7 @@ Move is an object contining the type(color) and the position.
 ```javascript
 move = {
   type:(black|white|nothing),
-  coord:[x,y]
+  coord:[first, second]
 }
 ```
 
