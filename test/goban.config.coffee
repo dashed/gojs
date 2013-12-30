@@ -59,6 +59,16 @@ describe 'goban config', (done) ->
       expect(config).to.have.deep.property('stone.BLACK', 'black')
       expect(config).to.have.deep.property('stone.WHITE', 'white')
 
+    it "should have default coordinate_system", ->
+      config = noarg.getConfig()
+      expect(config).to.have.deep.property('coordinate_system', 'cartesian_one')
+
+    it "should have coordinate_transformations", ->
+      config = noarg.getConfig()
+
+      expect(config).to.have.property('coordinate_system_transformations')
+
+
   describe "when loaded with custom config", ->
 
     it "should take only plain object", ->
