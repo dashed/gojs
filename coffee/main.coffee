@@ -263,7 +263,7 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
 
             state['ex_old_color'] = externalColor.call(@, state['_old_color'])
 
-            return callback(null, state)
+            return callback(undefined, state)
 
         # Change position's color
         _change_pos_f = (state, callback) =>
@@ -278,18 +278,18 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
 
             state['affected'] = affected
 
-            return callback(null, state)
+            return callback(undefined, state)
 
         meta_function = _.bind((state, callback) =>
                 # console.log callback
                 # console.log state
-                return callback(null, state)
+                return callback(undefined, state)
 
             , @
             , state)
 
         meta_function2 = (callback___)->
-            return callback___(null, state)
+            return callback___(undefined, state)
 
 
         waterfall_cb = (err, state)->

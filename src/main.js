@@ -250,7 +250,7 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
       _get_old_color_f = function(state, callback) {
         state['_old_color'] = _this.board.get(state['row'], state['col']);
         state['ex_old_color'] = externalColor.call(_this, state['_old_color']);
-        return callback(null, state);
+        return callback(void 0, state);
       };
       _change_pos_f = function(state, callback) {
         var affected;
@@ -260,13 +260,13 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
         affected[state['ex_old_color']][state['color']] = [];
         affected[state['ex_old_color']][state['color']].push([state['first'], state['second']]);
         state['affected'] = affected;
-        return callback(null, state);
+        return callback(void 0, state);
       };
       meta_function = _.bind(function(state, callback) {
-        return callback(null, state);
+        return callback(void 0, state);
       }, this, state);
       meta_function2 = function(callback___) {
-        return callback___(null, state);
+        return callback___(void 0, state);
       };
       waterfall_cb = function(err, state) {
         return state['callback'](err, state['attempt'], state['affected']);
