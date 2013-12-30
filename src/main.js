@@ -191,11 +191,12 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
         return queue_callback();
       }
       _old_color = this.board.get(row, col);
-      ex_old_color = internal_color.call(this, _old_color);
+      ex_old_color = externalColor.call(this, _old_color);
       this.board.set(color, row, col);
       affected = {};
       affected[ex_old_color] = {};
-      affected[ex_old_color][_color] = [first, second];
+      affected[ex_old_color][_color] = [];
+      affected[ex_old_color][_color].push([first, second]);
       _.defer(callback, err, attempt, affected);
       return queue_callback();
     };

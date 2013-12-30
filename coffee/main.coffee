@@ -207,14 +207,15 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
 
         # get old color
         _old_color = @board.get(row, col)
-        ex_old_color = internal_color.call(@, _old_color)
+        ex_old_color = externalColor.call(@, _old_color)
 
         # change position's color
         @board.set(color, row, col)
 
         affected = {}
         affected[ex_old_color] = {}
-        affected[ex_old_color][_color] = [first, second]
+        affected[ex_old_color][_color] = []
+        affected[ex_old_color][_color].push([first, second])
 
         _.defer(callback, err, attempt, affected)
 
