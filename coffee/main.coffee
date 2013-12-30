@@ -97,6 +97,9 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
     # merge config with current
     config: (opts)->
 
+        if(!opts)
+            return @_config
+
         if(!_.isPlainObject(opts))
             throw new Error('Attempt to load Goban config that is not a plain object.')
 

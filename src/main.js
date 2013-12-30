@@ -89,6 +89,9 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
     };
 
     Goban.prototype.config = function(opts) {
+      if (!opts) {
+        return this._config;
+      }
       if (!_.isPlainObject(opts)) {
         throw new Error('Attempt to load Goban config that is not a plain object.');
       }
