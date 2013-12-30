@@ -9,12 +9,12 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
     BLACK = 1
     WHITE = 2
 
-    constructor: (@length=19, @width) ->
+    constructor: (@row=19, @col) ->
 
         ###
         vars:
-        - length (cols)
-        - width (rows)
+        - row
+        - col (rows)
         - history
         - play_history
         - board_state
@@ -23,24 +23,24 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
 
         ###
         1. no args:
-            @length = @width = 19
+            @row = @col = 19
 
-        2. one arg (i.e. @length):
-            @width = @length
+        2. one arg (i.e. @row):
+            @col := @row
 
         3. two arg: trivial
         ###
 
-        # if @width === null then @width = @length
-        @width ?= @length
+        # if @col === null then @col = @row
+        @col ?= @row
 
         # Ensure param(s) is/are integer(s)
-        if !isInteger(@length) then throw new Error("First param of Goban (length) must be an integer")
-        if !isInteger(@width) then throw new Error("Second param of Goban (width) must be an integer")
+        if !isInteger(@row) then throw new Error("First param of Goban (row) must be an integer")
+        if !isInteger(@col) then throw new Error("Second param of Goban (col) must be an integer")
 
         # Ensure param(s) is/are not zero
-        if @length <= 0 then throw new Error("First param of Goban (length) must be at least 1")
-        if @width <= 0 then throw new Error("Second param of Goban (width) must be at least 1")
+        if @row <= 0 then throw new Error("First param of Goban (row) must be at least 1")
+        if @col <= 0 then throw new Error("Second param of Goban (col) must be at least 1")
 
 
         # set up config
@@ -50,7 +50,7 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
         @history = {}
         @play_history = []
 
-        @board = new Board(@length, @width, EMPTY)
+        @board = new Board(@row, @col, EMPTY)
         @board_state = {}
 
 
@@ -116,8 +116,8 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
         if(_.isFunction(coord_trans_func))
 
             data = {}
-            data['row_bound'] = @width
-            data['col_bound'] = @length
+            data['row_bound'] = @row
+            data['col_bound'] = @col
 
             func = _.bind(coord_trans_func, data, first, second)
             [row, col] = func()
@@ -153,7 +153,7 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
 
         [row, col] = normalizeCoord.call(@, first, second)
 
-        if not (0 <= col < @length) or not (0 <= row < @width)
+        if not (0 <= col < @col) or not (0 <= row < @row)
             throw new Error('Goban.get() parameter(s) is/are out of bounds.')
 
         color = @board.get(row, col)
@@ -189,7 +189,7 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
 
         err = undefined
 
-        if not (0 <= col < @length) or not (0 <= row < @width)
+        if not (0 <= col < @col) or not (0 <= row < @row)
             err = new Error('Goban.set() coord parameter(s) is/are out of bounds.')
 
             _.defer(callback, err, attempt, null)

@@ -11,14 +11,14 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
 
     WHITE = 2;
 
-    function Goban(length, width) {
+    function Goban(row, col) {
       var worker;
-      this.length = length != null ? length : 19;
-      this.width = width;
+      this.row = row != null ? row : 19;
+      this.col = col;
       /*
       vars:
-      - length (cols)
-      - width (rows)
+      - row
+      - col (rows)
       - history
       - play_history
       - board_state
@@ -27,33 +27,33 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
 
       /*
       1. no args:
-          @length = @width = 19
+          @row = @col = 19
       
-      2. one arg (i.e. @length):
-          @width = @length
+      2. one arg (i.e. @row):
+          @col := @row
       
       3. two arg: trivial
       */
 
-      if (this.width == null) {
-        this.width = this.length;
+      if (this.col == null) {
+        this.col = this.row;
       }
-      if (!isInteger(this.length)) {
-        throw new Error("First param of Goban (length) must be an integer");
+      if (!isInteger(this.row)) {
+        throw new Error("First param of Goban (row) must be an integer");
       }
-      if (!isInteger(this.width)) {
-        throw new Error("Second param of Goban (width) must be an integer");
+      if (!isInteger(this.col)) {
+        throw new Error("Second param of Goban (col) must be an integer");
       }
-      if (this.length <= 0) {
-        throw new Error("First param of Goban (length) must be at least 1");
+      if (this.row <= 0) {
+        throw new Error("First param of Goban (row) must be at least 1");
       }
-      if (this.width <= 0) {
-        throw new Error("Second param of Goban (width) must be at least 1");
+      if (this.col <= 0) {
+        throw new Error("Second param of Goban (col) must be at least 1");
       }
       setupConfig.call(this);
       this.history = {};
       this.play_history = [];
-      this.board = new Board(this.length, this.width, EMPTY);
+      this.board = new Board(this.row, this.col, EMPTY);
       this.board_state = {};
       worker = function(_work, callback) {
         var _args, _f, _this;
@@ -108,8 +108,8 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
       coord_trans_func = coordinates[this._config['coordinate_system']];
       if (_.isFunction(coord_trans_func)) {
         data = {};
-        data['row_bound'] = this.width;
-        data['col_bound'] = this.length;
+        data['row_bound'] = this.row;
+        data['col_bound'] = this.col;
         func = _.bind(coord_trans_func, data, first, second);
         _ref = func(), row = _ref[0], col = _ref[1];
         if (!isInteger(row) || !isInteger(col)) {
@@ -150,7 +150,7 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
     Goban.prototype.get = function(first, second) {
       var col, color, error, row, _ref;
       _ref = normalizeCoord.call(this, first, second), row = _ref[0], col = _ref[1];
-      if (!((0 <= col && col < this.length)) || !((0 <= row && row < this.width))) {
+      if (!((0 <= col && col < this.col)) || !((0 <= row && row < this.row))) {
         throw new Error('Goban.get() parameter(s) is/are out of bounds.');
       }
       color = this.board.get(row, col);
@@ -176,7 +176,7 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
       attempt['coord'] = [first, second];
       _ref = normalizeCoord.call(this, first, second), row = _ref[0], col = _ref[1];
       err = void 0;
-      if (!((0 <= col && col < this.length)) || !((0 <= row && row < this.width))) {
+      if (!((0 <= col && col < this.col)) || !((0 <= row && row < this.row))) {
         err = new Error('Goban.set() coord parameter(s) is/are out of bounds.');
         _.defer(callback, err, attempt, null);
         return queue_callback();
