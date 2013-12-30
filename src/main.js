@@ -147,7 +147,7 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
 
     Goban.prototype.get = function(first, second) {
       var col, color, error, row, _ref;
-      _ref = normalizeCoord(this, first, second), row = _ref[0], col = _ref[1];
+      _ref = normalizeCoord.call(this, first, second), row = _ref[0], col = _ref[1];
       if (!((0 <= col && col <= (this.length - 1))) || !((0 <= row && row <= (this.width - 1)))) {
         throw new Error('Goban.get() parameter(s) is/are out of bounds.');
       }
@@ -172,7 +172,7 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
       attempt = {};
       attempt['color'] = _color;
       attempt['coord'] = [first, second];
-      _ref = normalizeCoord(this, first, second), row = _ref[0], col = _ref[1];
+      _ref = normalizeCoord.call(this, first, second), row = _ref[0], col = _ref[1];
       err = void 0;
       if (!((0 <= col && col < this.length)) || !((0 <= row && row < this.width))) {
         err = new Error('Goban.set() coord parameter(s) is/are out of bounds.');

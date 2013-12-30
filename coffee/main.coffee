@@ -151,7 +151,7 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
     # Returns: stone color defined in config.
     get: (first, second) ->
 
-        [row, col] = normalizeCoord(@, first, second)
+        [row, col] = normalizeCoord.call(@, first, second)
 
         if not (0 <= col <= (@length - 1)) or not (0 <= row <= (@width - 1))
             throw new Error('Goban.get() parameter(s) is/are out of bounds.')
@@ -185,7 +185,7 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
         attempt['coord'] = [first, second]
 
         # normalize coord and validate
-        [row, col] = normalizeCoord(@, first, second)
+        [row, col] = normalizeCoord.call(@, first, second)
 
         err = undefined
 
