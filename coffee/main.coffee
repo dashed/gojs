@@ -1,4 +1,4 @@
-define ["./var/isInteger", "lodash", "board", "coordinate"], (isInteger, _, Board, coordinate_trans) ->
+define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger, _, async, Board, coordinate_trans) ->
 
   class Goban
 
@@ -54,6 +54,16 @@ define ["./var/isInteger", "lodash", "board", "coordinate"], (isInteger, _, Boar
         @board_state = {}
 
 
+        # create awesome queue
+        worker = (_work, callback) ->
+            _f = _work['f'] # function to exec
+            _this = _work['_this'] # context
+            _args = _work['_args'] or [] # an array
+            _args.push(callback)
+
+            _f.apply(_this,_args)
+
+        @queue = async.queue(worker, 1)
 
         return
 
@@ -157,7 +167,7 @@ define ["./var/isInteger", "lodash", "board", "coordinate"], (isInteger, _, Boar
 
 
     # set stone color of (first, second) defined in config
-    set: (_color, first, second, callback) ->
+    _set = (_color, first, second, callback, queue_callback) ->
 
         # validate color
         color = undefined
@@ -182,8 +192,8 @@ define ["./var/isInteger", "lodash", "board", "coordinate"], (isInteger, _, Boar
         if not (0 <= col < @length) or not (0 <= row < @width)
             err = new Error('Goban.set() coord parameter(s) is/are out of bounds.')
 
-            callback(err, attempt, null)
-            return @
+            _.defer(callback, err, attempt, null)
+            return queue_callback()
 
         # get old color
         _old_color = @board.get(row, col)
@@ -196,8 +206,18 @@ define ["./var/isInteger", "lodash", "board", "coordinate"], (isInteger, _, Boar
         affected[ex_old_color] = {}
         affected[ex_old_color][_color] = [first, second]
 
-        callback(err, attempt, affected)
+        _.defer(callback, err, attempt, affected)
 
+        return queue_callback()
+
+    set: (_color, first, second, callback) ->
+
+        work_package =
+            f: _set,
+            _this: @
+            _args: [_color, first, second, callback]
+
+        @queue.push(work_package)
         return @
 
     place: (color, x, y, callback) ->

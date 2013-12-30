@@ -1,7 +1,7 @@
-define(["./var/isInteger", "lodash", "board", "coordinate"], function(isInteger, _, Board, coordinate_trans) {
+define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(isInteger, _, async, Board, coordinate_trans) {
   var Goban;
   Goban = (function() {
-    var BLACK, EMPTY, WHITE, externalColor, internalColor, normalizeCoord, setupConfig;
+    var BLACK, EMPTY, WHITE, externalColor, internalColor, normalizeCoord, setupConfig, _set;
 
     Goban.VERSION = '0.1.0';
 
@@ -12,6 +12,7 @@ define(["./var/isInteger", "lodash", "board", "coordinate"], function(isInteger,
     WHITE = 2;
 
     function Goban(length, width) {
+      var worker;
       this.length = length != null ? length : 19;
       this.width = width;
       /*
@@ -54,6 +55,15 @@ define(["./var/isInteger", "lodash", "board", "coordinate"], function(isInteger,
       this.play_history = [];
       this.board = new Board(this.length, this.width, EMPTY);
       this.board_state = {};
+      worker = function(_work, callback) {
+        var _args, _f, _this;
+        _f = _work['f'];
+        _this = _work['_this'];
+        _args = _work['_args'] || [];
+        _args.push(callback);
+        return _f.apply(_this, _args);
+      };
+      this.queue = async.queue(worker, 1);
       return;
     }
 
@@ -150,7 +160,7 @@ define(["./var/isInteger", "lodash", "board", "coordinate"], function(isInteger,
       }
     };
 
-    Goban.prototype.set = function(_color, first, second, callback) {
+    _set = function(_color, first, second, callback, queue_callback) {
       var affected, attempt, col, color, err, error, ex_old_color, row, _old_color, _ref;
       color = void 0;
       try {
@@ -166,8 +176,8 @@ define(["./var/isInteger", "lodash", "board", "coordinate"], function(isInteger,
       err = void 0;
       if (!((0 <= col && col < this.length)) || !((0 <= row && row < this.width))) {
         err = new Error('Goban.set() coord parameter(s) is/are out of bounds.');
-        callback(err, attempt, null);
-        return this;
+        _.defer(callback, err, attempt, null);
+        return queue_callback();
       }
       _old_color = this.board.get(row, col);
       ex_old_color = internal_color.call(this, _old_color);
@@ -175,7 +185,18 @@ define(["./var/isInteger", "lodash", "board", "coordinate"], function(isInteger,
       affected = {};
       affected[ex_old_color] = {};
       affected[ex_old_color][_color] = [first, second];
-      callback(err, attempt, affected);
+      _.defer(callback, err, attempt, affected);
+      return queue_callback();
+    };
+
+    Goban.prototype.set = function(_color, first, second, callback) {
+      var work_package;
+      work_package = {
+        f: _set,
+        _this: this,
+        _args: [_color, first, second, callback]
+      };
+      this.queue.push(work_package);
       return this;
     };
 
