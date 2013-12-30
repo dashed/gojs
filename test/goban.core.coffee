@@ -85,26 +85,26 @@ describe 'goban', (done) ->
             color = func()
             expect(color).to.equal(empty)
 
-      describe "with incorrect external color", ->
-        it "should throw error", ->
+    describe "with incorrect external color", ->
+      it "should throw error", ->
 
-          config = test_board.config()
-          empty = config['stone']['EMPTY']
-          expect(config['coordinate_system']).to.equal('cartesian_one')
+        config = test_board.config()
+        empty = config['stone']['EMPTY']
+        expect(config['coordinate_system']).to.equal('cartesian_one')
 
-          invalid = 'invalid'
+        invalid = 'invalid'
 
-          _row = 2
-          _col = 3
+        _row = 2
+        _col = 3
 
-          test_board.board.set(invalid, _row, _col)
-          expect(test_board.board.get(_row, _col)).to.equal(invalid)
+        test_board.board.set(invalid, _row, _col)
+        expect(test_board.board.get(_row, _col)).to.equal(invalid)
 
-          # cartesian_one inverse
-          x = _col + 1
-          y = row - _row
+        # cartesian_one inverse
+        x = _col + 1
+        y = row - _row
 
-          (-> test_board.get(x, y)).should.throw(Error)
+        (-> test_board.get(x, y)).should.throw(Error)
 
   describe "when Goban.set(...) is used", ->
 
