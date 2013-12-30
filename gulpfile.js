@@ -5,7 +5,6 @@ var gutil = require('gulp-util');
 var coffee = require('gulp-coffee');
 
 var path = require('path');
-var fs = require('fs');
 
 var srcCoffeeDir = './coffee/';
 var destDir = './src/';
@@ -48,7 +47,7 @@ var gulpCoffee = function(coffeeFile) {
             });
     return;
 
-}
+};
 
 // The default task (called when you run `gulp`)
 gulp.task('default', function() {

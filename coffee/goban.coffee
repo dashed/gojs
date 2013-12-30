@@ -9,6 +9,7 @@ define ["main", "lodash"], (Goban, _) ->
     # Emulate properties
     _.each(_.keys(Goban), (key)->
         factory[key] = Goban[key]
+        return
         )
 
     return factory

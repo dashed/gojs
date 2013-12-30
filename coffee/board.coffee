@@ -1,4 +1,4 @@
-define ["lodash"], (_) ->
+define [], () ->
 
     ###
     Represent the board in 1D array.

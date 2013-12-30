@@ -1,4 +1,4 @@
-define(["lodash"], function(_) {
+define([], function() {
   /*
   Represent the board in 1D array.
   
