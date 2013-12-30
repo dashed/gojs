@@ -47,24 +47,24 @@ describe 'goban config', (done) ->
 
     it "should be an object", ->
 
-      config = noarg.getConfig()
+      config = noarg.config()
 
       expect(config).to.be.an('object')
 
     it "should have stone colors", ->
 
-      config = noarg.getConfig()
+      config = noarg.config()
 
       expect(config).to.have.deep.property('stone.EMPTY', 'empty')
       expect(config).to.have.deep.property('stone.BLACK', 'black')
       expect(config).to.have.deep.property('stone.WHITE', 'white')
 
     it "should have default coordinate_system", ->
-      config = noarg.getConfig()
+      config = noarg.config()
       expect(config).to.have.deep.property('coordinate_system', 'cartesian_one')
 
     it "should have coordinate_transformations", ->
-      config = noarg.getConfig()
+      config = noarg.config()
 
       expect(config).to.have.property('coordinate_system_transformations')
 
@@ -77,3 +77,7 @@ describe 'goban config', (done) ->
 
       (-> noarg.config({})).should.not.throw(Error)
       (-> noarg.config({ 'x': 0, 'y': 0 })).should.not.throw(Error)
+
+    it "should return itself", ->
+
+      expect(noarg.config({})).to.equal(noarg)

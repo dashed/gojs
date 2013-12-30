@@ -95,9 +95,9 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
         return
 
     # merge config with current
-    config: (opts)->
+    config: (opts = undefined)->
 
-        if(!opts)
+        if(opts is undefined)
             return @_config
 
         if(!_.isPlainObject(opts))
@@ -106,9 +106,6 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
         @_config = _.assign({}, @_config, opts)
 
         return @
-
-    getConfig: ->
-        return @_config
 
 
     normalizeCoord = (first, second) ->

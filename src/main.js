@@ -89,7 +89,10 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
     };
 
     Goban.prototype.config = function(opts) {
-      if (!opts) {
+      if (opts == null) {
+        opts = void 0;
+      }
+      if (opts === void 0) {
         return this._config;
       }
       if (!_.isPlainObject(opts)) {
@@ -97,10 +100,6 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
       }
       this._config = _.assign({}, this._config, opts);
       return this;
-    };
-
-    Goban.prototype.getConfig = function() {
-      return this._config;
     };
 
     normalizeCoord = function(first, second) {
