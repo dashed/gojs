@@ -10,11 +10,14 @@ define(["lodash"], function(_) {
     function Board(row, col, value) {
       this.row = row;
       this.col = col;
+      if (value == null) {
+        value = void 0;
+      }
       if (this.col == null) {
         this.col = this.row;
       }
       this.board = [];
-      if (value) {
+      if (value !== void 0) {
         this.setDefault(value);
       }
     }
