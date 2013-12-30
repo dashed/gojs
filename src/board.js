@@ -7,13 +7,16 @@ define(["lodash"], function(_) {
 
   var Board;
   Board = (function() {
-    function Board(row, col) {
+    function Board(row, col, value) {
       this.row = row;
       this.col = col;
       if (this.col == null) {
         this.col = this.row;
       }
       this.board = [];
+      if (value) {
+        this.setDefault(value);
+      }
     }
 
     Board.prototype.setDefault = function(value) {

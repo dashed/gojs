@@ -8,12 +8,15 @@ define ["lodash"], (_) ->
 
     class Board
 
-        constructor: (@row, @col) ->
+        constructor: (@row, @col, value) ->
 
             @col ?= @row
 
             # define the board array
             @board = []
+
+            if(value)
+                @setDefault(value)
 
         # fill entire array with default value
         setDefault: (value) ->
