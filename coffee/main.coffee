@@ -247,8 +247,20 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
         @queue.push(work_package)
         return @
 
-    place: (color, x, y, callback) ->
+    _place = (_color=undefined, first=undefined, second=undefined, callback=undefined, queue_callback) ->
 
+        # future
+
+        return
+
+    place: (_color, first, second, callback) ->
+
+        work_package =
+            f: _place,
+            _this: @
+            _args: [_color, first, second, callback]
+
+        @queue.push(work_package)
         return @
 
 

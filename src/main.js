@@ -1,7 +1,7 @@
 define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(isInteger, _, async, Board, coordinate_trans) {
   var Goban;
   Goban = (function() {
-    var BLACK, EMPTY, WHITE, externalColor, internalColor, normalizeCoord, setupConfig, _set;
+    var BLACK, EMPTY, WHITE, externalColor, internalColor, normalizeCoord, setupConfig, _place, _set;
 
     Goban.VERSION = '0.1.0';
 
@@ -231,7 +231,29 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
       return this;
     };
 
-    Goban.prototype.place = function(color, x, y, callback) {
+    _place = function(_color, first, second, callback, queue_callback) {
+      if (_color == null) {
+        _color = void 0;
+      }
+      if (first == null) {
+        first = void 0;
+      }
+      if (second == null) {
+        second = void 0;
+      }
+      if (callback == null) {
+        callback = void 0;
+      }
+    };
+
+    Goban.prototype.place = function(_color, first, second, callback) {
+      var work_package;
+      work_package = {
+        f: _place,
+        _this: this,
+        _args: [_color, first, second, callback]
+      };
+      this.queue.push(work_package);
       return this;
     };
 
