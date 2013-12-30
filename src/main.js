@@ -183,7 +183,7 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
       state['color'] = _color;
       state['first'] = _first;
       state['second'] = _second;
-      state['queue_callback'] = _queue_callback;
+      state['queue_callback'] = queue_callback;
       _callback_f = function(state, callback) {
         _callback = state['callback'];
         if (_callback === void 0) {
@@ -260,7 +260,7 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
         state['affected'] = affected;
         return callback(null, state);
       };
-      meta_function = _.bind(function(callback, state) {
+      meta_function = _.bind(function(state, callback) {
         return callback(null, state);
       }, this, state);
       waterfall_cb = function(err, state) {

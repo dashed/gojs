@@ -173,7 +173,7 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
         state['color'] = _color
         state['first'] = _first
         state['second'] = _second
-        state['queue_callback'] = _queue_callback
+        state['queue_callback'] = queue_callback
 
         # Callback function for _callback
         _callback_f = (state, callback) ->
@@ -272,7 +272,9 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
 
             callback(null, state)
 
-        meta_function = _.bind((callback, state) ->
+        meta_function = _.bind((state, callback) ->
+                # console.log callback
+                # console.log state
                 return callback(null, state)
 
             , @
