@@ -165,6 +165,9 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
     # Set stone color of position (first, second) as defined in config
     _set = (_color=undefined, _first=undefined, _second=undefined, _callback=undefined, queue_callback) ->
 
+        if _callback is undefined
+            _callback = ->
+
         # Closure variables
         state = {}
         state['affected'] = undefined
@@ -176,18 +179,14 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
         state['queue_callback'] = queue_callback
 
         # Callback function for _callback
-        _callback_f = (state, callback) ->
-            _callback = state['callback']
-
-            if _callback is undefined
-                _callback = ->
-
+        _callback_f = (state, callback) =>
+            __callback = state['callback']
             state['callback'] = _.compose(queue_callback, _callback)
 
             return callback(null, state)
 
         # Callback function for _color
-        _color_f = (state, callback) ->
+        _color_f = (state, callback) =>
 
             _color = state['color']
             err = undefined
@@ -198,7 +197,7 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
             callback(err, state)
 
         # Callback function for first/second
-        _first_second_f = (state, callback) ->
+        _first_second_f = (state, callback) =>
 
             _first = state['first']
             _second = state['second']
@@ -211,7 +210,8 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
             return callback(err, state)
 
             # Construct data of attempted stone placement
-        _stone_place_f = (state, callback) ->
+        _stone_place_f = (state, callback) =>
+
 
             _color = state['color']
 
@@ -225,17 +225,19 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
             color = undefined
 
             # Convert to internal color
+
             try
-                attempt['color'] = internalColor.call(@, _color)
+                state['internal_color'] = internalColor.call(@, _color)
             catch error
                 err = new Error("Invalid color for Goban.set(). Given: #{_color}")
 
             return callback(err, state)
 
         # Normalize coord and validate
-        _norm_coord_validate_f = (state, callback) ->
+        _norm_coord_validate_f = (state, callback) =>
 
-            row = col = undefined
+
+            state['row'] = state['col'] = undefined
             err = undefined
 
             try
@@ -248,37 +250,47 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
             if not (0 <= col < @col) or not (0 <= row < @row)
                 err = new Error('Goban.set() coord parameter(s) is/are out of bounds.')
 
+
             return callback(err, state)
 
             # Get old color
-        _get_old_color_f = (state, callback) ->
+        _get_old_color_f = (state, callback) =>
+
 
             state['_old_color'] = @board.get(state['row'], state['col'])
+
+            # console.log state['_old_color']
+
             state['ex_old_color'] = externalColor.call(@, state['_old_color'])
 
             return callback(null, state)
 
         # Change position's color
-        _change_pos_f = (state, callback) ->
+        _change_pos_f = (state, callback) =>
 
-            @board.set(state['color'], state['row'], state['col'])
+
+            @board.set(state['internal_color'], state['row'], state['col'])
 
             affected = {}
             affected[state['ex_old_color']] = {}
-            affected[state['ex_old_color']][state['_color']] = []
-            affected[state['ex_old_color']][state['_color']].push([state['first'], state['second']])
+            affected[state['ex_old_color']][state['color']] = []
+            affected[state['ex_old_color']][state['color']].push([state['first'], state['second']])
 
             state['affected'] = affected
 
-            callback(null, state)
+            return callback(null, state)
 
-        meta_function = _.bind((state, callback) ->
+        meta_function = _.bind((state, callback) =>
                 # console.log callback
                 # console.log state
                 return callback(null, state)
 
             , @
             , state)
+
+        meta_function2 = (callback___)->
+            return callback___(null, state)
+
 
         waterfall_cb = (err, state)->
             return state['callback'](err, state['attempt'], state['affected'])
@@ -292,12 +304,15 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
             _get_old_color_f,
             _change_pos_f], waterfall_cb)
 
+        return
+
     set: (_color, first, second, callback) ->
 
         work_package =
             f: _set,
             _this: @
             _args: [_color, first, second, callback]
+
 
         @queue.push(work_package)
         return @

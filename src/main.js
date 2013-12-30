@@ -163,7 +163,8 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
     };
 
     _set = function(_color, _first, _second, _callback, queue_callback) {
-      var meta_function, state, waterfall_cb, _callback_f, _change_pos_f, _color_f, _first_second_f, _get_old_color_f, _norm_coord_validate_f, _stone_place_f;
+      var meta_function, meta_function2, state, waterfall_cb, _callback_f, _change_pos_f, _color_f, _first_second_f, _get_old_color_f, _norm_coord_validate_f, _stone_place_f,
+        _this = this;
       if (_color == null) {
         _color = void 0;
       }
@@ -176,6 +177,9 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
       if (_callback == null) {
         _callback = void 0;
       }
+      if (_callback === void 0) {
+        _callback = function() {};
+      }
       state = {};
       state['affected'] = void 0;
       state['attempt'] = void 0;
@@ -185,10 +189,8 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
       state['second'] = _second;
       state['queue_callback'] = queue_callback;
       _callback_f = function(state, callback) {
-        _callback = state['callback'];
-        if (_callback === void 0) {
-          _callback = function() {};
-        }
+        var __callback;
+        __callback = state['callback'];
         state['callback'] = _.compose(queue_callback, _callback);
         return callback(null, state);
       };
@@ -221,7 +223,7 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
         err = void 0;
         color = void 0;
         try {
-          attempt['color'] = internalColor.call(this, _color);
+          state['internal_color'] = internalColor.call(_this, _color);
         } catch (_error) {
           error = _error;
           err = new Error("Invalid color for Goban.set(). Given: " + _color);
@@ -230,43 +232,46 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
       };
       _norm_coord_validate_f = function(state, callback) {
         var col, err, error, row, _ref;
-        row = col = void 0;
+        state['row'] = state['col'] = void 0;
         err = void 0;
         try {
-          _ref = normalizeCoord.call(this, state['first'], state['second']), row = _ref[0], col = _ref[1];
+          _ref = normalizeCoord.call(_this, state['first'], state['second']), row = _ref[0], col = _ref[1];
           state['row'] = row;
           state['col'] = col;
         } catch (_error) {
           error = _error;
           callback(error, state);
         }
-        if (!((0 <= col && col < this.col)) || !((0 <= row && row < this.row))) {
+        if (!((0 <= col && col < _this.col)) || !((0 <= row && row < _this.row))) {
           err = new Error('Goban.set() coord parameter(s) is/are out of bounds.');
         }
         return callback(err, state);
       };
       _get_old_color_f = function(state, callback) {
-        state['_old_color'] = this.board.get(state['row'], state['col']);
-        state['ex_old_color'] = externalColor.call(this, state['_old_color']);
+        state['_old_color'] = _this.board.get(state['row'], state['col']);
+        state['ex_old_color'] = externalColor.call(_this, state['_old_color']);
         return callback(null, state);
       };
       _change_pos_f = function(state, callback) {
         var affected;
-        this.board.set(state['color'], state['row'], state['col']);
+        _this.board.set(state['internal_color'], state['row'], state['col']);
         affected = {};
         affected[state['ex_old_color']] = {};
-        affected[state['ex_old_color']][state['_color']] = [];
-        affected[state['ex_old_color']][state['_color']].push([state['first'], state['second']]);
+        affected[state['ex_old_color']][state['color']] = [];
+        affected[state['ex_old_color']][state['color']].push([state['first'], state['second']]);
         state['affected'] = affected;
         return callback(null, state);
       };
       meta_function = _.bind(function(state, callback) {
         return callback(null, state);
       }, this, state);
+      meta_function2 = function(callback___) {
+        return callback___(null, state);
+      };
       waterfall_cb = function(err, state) {
         return state['callback'](err, state['attempt'], state['affected']);
       };
-      return async.waterfall([meta_function, _callback_f, _color_f, _first_second_f, _stone_place_f, _norm_coord_validate_f, _get_old_color_f, _change_pos_f], waterfall_cb);
+      async.waterfall([meta_function, _callback_f, _color_f, _first_second_f, _stone_place_f, _norm_coord_validate_f, _get_old_color_f, _change_pos_f], waterfall_cb);
     };
 
     Goban.prototype.set = function(_color, first, second, callback) {
