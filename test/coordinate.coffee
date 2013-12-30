@@ -46,6 +46,7 @@ describe 'goban coordinate system', (done) ->
 
     expect(coordinate).to.have.property('japanese')
     expect(coordinate).to.have.property('western')
+    expect(coordinate).to.have.property('western2')
     expect(coordinate).to.have.property('matrix')
     expect(coordinate).to.have.property('cartesian_zero')
     expect(coordinate).to.have.property('cartesian_one')
@@ -65,10 +66,10 @@ describe 'goban coordinate system', (done) ->
       while(x-- > 1)
         while(y-- > 1)
           func = _.bind(cart_one, stub, x, y)
-          [row, col] = func()
+          [_row, _col] = func()
 
-          expect(col).to.equal(x-1)
-          expect(row).to.equal(stub['row_bound'] - y)
+          expect(_row).to.equal(stub['row_bound'] - y)
+          expect(_col).to.equal(x-1)
 
   describe "when has cartesian_zero", ->
 
@@ -106,8 +107,110 @@ describe 'goban coordinate system', (done) ->
       while(row-- > 0)
         while(col-- > 0)
           func = _.bind(matrix, stub, row, col)
-          [row, col] = func()
+          [_row, _col] = func()
 
-          expect(col).to.equal(col)
-          expect(row).to.equal(row)
+          expect(_col).to.equal(col)
+          expect(_row).to.equal(row)
 
+
+  describe "when has japanese", ->
+
+    it "should produce correct values for 19x19 board", ->
+
+      japanese = coordinate['japanese']
+
+      row = col = 20
+
+      stub = {}
+      stub['row_bound'] = row
+      stub['col_bound'] = col
+
+      while(row-- > 0)
+        while(col-- > 0)
+          func = _.bind(japanese, stub, row, col)
+          [_row, _col] = func()
+
+          expect(_col).to.equal(col - 1)
+          expect(_row).to.equal(row - 1)
+
+  describe "when has western", ->
+
+    it "should produce correct values for for 19x25", ->
+
+      alphabet = "abcdefghjklmnopqrstuvwxyz!".toUpperCase()
+
+      western = coordinate['western']
+
+      row = col = 20
+
+      stub = {}
+      stub['row_bound'] = row
+      stub['col_bound'] = col
+
+      while(row-- > 1)
+        _.each(alphabet, (letter, indx)->
+
+          func = _.bind(western, stub, letter, row)
+
+          if (letter is "!")
+            (-> func()).should.throw(Error)
+            return
+
+          [_row, _col] = func()
+
+          expect(_col).to.equal(indx)
+          expect(_row).to.equal(stub['row_bound'] - row)
+          )
+
+    it "should throw error on invalid input", ->
+
+      western = coordinate['western']
+
+      row = col = 20
+
+      stub = {}
+      stub['row_bound'] = row
+      stub['col_bound'] = col
+
+      (-> western(stub, 'invalid', row)).should.throw(Error)
+
+  describe "when has western2", ->
+
+    it "should produce correct values for 26x26 board", ->
+
+      alphabet = "abcdefghijklmnopqrstuvwxyz!".toUpperCase()
+
+      western = coordinate['western2']
+
+      row = col = 26
+
+      stub = {}
+      stub['row_bound'] = row
+      stub['col_bound'] = col
+
+      while(row-- > 1)
+        _.each(alphabet, (letter, indx)->
+
+          func = _.bind(western, stub, letter, row)
+
+          if (letter is "!")
+            (-> func()).should.throw(Error)
+            return
+
+          [_row, _col] = func()
+
+          expect(_col).to.equal(indx)
+          expect(_row).to.equal(stub['row_bound'] - row)
+          )
+
+    it "should throw error on invalid input", ->
+
+      western = coordinate['western2']
+
+      row = col = 26
+
+      stub = {}
+      stub['row_bound'] = row
+      stub['col_bound'] = col
+
+      (-> western(stub, 'invalid', row)).should.throw(Error)

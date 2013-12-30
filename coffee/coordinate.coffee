@@ -1,4 +1,4 @@
-define [], () ->
+define ['lodash'], (_) ->
     ###
     Define the various coordinate systems for Goban.
 
@@ -32,11 +32,15 @@ define [], () ->
 
     meta_western = (alphabet, _letter, num) ->
         if !(_.isString(_letter) and _letter.length is 1)
-            throw new Error('Invalid letter coordinate. Given (#{_letter}, #{num})')
+            throw new Error("Invalid letter coordinate. Given (#{_letter}, #{num})")
 
         letter = _letter.toLowerCase()
 
         col = _.indexOf(alphabet, letter)
+
+        if (col < 0)
+            throw new Error("Invalid letter coordinate. Given (#{_letter}, #{num})")
+
         row = @row_bound - num
         return [row, col]
 
@@ -45,11 +49,11 @@ define [], () ->
     #   A <= _letter <= Z (exclude I)
     #   1 <= num <= row_bound
     coordinates['western'] = (_letter, num) ->
-        return meta_western("abcdefghjklmnopqrstuvwxyz", _letter, num)
+        return meta_western.call(@, "abcdefghjklmnopqrstuvwxyz", _letter, num)
 
 
-    coordinates['western2'] = (letter, y) ->
-        return meta_western("abcdefghijklmnopqrstuvwxyz", _letter, num)
+    coordinates['western2'] = (_letter, num) ->
+        return meta_western.call(@, "abcdefghijklmnopqrstuvwxyz", _letter, num)
 
     coordinates['matrix'] = (row, col) ->
         return [row, col]

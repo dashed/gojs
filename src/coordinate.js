@@ -1,4 +1,4 @@
-define([], function() {
+define(['lodash'], function(_) {
   /*
   Define the various coordinate systems for Goban.
   
@@ -32,18 +32,21 @@ define([], function() {
   meta_western = function(alphabet, _letter, num) {
     var col, letter, row;
     if (!(_.isString(_letter) && _letter.length === 1)) {
-      throw new Error('Invalid letter coordinate. Given (#{_letter}, #{num})');
+      throw new Error("Invalid letter coordinate. Given (" + _letter + ", " + num + ")");
     }
     letter = _letter.toLowerCase();
     col = _.indexOf(alphabet, letter);
+    if (col < 0) {
+      throw new Error("Invalid letter coordinate. Given (" + _letter + ", " + num + ")");
+    }
     row = this.row_bound - num;
     return [row, col];
   };
   coordinates['western'] = function(_letter, num) {
-    return meta_western("abcdefghjklmnopqrstuvwxyz", _letter, num);
+    return meta_western.call(this, "abcdefghjklmnopqrstuvwxyz", _letter, num);
   };
-  coordinates['western2'] = function(letter, y) {
-    return meta_western("abcdefghijklmnopqrstuvwxyz", _letter, num);
+  coordinates['western2'] = function(_letter, num) {
+    return meta_western.call(this, "abcdefghijklmnopqrstuvwxyz", _letter, num);
   };
   coordinates['matrix'] = function(row, col) {
     return [row, col];
