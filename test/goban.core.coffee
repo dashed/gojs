@@ -1,5 +1,10 @@
 # Test set up from http://stackoverflow.com/a/15464313/412627 and https://github.com/clubajax/mocha-bootstrap
 
+Object.defineProperty global, "name_of_leaking_property",
+  set: (value) ->
+    throw new Error("SHIT!")
+
+
 chai = require('chai')
 requirejs = require('requirejs')
 

@@ -4,6 +4,7 @@ goban.js
 [![Build Status](https://travis-ci.org/gobanjs/gojs.png?branch=rewrite)](https://travis-ci.org/gobanjs/gojs)
 [![Dependency Status](https://david-dm.org/gobanjs/gojs.png)](https://david-dm.org/gobanjs/gojs)
 [![Coverage Status](https://coveralls.io/repos/gobanjs/gojs/badge.png?branch=rewrite)](https://coveralls.io/r/gobanjs/gojs?branch=rewrite)
+[![Code Climate](https://codeclimate.com/github/gobanjs/gojs.png)](https://codeclimate.com/github/gobanjs/gojs)
 
 
 goban.js is a **rules engine** for a board game called [Go](https://en.wikipedia.org/wiki/Go_(game)). Note that it is not to be confused with [AI engines](https://en.wikipedia.org/wiki/Computer_Go), as goban.js provides API to emulate go with configured rules ranging from presets to custom.
