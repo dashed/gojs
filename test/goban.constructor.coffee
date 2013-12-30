@@ -42,15 +42,34 @@ describe 'goban constructor', (done) ->
 
   describe "when has no arguments", ->
 
-    it "should create 19x19 board", ->
+    it "should create 19x19 board with defined row and col", ->
 
       no_arg = Goban()
 
-      no_arg.width.should.equal(no_arg.length)
+      no_arg.row.should.equal(no_arg.col)
 
-      no_arg.width.should.equal(19)
-      no_arg.length.should.equal(19)
+      no_arg.row.should.equal(19)
+      no_arg.col.should.equal(19)
 
+  describe "when has arguments", ->
+
+    it "should create 5x19 board with defined row and col", ->
+
+      no_arg = Goban(5,19)
+
+      no_arg.row.should.not.equal(no_arg.col)
+
+      no_arg.row.should.equal(5)
+      no_arg.col.should.equal(19)
+
+    it "should create 5x5 board with defined row and col", ->
+
+      no_arg = Goban(5,5)
+
+      no_arg.row.should.equal(no_arg.col)
+
+      no_arg.row.should.equal(5)
+      no_arg.col.should.equal(5)
 
   invalid_input = ['invalid', 4.5, false, true, 0, 0.0, -5, -9.5]
   valid_input = [4, null, undefined]
