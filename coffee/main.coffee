@@ -175,120 +175,120 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
         state['second'] = _second
         state['queue_callback'] = _queue_callback
 
-        meta_function = _.bind(
-            (callback, state) ->
-                callback(null, state)
-            ,
-            this,
-            state
-        )
+        # Callback function for _callback
+        _callback_f = (state, callback) ->
+            _callback = state['callback']
 
-        async.waterfall ([
-            meta_function,
+            if _callback is undefined
+                _callback = ->
 
-            # Callback function for _callback
-            (state, callback) ->
+            state['callback'] = _.compose(queue_callback, _callback)
 
-                _callback = state['callback']
+            return callback(null, state)
 
-                if _callback is undefined
-                    _callback = ->
+        # Callback function for _color
+        _color_f = (state, callback) ->
 
-                state['callback'] = _.compose(queue_callback, _callback)
+            _color = state['color']
+            err = undefined
 
-                callback(null, state)
-            ,
-            # Callback function for _color
-            (state, callback) ->
+            if(_color is undefined)
+                err = new Error("No color give for Goban.set()")
 
-                _color = state['color']
-                err = undefined
+            callback(err, state)
 
-                if(_color is undefined)
-                    err = new Error("No color give for Goban.set()")
+        # Callback function for first/second
+        _first_second_f = (state, callback) ->
 
-                callback(err, state)
-            ,
-            # Callback function for first/second
-            (state, callback) ->
+            _first = state['first']
+            _second = state['second']
 
-                _first = state['first']
-                _second = state['second']
+            err = undefined
 
-                err = undefined
+            if(_first is undefined or _second is undefined)
+                err = new Error("Invalid coordinate for Goban.set()")
 
-                if(_first is undefined or _second is undefined)
-                    err = new Error("Invalid coordinate for Goban.set()")
+            return callback(err, state)
 
-                callback(err, state)
-            ,
             # Construct data of attempted stone placement
-            (state, callback) ->
+        _stone_place_f = (state, callback) ->
 
-                _color = state['color']
+            _color = state['color']
 
-                attempt = {}
-                attempt['color'] = _color
-                attempt['coord'] = [state['first'], state['second']]
+            attempt = {}
+            attempt['color'] = _color
+            attempt['coord'] = [state['first'], state['second']]
 
-                state['attempt'] = attempt
+            state['attempt'] = attempt
 
-                err = undefined
-                color = undefined
+            err = undefined
+            color = undefined
 
-                # Convert to internal color
-                try
-                    attempt['color'] = internalColor.call(@, _color)
-                catch error
-                    err = new Error("Invalid color for Goban.set(). Given: #{_color}")
+            # Convert to internal color
+            try
+                attempt['color'] = internalColor.call(@, _color)
+            catch error
+                err = new Error("Invalid color for Goban.set(). Given: #{_color}")
 
-                callback(err, state)
-            ,
-            # Normalize coord and validate
-            (state, callback) ->
+            return callback(err, state)
 
-                row = col = undefined
-                err = undefined
+        # Normalize coord and validate
+        _norm_coord_validate_f = (state, callback) ->
 
-                try
-                    [row, col] = normalizeCoord.call(@, state['first'], state['second'])
-                    state['row'] = row
-                    state['col'] = col
-                catch error
-                    callback(error, state)
+            row = col = undefined
+            err = undefined
 
-                if not (0 <= col < @col) or not (0 <= row < @row)
-                    err = new Error('Goban.set() coord parameter(s) is/are out of bounds.')
+            try
+                [row, col] = normalizeCoord.call(@, state['first'], state['second'])
+                state['row'] = row
+                state['col'] = col
+            catch error
+                callback(error, state)
 
-                callback(err, state)
-            ,
+            if not (0 <= col < @col) or not (0 <= row < @row)
+                err = new Error('Goban.set() coord parameter(s) is/are out of bounds.')
+
+            return callback(err, state)
+
             # Get old color
-            (state, callback) ->
+        _get_old_color_f = (state, callback) ->
 
-                state['_old_color'] = @board.get(state['row'], state['col'])
-                state['ex_old_color'] = externalColor.call(@, state['_old_color'])
+            state['_old_color'] = @board.get(state['row'], state['col'])
+            state['ex_old_color'] = externalColor.call(@, state['_old_color'])
 
-                callback(null, state)
-            ,
-            # Change position's color
-            (state, callback) ->
+            return callback(null, state)
 
-                @board.set(state['color'], state['row'], state['col'])
+        # Change position's color
+        _change_pos_f = (state, callback) ->
 
-                affected = {}
-                affected[state['ex_old_color']] = {}
-                affected[state['ex_old_color']][state['_color']] = []
-                affected[state['ex_old_color']][state['_color']].push([state['first'], state['second']])
+            @board.set(state['color'], state['row'], state['col'])
 
-                state['affected'] = affected
+            affected = {}
+            affected[state['ex_old_color']] = {}
+            affected[state['ex_old_color']][state['_color']] = []
+            affected[state['ex_old_color']][state['_color']].push([state['first'], state['second']])
 
-                callback(null, state)
-            ,
-        # Execute the end result
-        ], (err, state) ->
+            state['affected'] = affected
 
-            state['callback'](err, state['attempt'], state['affected'])
-        )
+            callback(null, state)
+
+        meta_function = _.bind((callback, state) ->
+                return callback(null, state)
+
+            , @
+            , state)
+
+        waterfall_cb = (err, state)->
+            return state['callback'](err, state['attempt'], state['affected'])
+
+        async.waterfall([meta_function,
+            _callback_f,
+            _color_f,
+            _first_second_f,
+            _stone_place_f,
+            _norm_coord_validate_f,
+            _get_old_color_f,
+            _change_pos_f], waterfall_cb)
 
     set: (_color, first, second, callback) ->
 
