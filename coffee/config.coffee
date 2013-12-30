@@ -7,3 +7,4 @@ requirejs.config
 
     paths:
         'lodash': '../vendor/lodash.compat'
+        'async': '../vendor/async'
