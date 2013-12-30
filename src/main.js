@@ -164,18 +164,27 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
 
     _set = function(_color, first, second, callback, queue_callback) {
       var affected, attempt, col, color, err, error, ex_old_color, row, _old_color, _ref;
+      attempt = {};
+      attempt['color'] = _color;
+      attempt['coord'] = [first, second];
+      err = void 0;
       color = void 0;
       try {
         color = internalColor.call(this, _color);
       } catch (_error) {
         error = _error;
-        throw new Error("Invalid color for Goban.set(x,y)");
+        err = new Error("Invalid color for Goban.set(x,y). Given: " + _color);
+        _.defer(callback, err, attempt, null);
+        return queue_callback();
       }
-      attempt = {};
-      attempt['color'] = _color;
-      attempt['coord'] = [first, second];
-      _ref = normalizeCoord.call(this, first, second), row = _ref[0], col = _ref[1];
-      err = void 0;
+      row = col = void 0;
+      try {
+        _ref = normalizeCoord.call(this, first, second), row = _ref[0], col = _ref[1];
+      } catch (_error) {
+        error = _error;
+        _.defer(callback, error, attempt, null);
+        return queue_callback();
+      }
       if (!((0 <= col && col < this.col)) || !((0 <= row && row < this.row))) {
         err = new Error('Goban.set() coord parameter(s) is/are out of bounds.');
         _.defer(callback, err, attempt, null);

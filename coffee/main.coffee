@@ -169,6 +169,13 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
     # set stone color of (first, second) defined in config
     _set = (_color, first, second, callback, queue_callback) ->
 
+        # construct attempt data
+        attempt = {}
+        attempt['color'] = _color
+        attempt['coord'] = [first, second]
+
+        err = undefined
+
         # validate color
         color = undefined
 
@@ -176,18 +183,21 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
         try
             color = internalColor.call(@, _color)
         catch error
-            throw new Error("Invalid color for Goban.set(x,y)")
+            err = new Error("Invalid color for Goban.set(x,y). Given: #{_color}")
 
+            _.defer(callback, err, attempt, null)
+            return queue_callback()
 
-        # construct attempt data
-        attempt = {}
-        attempt['color'] = _color
-        attempt['coord'] = [first, second]
 
         # normalize coord and validate
-        [row, col] = normalizeCoord.call(@, first, second)
+        row = col = undefined
 
-        err = undefined
+        try
+            [row, col] = normalizeCoord.call(@, first, second)
+        catch error
+            _.defer(callback, error, attempt, null)
+            return queue_callback()
+
 
         if not (0 <= col < @col) or not (0 <= row < @row)
             err = new Error('Goban.set() coord parameter(s) is/are out of bounds.')
