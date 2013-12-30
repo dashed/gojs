@@ -42,15 +42,13 @@ describe 'goban coordinate system', (done) ->
 
   ################## Tests ##################
 
-  describe "when loaded", ->
+  it "should have transformations", ->
 
-    it "should have transformations", ->
-
-      expect(coordinate).to.have.property('japanese')
-      expect(coordinate).to.have.property('western')
-      expect(coordinate).to.have.property('matrix')
-      expect(coordinate).to.have.property('cartesian_zero')
-      expect(coordinate).to.have.property('cartesian_one')
+    expect(coordinate).to.have.property('japanese')
+    expect(coordinate).to.have.property('western')
+    expect(coordinate).to.have.property('matrix')
+    expect(coordinate).to.have.property('cartesian_zero')
+    expect(coordinate).to.have.property('cartesian_one')
 
   describe "when has cartesian_one", ->
 

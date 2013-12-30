@@ -1,6 +1,8 @@
 goban.js
 ========
 
+[![Build Status](https://travis-ci.org/gobanjs/gojs.png?branch=rewrite)](https://travis-ci.org/gobanjs/gojs)
+
 goban.js is a **rules engine** for a board game called [Go](https://en.wikipedia.org/wiki/Go_(game)). Note that it is not to be confused with [AI engines](https://en.wikipedia.org/wiki/Computer_Go), as goban.js provides API to emulate go with configured rules ranging from presets to custom.
 
 Refer to other [github projects](https://github.com/gobanjs) within the **goban.js** family for frontends to goban.js.

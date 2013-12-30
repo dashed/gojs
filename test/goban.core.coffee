@@ -34,8 +34,15 @@ describe 'goban', (done) ->
       # Attach to global var
       Goban = _goban
 
+      test_board = Goban(5, 19)
+
       # Tests will run after this is called
       done()
     )
 
   ################## Tests ##################
+
+  describe "when Goban.get(...) is used", ->
+
+    it "should return empty value", ->
+
