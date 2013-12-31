@@ -60,6 +60,14 @@ gulp.task('default', function() {
             gulpCoffee(file.path);
         });
 
+    // Prototyping
+    // gulp.src(target)
+    //     .pipe(coffee({bare: true}))
+    //         .on('error', gutil.log)
+    //         // Trigger system bell
+    //         .on('error', gutil.beep)
+    //     .pipe(gulp.dest(destDir))
+    //     .on('data', function(file) {console.log(file.path);});
 
     // Watch coffeescript files and compile them if they change
     gulp.watch(target, function(event) {

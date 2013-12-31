@@ -1,5 +1,5 @@
 {
-  "name": "gobanjs",
+  "name": "goban",
   "version": "0.1.0",
   "description": "Go engine logic backend written in JavaScript",
   "scripts": {
