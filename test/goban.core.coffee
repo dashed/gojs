@@ -268,7 +268,7 @@ describe 'goban', (done) ->
 
           expect(attempt).to.have.deep.property('color', color)
 
-          expect(attempt).to.have.deep.property('coord[0]', second)
+          expect(attempt).to.have.deep.property('coord[0]', first)
           expect(attempt).to.have.deep.property('coord[1]', second)
 
           return cb && cb()
