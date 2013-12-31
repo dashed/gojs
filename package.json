@@ -4,7 +4,7 @@
   "description": "Go engine logic backend written in JavaScript",
   "scripts": {
     "test": "istanbul test --report html -x 'vendor/**' --hook-run-in-context _mocha",
-    "test-travis": "istanbul cover -x 'vendor/**' --hook-run-in-context _mocha -- -R spec && (cat coverage/lcov.info | coveralls) || ((cat coverage/lcov.info | coveralls) && exit 1)"
+    "test-travis": "istanbul cover -x 'vendor/**' --hook-run-in-context _mocha -- -R spec;A=$?;cat coverage/lcov.info | coveralls;exit $A"
   },
   "repository": {
     "type": "git",
