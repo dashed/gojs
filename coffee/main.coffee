@@ -288,9 +288,6 @@ define ["./var/isInteger", "lodash", "async", "board", "coordinate"], (isInteger
             , @
             , state)
 
-        meta_function2 = (callback___)->
-            return callback___(undefined, state)
-
 
         waterfall_cb = (err, state)->
             return state['callback'](err, state['attempt'], state['affected'])

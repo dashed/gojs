@@ -163,7 +163,7 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
     };
 
     _set = function(_color, _first, _second, _callback, queue_callback) {
-      var meta_function, meta_function2, state, waterfall_cb, _callback_f, _change_pos_f, _color_f, _first_second_f, _get_old_color_f, _norm_coord_validate_f, _stone_place_f,
+      var meta_function, state, waterfall_cb, _callback_f, _change_pos_f, _color_f, _first_second_f, _get_old_color_f, _norm_coord_validate_f, _stone_place_f,
         _this = this;
       if (_color == null) {
         _color = void 0;
@@ -265,9 +265,6 @@ define(["./var/isInteger", "lodash", "async", "board", "coordinate"], function(i
       meta_function = _.bind(function(state, callback) {
         return callback(void 0, state);
       }, this, state);
-      meta_function2 = function(callback___) {
-        return callback___(void 0, state);
-      };
       waterfall_cb = function(err, state) {
         return state['callback'](err, state['attempt'], state['affected']);
       };
