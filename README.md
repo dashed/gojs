@@ -1,3 +1,6 @@
+# Note: Work In Progress
+
+
 goban.js
 ========
 
