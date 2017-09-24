@@ -3,11 +3,43 @@
   "version": "1.0.0",
   "description": "Rules engine for the Go board game.",
   "main": "index.js",
-  "repository": "git@github.com:dashed/gojs.git",
+  "repository": "https://github.com/dashed/goban",
   "author": {
     "name": "Alberto Leal",
     "email": "mailforalberto@gmail.com",
     "url": "github.com/dashed"
   },
-  "license": "MIT"
+  "keywords": [
+    "go",
+    "goban",
+    "rules",
+    "engine"
+  ],
+  "eslintConfig": {
+    "parser": "babel-eslint",
+    "env": {
+      "browser": true,
+      "node": true,
+      "jest": true
+    },
+    "extends": [
+      "eslint:recommended"
+    ]
+  },
+  "scripts": {
+    "pretty": "prettier --write --tab-width 4 'src/**/*.js' 'test/**/*.js'",
+    "lint": "eslint src test",
+    "build": "nwb build-web-module",
+    "clean": "nwb clean-module && nwb clean-demo",
+    "test": "nwb test",
+    "travis": "npm run lint && npm run test",
+    "prepublish": "npm run lint && npm run test && npm run build"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "babel-eslint": "^8.0.0",
+    "eslint": "^4.7.2",
+    "nwb": "^0.18.10",
+    "prettier": "^1.7.0"
+  }
 }
