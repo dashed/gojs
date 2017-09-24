@@ -1,0 +1,13 @@
+{
+  "name": "goban",
+  "version": "1.0.0",
+  "description": "Rules engine for the Go board game.",
+  "main": "index.js",
+  "repository": "git@github.com:dashed/gojs.git",
+  "author": {
+    "name": "Alberto Leal",
+    "email": "mailforalberto@gmail.com",
+    "url": "github.com/dashed"
+  },
+  "license": "MIT"
+}
